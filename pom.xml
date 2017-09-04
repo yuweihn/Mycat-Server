@@ -231,6 +231,12 @@
 			<artifactId>netty-buffer</artifactId>
 			<version>4.1.9.Final</version>
 		</dependency>
+		<dependency>
+			<groupId>com.trilead</groupId>
+			<artifactId>trilead-ssh2</artifactId>
+			<version>1.0.0-build221</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 
