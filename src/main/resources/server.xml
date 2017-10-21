@@ -90,12 +90,12 @@
 
 	<user name="root" defaultAccount="true">
 		<property name="password">123456</property>
-		<property name="schemas">TESTDB</property>
+		<property name="schemas">mycat_demo</property>
 		
 		<!-- 表级 DML 权限设置 -->
 		<!-- 		
 		<privileges check="false">
-			<schema name="TESTDB" dml="0110" >
+			<schema name="mycat_demo" dml="0110" >
 				<table name="tb01" dml="0000"></table>
 				<table name="tb02" dml="1111"></table>
 			</schema>
@@ -105,7 +105,7 @@
 
 	<user name="user">
 		<property name="password">user</property>
-		<property name="schemas">TESTDB</property>
+		<property name="schemas">mycat_demo</property>
 		<property name="readOnly">true</property>
 	</user>
 
