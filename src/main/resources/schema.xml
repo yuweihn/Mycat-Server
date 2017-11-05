@@ -41,7 +41,7 @@
 	<dataNode name="jdbc_dn3" 	dataHost="jdbchost" database="db3" /> -->
 	<dataHost name="localhost1" maxCon="1000" minCon="10" balance="0"
 			  writeType="0" dbType="mysql" dbDriver="native" switchType="1"  slaveThreshold="100">
-		<heartbeat>select 'x'</heartbeat>
+		<heartbeat>select user()</heartbeat>
 		<!-- can have multi write hosts -->
 		<writeHost host="hostM1" url="dev-mysql.xiongan.me:3307" user="yuwei" password="dev">
 		</writeHost>
