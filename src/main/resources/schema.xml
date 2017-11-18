@@ -33,8 +33,8 @@
 	</schema>
 	<!-- <dataNode name="dn1$0-743" dataHost="localhost1" database="db$0-743"
 		/> -->
-	<dataNode name="dn1" dataHost="localhost1" database="dev" />
-	<dataNode name="dn2" dataHost="localhost1" database="open_dev" />
+	<dataNode name="dn1" dataHost="localhost1" database="dev_01" />
+	<dataNode name="dn2" dataHost="localhost1" database="dev_02" />
 	<!--<dataNode name="dn4" dataHost="sequoiadb1" database="SAMPLE" />
 	 <dataNode name="jdbc_dn1" dataHost="jdbchost" database="db1" />
 	<dataNode	name="jdbc_dn2" dataHost="jdbchost" database="db2" />
