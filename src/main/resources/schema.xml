@@ -2,7 +2,7 @@
 <!DOCTYPE mycat:schema SYSTEM "schema.dtd">
 <mycat:schema xmlns:mycat="http://io.mycat/">
 
-	<schema name="mycat_demo" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn1">
+	<schema name="dev_mycat" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn1">
 		<!-- auto sharding by id (long) -->
 		<table name="user_test" dataNode="dn1,dn2" rule="sharding-by-murmur"/>
 
