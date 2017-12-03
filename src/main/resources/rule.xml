@@ -15,6 +15,12 @@
 			<algorithm>sharding-by-mod2</algorithm>
 		</rule>
 	</tableRule>
+	<tableRule name="sharding-by-segmentMod2">
+		<rule>
+			<columns>segment</columns>
+			<algorithm>sharding-by-mod2</algorithm>
+		</rule>
+	</tableRule>
 
 
 

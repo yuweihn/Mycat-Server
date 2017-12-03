@@ -5,6 +5,7 @@
 	<schema name="dev_mycat" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn1">
 		<!-- auto sharding by id (long) -->
 		<table name="user_test" dataNode="dn1,dn2" rule="sharding-by-murmur"/>
+		<table name="sequence" dataNode="dn1,dn2" rule="sharding-by-segmentMod2"/>
 
 		<!--&lt;!&ndash; global table is auto cloned to all defined data nodes ,so can join-->
 			<!--with any table whose sharding node is in the same data node &ndash;&gt;-->
