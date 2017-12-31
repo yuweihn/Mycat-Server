@@ -17,8 +17,8 @@
 		<property name="charset">utf8</property>
 		<property name="sequnceHandlerType">0</property>
 		<property name="subqueryRelationshipCheck">false</property> <!-- 子查询中存在关联查询的情况下,检查关联字段中是否有分片字段 .默认 false -->
-		<!--  <property name="useCompression">1</property>--> <!--1为开启mysql压缩协议-->
-		<!--  <property name="fakeMySQLVersion">5.6.20</property>--> <!--设置模拟的MySQL版本号-->
+		<!--<property name="useCompression">1</property>--> <!--1为开启mysql压缩协议-->
+		<!--<property name="fakeMySQLVersion">5.6.20</property>--> <!--设置模拟的MySQL版本号-->
 		<!--<property name="processorBufferChunk">40960</property>-->
 		<!--<property name="processors">1</property>-->
 		<!--<property name="processorExecutor">32</property>-->
