@@ -23,6 +23,13 @@
  */
 package io.mycat.net;
 
+import com.google.common.base.Strings;
+import io.mycat.backend.mysql.CharsetUtil;
+import io.mycat.util.CompressUtil;
+import io.mycat.util.TimeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -32,14 +39,6 @@ import java.nio.channels.SocketChannel;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.google.common.base.Strings;
-
-import io.mycat.backend.mysql.CharsetUtil;
-import io.mycat.util.CompressUtil;
-import io.mycat.util.TimeUtil;
-
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 /**
  * @author mycat
@@ -307,7 +306,7 @@ public abstract class AbstractConnection implements NIOConnection {
 		// 循环处理字节信息
 		int offset = readBufferOffset, length = 0, position = readBuffer.position();
 		for (;;) {
-			length = getPacketLength(readBuffer, offset);			
+			length = getPacketLength(readBuffer, offset);
 			if (length == -1) {
 				if (offset != 0) {
 					this.readBuffer = compactReadBuffer(readBuffer, offset);
