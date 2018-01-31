@@ -23,6 +23,12 @@
  */
 package io.mycat.net;
 
+import io.mycat.MycatServer;
+import io.mycat.net.factory.FrontendConnectionFactory;
+import io.mycat.util.SelectorUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -32,12 +38,6 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Set;
-
-import io.mycat.util.SelectorUtil;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
-
-import io.mycat.MycatServer;
-import io.mycat.net.factory.FrontendConnectionFactory;
 
 /**
  * @author mycat
@@ -132,8 +132,7 @@ public final class NIOAcceptor extends Thread implements SocketAcceptor{
 			FrontendConnection c = factory.make(channel);
 			c.setAccepted(true);
 			c.setId(ID_GENERATOR.getId());
-			NIOProcessor processor = (NIOProcessor) MycatServer.getInstance()
-					.nextProcessor();
+			NIOProcessor processor = MycatServer.getInstance().nextProcessor();
 			c.setProcessor(processor);
 			
 			NIOReactor reactor = reactorPool.getNextReactor();
