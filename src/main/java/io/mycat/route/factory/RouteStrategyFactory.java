@@ -1,14 +1,12 @@
 package io.mycat.route.factory;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import io.mycat.MycatServer;
 import io.mycat.config.model.SystemConfig;
 import io.mycat.route.RouteStrategy;
 import io.mycat.route.impl.DruidMycatRouteStrategy;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * 路由策略工厂类
@@ -24,13 +22,15 @@ public class RouteStrategyFactory {
 
 		String defaultSqlParser = config.getDefaultSqlParser();
 		defaultSqlParser = defaultSqlParser == null ? "" : defaultSqlParser;
+
+		String druidParserKey = "druidparser";
 		//修改为ConcurrentHashMap，避免并发问题
-		strategyMap.putIfAbsent("druidparser", new DruidMycatRouteStrategy());
+		strategyMap.putIfAbsent(druidParserKey, new DruidMycatRouteStrategy());
 
 		defaultStrategy = strategyMap.get(defaultSqlParser);
 		if(defaultStrategy == null) {
-			defaultStrategy = strategyMap.get("druidparser");
-			defaultSqlParser = "druidparser";
+			defaultStrategy = strategyMap.get(druidParserKey);
+			defaultSqlParser = druidParserKey;
 		}
 		config.setDefaultSqlParser(defaultSqlParser);
 		isInit = true;
