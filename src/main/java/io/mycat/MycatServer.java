@@ -350,7 +350,7 @@ public class MycatServer {
 				 * bufferPoolPageNumber对应每个bytebufferlist有多少个bytebufferchunk
 				 */
 
-				totalNetWorkBufferSize = 6*bufferPoolPageSize * bufferPoolPageNumber;
+				totalNetWorkBufferSize = 6 * bufferPoolPageSize * bufferPoolPageNumber;
 				break;
 			case 2:
 				bufferPool = new NettyBufferPool(bufferPoolChunkSize);
@@ -359,7 +359,7 @@ public class MycatServer {
 				break;
 			default:
 				bufferPool = new DirectByteBufferPool(bufferPoolPageSize,bufferPoolChunkSize,
-					bufferPoolPageNumber,system.getFrontSocketSoRcvbuf());;
+					bufferPoolPageNumber,system.getFrontSocketSoRcvbuf());
 				totalNetWorkBufferSize = bufferPoolPageSize*bufferPoolPageNumber;
 		}
 		
