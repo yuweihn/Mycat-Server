@@ -23,14 +23,14 @@ public class RouteStrategyFactory {
 		String defaultSqlParser = config.getDefaultSqlParser();
 		defaultSqlParser = defaultSqlParser == null ? "" : defaultSqlParser;
 
-		String druidParserKey = "druidparser";
+		String druidParserType = "druidparser";
 		//修改为ConcurrentHashMap，避免并发问题
-		strategyMap.putIfAbsent(druidParserKey, new DruidMycatRouteStrategy());
+		strategyMap.putIfAbsent(druidParserType, new DruidMycatRouteStrategy());
 
 		defaultStrategy = strategyMap.get(defaultSqlParser);
 		if(defaultStrategy == null) {
-			defaultStrategy = strategyMap.get(druidParserKey);
-			defaultSqlParser = druidParserKey;
+			defaultStrategy = strategyMap.get(druidParserType);
+			defaultSqlParser = druidParserType;
 		}
 		config.setDefaultSqlParser(defaultSqlParser);
 		isInit = true;
