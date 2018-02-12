@@ -93,9 +93,9 @@ public class DirectByteBufferPool implements BufferPool{
 
     public void recycle(ByteBuffer theBuf) {
       	if(theBuf != null && (!(theBuf instanceof DirectBuffer))) {
-    		theBuf.clear();
-    		return;
-         }
+            theBuf.clear();
+            return;
+        }
  		 
 		final long size = theBuf.capacity();
 
