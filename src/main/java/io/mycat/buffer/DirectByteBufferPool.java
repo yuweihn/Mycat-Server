@@ -69,7 +69,7 @@ public class DirectByteBufferPool implements BufferPool{
     }
 
     public ByteBuffer allocate(int size) {
-       final int theChunkCount = size / chunkSize + (size % chunkSize == 0 ? 0 : 1);
+        final int theChunkCount = size / chunkSize + (size % chunkSize == 0 ? 0 : 1);
         int selectedPage =  (int)(prevAllocatedPage.incrementAndGet() % allPages.length);
         ByteBuffer byteBuf = allocateBuffer(theChunkCount, 0, selectedPage);
         if (byteBuf == null) {
@@ -77,22 +77,22 @@ public class DirectByteBufferPool implements BufferPool{
         }
         final long threadId = Thread.currentThread().getId();
 
-        if(byteBuf !=null){
-            if (memoryUsage.containsKey(threadId)){
-                memoryUsage.put(threadId,memoryUsage.get(threadId)+byteBuf.capacity());
-            }else {
-                memoryUsage.put(threadId,(long)byteBuf.capacity());
+        if(byteBuf != null) {
+            if (memoryUsage.containsKey(threadId)) {
+                memoryUsage.put(threadId, memoryUsage.get(threadId) + byteBuf.capacity());
+            } else {
+                memoryUsage.put(threadId, (long) byteBuf.capacity());
             }
         }
 
-        if(byteBuf==null){
+        if(byteBuf == null) {
             return  ByteBuffer.allocate(size);
         }
         return byteBuf;
     }
 
     public void recycle(ByteBuffer theBuf) {
-      	if(theBuf !=null && (!(theBuf instanceof DirectBuffer) )){
+      	if(theBuf != null && (!(theBuf instanceof DirectBuffer))) {
     		theBuf.clear();
     		return;
          }
@@ -105,20 +105,17 @@ public class DirectByteBufferPool implements BufferPool{
 		DirectBuffer parentBuf = (DirectBuffer) thisNavBuf.attachment();
 		int startChunk = (int) ((thisNavBuf.address() - parentBuf.address()) / chunkSize);
 		for (int i = 0; i < allPages.length; i++) {
-			if ((recycled = allPages[i].recycleBuffer((ByteBuffer) parentBuf, startChunk,
-					chunkCount) == true)) {
+			if ((recycled = allPages[i].recycleBuffer((ByteBuffer) parentBuf, startChunk, chunkCount) == true)) {
 				break;
 			}
 		}
 		final long threadId = Thread.currentThread().getId();
-
 		if (memoryUsage.containsKey(threadId)) {
 			memoryUsage.put(threadId, memoryUsage.get(threadId) - size);
 		}
 		if (recycled == false) {
 			LOGGER.warn("warning ,not recycled buffer " + theBuf);
 		}
-	
     }
 
     /**
