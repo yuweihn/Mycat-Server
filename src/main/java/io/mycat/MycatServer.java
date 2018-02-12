@@ -176,23 +176,21 @@ public class MycatServer {
 		dnIndexProperties = loadDnIndexProps();
 		try {
 			//SQL解析器
-			sqlInterceptor = (SQLInterceptor) Class.forName(
-					config.getSystem().getSqlInterceptor()).newInstance();
+			sqlInterceptor = (SQLInterceptor) Class.forName(config.getSystem().getSqlInterceptor()).newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		
 		//catlet加载器
-		catletClassLoader = new DynaClassLoader(SystemConfig.getHomePath()
-				+ File.separator + "catlet", config.getSystem().getCatletClassCheckSeconds());
+		catletClassLoader = new DynaClassLoader(SystemConfig.getHomePath() + File.separator + "catlet"
+                , config.getSystem().getCatletClassCheckSeconds());
 		
 		//记录启动时间
 		this.startupTime = TimeUtil.currentTimeMillis();
 		 if(isUseZkSwitch()) {
-			 String path=     ZKUtils.getZKBasePath()+"lock/dnindex.lock";
+			 String path = ZKUtils.getZKBasePath() + "lock/dnindex.lock";
 			 dnindexLock = new InterProcessMutex(ZKUtils.getConnection(), path);
 		 }
-
 	}
 
 	public AtomicBoolean getStartup() {
@@ -271,7 +269,6 @@ public class MycatServer {
 			} else {
 				return asyncChannelGroups[index];
 			}
-
 		}
 	}
 
