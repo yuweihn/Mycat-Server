@@ -332,11 +332,9 @@ public class MycatServer {
 
 		switch (bufferPoolType){
 			case 0:
-				bufferPool = new DirectByteBufferPool(bufferPoolPageSize,bufferPoolChunkSize,
-					bufferPoolPageNumber,system.getFrontSocketSoRcvbuf());
-			
-
-				totalNetWorkBufferSize = bufferPoolPageSize*bufferPoolPageNumber;
+				bufferPool = new DirectByteBufferPool(bufferPoolPageSize, bufferPoolChunkSize, bufferPoolPageNumber
+						, system.getFrontSocketSoRcvbuf());
+				totalNetWorkBufferSize = bufferPoolPageSize * bufferPoolPageNumber;
 				break;
 			case 1:
 				/**
@@ -358,9 +356,9 @@ public class MycatServer {
 		
 				break;
 			default:
-				bufferPool = new DirectByteBufferPool(bufferPoolPageSize,bufferPoolChunkSize,
-					bufferPoolPageNumber,system.getFrontSocketSoRcvbuf());
-				totalNetWorkBufferSize = bufferPoolPageSize*bufferPoolPageNumber;
+				bufferPool = new DirectByteBufferPool(bufferPoolPageSize, bufferPoolChunkSize, bufferPoolPageNumber
+						, system.getFrontSocketSoRcvbuf());
+				totalNetWorkBufferSize = bufferPoolPageSize * bufferPoolPageNumber;
 		}
 		
 			/**
@@ -368,22 +366,20 @@ public class MycatServer {
 		 */
 		if(system.getUseOffHeapForMerge() == 1){
 			try {
-				myCatMemory = new MyCatMemory(system,totalNetWorkBufferSize);
+				myCatMemory = new MyCatMemory(system, totalNetWorkBufferSize);
 			} catch (NoSuchFieldException e) {
-				LOGGER .error("NoSuchFieldException",e);
+				LOGGER .error("NoSuchFieldException", e);
 			} catch (IllegalAccessException e) {
-				LOGGER.error("Error",e);
+				LOGGER.error("Error", e);
 			}
 		}
-		businessExecutor = ExecutorUtil.create("BusinessExecutor",
-				threadPoolSize);
+		businessExecutor = ExecutorUtil.create("BusinessExecutor", threadPoolSize);
 		sequenceExecutor = ExecutorUtil.create("SequenceExecutor", threadPoolSize);
 		timerExecutor = ExecutorUtil.create("Timer", system.getTimerExecutor());
 		listeningExecutorService = MoreExecutors.listeningDecorator(businessExecutor);
 
 		for (int i = 0; i < processors.length; i++) {
-			processors[i] = new NIOProcessor("Processor" + i, bufferPool,
-					businessExecutor);
+			processors[i] = new NIOProcessor("Processor" + i, bufferPool, businessExecutor);
 		}
 
 		if (aio) {
@@ -400,34 +396,23 @@ public class MycatServer {
 							Thread th = new Thread(r);
 							//TODO
 							th.setName(DirectByteBufferPool.LOCAL_BUF_THREAD_PREX + "AIO" + (inx++));
-							LOGGER.info("created new AIO thread "+ th.getName());
+							LOGGER.info("created new AIO thread " + th.getName());
 							return th;
 						}
 					}
 				);
 			}
-			manager = new AIOAcceptor(NAME + "Manager", system.getBindIp(),
-					system.getManagerPort(), mf, this.asyncChannelGroups[0]);
-
+			manager = new AIOAcceptor(NAME + "Manager", system.getBindIp(), system.getManagerPort(), mf, this.asyncChannelGroups[0]);
 			// startup server
-
-			server = new AIOAcceptor(NAME + "Server", system.getBindIp(),
-					system.getServerPort(), sf, this.asyncChannelGroups[0]);
-
+			server = new AIOAcceptor(NAME + "Server", system.getBindIp(), system.getServerPort(), sf, this.asyncChannelGroups[0]);
 		} else {
 			LOGGER.info("using nio network handler ");
 			
-			NIOReactorPool reactorPool = new NIOReactorPool(
-					DirectByteBufferPool.LOCAL_BUF_THREAD_PREX + "NIOREACTOR",
-					processors.length);
+			NIOReactorPool reactorPool = new NIOReactorPool(DirectByteBufferPool.LOCAL_BUF_THREAD_PREX + "NIOREACTOR", processors.length);
 			connector = new NIOConnector(DirectByteBufferPool.LOCAL_BUF_THREAD_PREX + "NIOConnector", reactorPool);
 			((NIOConnector) connector).start();
-
-			manager = new NIOAcceptor(DirectByteBufferPool.LOCAL_BUF_THREAD_PREX + NAME
-					+ "Manager", system.getBindIp(), system.getManagerPort(), mf, reactorPool);
-
-			server = new NIOAcceptor(DirectByteBufferPool.LOCAL_BUF_THREAD_PREX + NAME
-					+ "Server", system.getBindIp(), system.getServerPort(), sf, reactorPool);
+			manager = new NIOAcceptor(DirectByteBufferPool.LOCAL_BUF_THREAD_PREX + NAME + "Manager", system.getBindIp(), system.getManagerPort(), mf, reactorPool);
+			server = new NIOAcceptor(DirectByteBufferPool.LOCAL_BUF_THREAD_PREX + NAME + "Server", system.getBindIp(), system.getServerPort(), sf, reactorPool);
 		}
 		// manager start
 		manager.start();
@@ -497,11 +482,11 @@ public class MycatServer {
 		InterProcessMutex	ruleDataLock =null;
 		try {
 			File file = new File(SystemConfig.getHomePath(), "conf" + File.separator + "ruledata");
-			String path=     ZKUtils.getZKBasePath()+"lock/ruledata.lock";
-			ruleDataLock=	 new InterProcessMutex(ZKUtils.getConnection(), path);
+			String path =     ZKUtils.getZKBasePath() + "lock/ruledata.lock";
+			ruleDataLock =	 new InterProcessMutex(ZKUtils.getConnection(), path);
 			ruleDataLock.acquire(30, TimeUnit.SECONDS);
-		      File[]  childFiles=	file.listFiles();
-			if(childFiles!=null&&childFiles.length>0) {
+		      File[]  childFiles =	file.listFiles();
+			if(childFiles != null && childFiles.length > 0) {
 				String basePath = ZKUtils.getZKBasePath() + "ruledata/";
 				for (File childFile : childFiles) {
 					CuratorFramework zk = ZKUtils.getConnection();
@@ -515,7 +500,7 @@ public class MycatServer {
 			throw new RuntimeException(e);
 		} finally {
 			try {
-				if(ruleDataLock!=null)
+				if(ruleDataLock != null)
 				ruleDataLock.release();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -544,9 +529,8 @@ public class MycatServer {
         }
 	}
 
-	public void reloadDnIndex()
-	{
-		if(MycatServer.getInstance().getProcessors()==null) return;
+	public void reloadDnIndex() {
+		if(MycatServer.getInstance().getProcessors() == null) return;
 		// load datanode active index from properties
 		dnIndexProperties = loadDnIndexProps();
 		// init datahost
