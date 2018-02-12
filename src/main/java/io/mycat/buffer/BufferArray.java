@@ -85,52 +85,43 @@ public class BufferArray {
 
 
     public byte[] writeToByteArrayAndRecycle() {
-        BufferArray bufferArray=this;
+        BufferArray bufferArray = this;
         try {
-
-              int size=0;
+			int size = 0;
             List<ByteBuffer> blockes = bufferArray.getWritedBlockLst();
             if (!bufferArray.getWritedBlockLst().isEmpty()) {
                 for (ByteBuffer curBuf : blockes) {
                     curBuf.flip();
-                    size+=curBuf.remaining();
+                    size += curBuf.remaining();
                 }
             }
             ByteBuffer curBuf = bufferArray.getCurWritingBlock();
             curBuf.flip();
-            if(curBuf.hasRemaining())
-            {
+            if(curBuf.hasRemaining()) {
                 size += curBuf.remaining();
             }
-            if(size>0)
-            {
-                int offset=0;
-                byte[] all=new byte[size];
+            if(size > 0) {
+                int offset = 0;
+                byte[] all = new byte[size];
                 if (!bufferArray.getWritedBlockLst().isEmpty()) {
                     for (ByteBuffer tBuf : blockes) {
-
-                        ByteBufferUtil.arrayCopy(tBuf,0,all,offset,tBuf.remaining());
-                        offset+=tBuf.remaining();
-
+                        ByteBufferUtil.arrayCopy(tBuf,0, all, offset, tBuf.remaining());
+                        offset += tBuf.remaining();
                         bufferPool.recycle(tBuf);
                     }
                 }
                 ByteBuffer tBuf = bufferArray.getCurWritingBlock();
-                if(tBuf.hasRemaining())
-                {
-                    ByteBufferUtil.arrayCopy(tBuf,0,all,offset,tBuf.remaining());
+                if(tBuf.hasRemaining()) {
+                    ByteBufferUtil.arrayCopy(tBuf,0, all, offset, tBuf.remaining());
                     bufferPool.recycle(tBuf);
                    // offset += curBuf.remaining();
                 }
                 return all;
             }
-
         } finally {
-
             bufferArray.clear();
         }
-
-      return EMPTY;
+		return EMPTY;
     }
 
     private static byte[] EMPTY=new byte[0];
