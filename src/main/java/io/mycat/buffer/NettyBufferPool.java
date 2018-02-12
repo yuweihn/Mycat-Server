@@ -43,14 +43,11 @@ public class NettyBufferPool implements BufferPool {
 
     @Override
     public void recycle(ByteBuffer byteBuffer) {
-        ByteBuf byteBuf =
-                allocator.recycleMaps.get(PlatformDependent.directBufferAddress(byteBuffer));
-
+        ByteBuf byteBuf = allocator.recycleMaps.get(PlatformDependent.directBufferAddress(byteBuffer));
         if (byteBuf != null) {
             byteBuf.release();
             allocator.recycleMaps.remove(PlatformDependent.directBufferAddress(byteBuffer));
         }
-
     }
 
     /**
@@ -79,7 +76,6 @@ public class NettyBufferPool implements BufferPool {
 
     @Override
     public long size() {
-
         List<PoolArenaMetric> list = allocator.getAlloc().directArenas();
         long chunkSizeBytes = allocator.getChunkSize();
         int chunkCount = 0;
