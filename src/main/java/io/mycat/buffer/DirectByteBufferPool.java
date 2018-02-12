@@ -29,7 +29,7 @@ public class DirectByteBufferPool implements BufferPool{
      /**
      * 记录对线程ID->该线程的所使用Direct Buffer的size
      */
-    private final ConcurrentHashMap<Long,Long> memoryUsage;
+    private final ConcurrentHashMap<Long, Long> memoryUsage;
 
     public DirectByteBufferPool(int pageSize, short chunkSize, short pageCount,int conReadBuferChunk) {
         allPages = new ByteBufferPage[pageCount];
