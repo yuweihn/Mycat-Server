@@ -114,7 +114,7 @@ public class DirectByteBufferPool implements BufferPool{
 			memoryUsage.put(threadId, memoryUsage.get(threadId) - size);
 		}
 		if (recycled == false) {
-			LOGGER.warn("warning ,not recycled buffer " + theBuf);
+			LOGGER.warn("warning, not recycled buffer " + theBuf);
 		}
     }
 
