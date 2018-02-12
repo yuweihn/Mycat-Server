@@ -1,16 +1,12 @@
 package io.mycat.buffer;
 
-import java.nio.ByteBuffer;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import sun.nio.ch.DirectBuffer;
+
+import java.nio.ByteBuffer;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * DirectByteBuffer池，可以分配任意指定大小的DirectByteBuffer，用完需要归还
@@ -125,6 +121,13 @@ public class DirectByteBufferPool implements BufferPool{
 	
     }
 
+    /**
+     * 在[startPage, endPage)范围内的某个内存页中分配theChunkCount个内存块
+     * @param theChunkCount
+     * @param startPage
+     * @param endPage
+     * @return
+     */
     private ByteBuffer allocateBuffer(int theChunkCount, int startPage, int endPage) {
         for (int i = startPage; i < endPage; i++) {
             ByteBuffer buffer = allPages[i].allocatChunk(theChunkCount);
