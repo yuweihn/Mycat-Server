@@ -23,12 +23,13 @@
  */
 package io.mycat.cache;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 /**
  * cache service for other component default using memory cache encache
@@ -43,7 +44,6 @@ public class CacheService {
 	private final Map<String, CachePool> allPools = new HashMap<String, CachePool>();
 
 	public CacheService() {
-
 		// load cache pool defined
 		try {
 			init();
@@ -54,35 +54,28 @@ public class CacheService {
 				throw new RuntimeException(e);
 			}
 		}
-
 	}
-	public Map<String, CachePool> getAllCachePools()
-	{
+	public Map<String, CachePool> getAllCachePools() {
 		return this.allPools;
 	}
 
 	private void init() throws Exception {
 		Properties props = new Properties();
-		props.load(CacheService.class
-				.getResourceAsStream("/cacheservice.properties"));
+		props.load(CacheService.class.getResourceAsStream("/cacheservice.properties"));
 		final String poolFactoryPref = "factory.";
 		final String poolKeyPref = "pool.";
 		final String layedPoolKeyPref = "layedpool.";
 		String[] keys = props.keySet().toArray(new String[0]);
 		Arrays.sort(keys);
 		for (String key : keys) {
-
 			if (key.startsWith(poolFactoryPref)) {
-				createPoolFactory(key.substring(poolFactoryPref.length()),
-						(String) props.get(key));
+				createPoolFactory(key.substring(poolFactoryPref.length()), (String) props.get(key));
 			} else if (key.startsWith(poolKeyPref)) {
 				String cacheName = key.substring(poolKeyPref.length());
 				String value = (String) props.get(key);
 				String[] valueItems = value.split(",");
 				if (valueItems.length < 3) {
-					throw new java.lang.IllegalArgumentException(
-							"invalid cache config ,key:" + key + " value:"
-									+ value);
+					throw new IllegalArgumentException("invalid cache config, key:" + key + " value:" + value);
 				}
 				String type = valueItems[0];
 				int size = Integer.parseInt(valueItems[1]);
@@ -104,63 +97,49 @@ public class CacheService {
 					String child = cacheName.substring(index + 1);
 					CachePool pool = this.allPools.get(parent);
 					if (pool == null || !(pool instanceof LayerCachePool)) {
-						throw new java.lang.IllegalArgumentException(
-								"parent pool not exists or not layered cache pool:"
-										+ parent + " the child cache is:"
-										+ child);
+						throw new IllegalArgumentException("parent pool not exists or not layered cache pool:" + parent + " the child cache is:" + child);
 					}
 
 					int size = Integer.valueOf(valueItems[0]);
 					int timeOut = Integer.valueOf(valueItems[1]);
-					((DefaultLayedCachePool) pool).createChildCache(child,
-							size, timeOut);
+					((DefaultLayedCachePool) pool).createChildCache(child, size, timeOut);
 				}
 			}
 		}
 	}
 
-	private void createLayeredPool(String cacheName, String type, int size,
-			int expireSeconds) {
+	private void createLayeredPool(String cacheName, String type, int size, int expireSeconds) {
 		checkExists(cacheName);
 		logger.info("create layer cache pool " + cacheName + " of type " + type
 				+ " ,default cache size " + size + " ,default expire seconds"
 				+ expireSeconds);
-		DefaultLayedCachePool layerdPool = new DefaultLayedCachePool(cacheName,
-				this.getCacheFact(type), size, expireSeconds);
+		DefaultLayedCachePool layerdPool = new DefaultLayedCachePool(cacheName, this.getCacheFact(type), size, expireSeconds);
 		this.allPools.put(cacheName, layerdPool);
 
 	}
 
 	private void checkExists(String poolName) {
 		if (allPools.containsKey(poolName)) {
-			throw new java.lang.IllegalArgumentException(
-					"duplicate cache pool name: " + poolName);
+			throw new IllegalArgumentException("duplicate cache pool name: " + poolName);
 		}
 	}
 
-	private void createPoolFactory(String factryType, String factryClassName)
-			throws Exception {
-		CachePoolFactory factry = (CachePoolFactory) Class.forName(
-				factryClassName).newInstance();
+	private void createPoolFactory(String factryType, String factryClassName) throws Exception {
+		CachePoolFactory factry = (CachePoolFactory) Class.forName(factryClassName).newInstance();
 		poolFactorys.put(factryType, factry);
-
 	}
 
-	private void createPool(String poolName, String type, int cacheSize,
-			int expireSeconds) {
+	private void createPool(String poolName, String type, int cacheSize, int expireSeconds) {
 		checkExists(poolName);
 		CachePoolFactory cacheFact = getCacheFact(type);
-		CachePool cachePool = cacheFact.createCachePool(poolName, cacheSize,
-				expireSeconds);
+		CachePool cachePool = cacheFact.createCachePool(poolName, cacheSize, expireSeconds);
 		allPools.put(poolName, cachePool);
-
 	}
 
 	private CachePoolFactory getCacheFact(String type) {
 		CachePoolFactory facty = this.poolFactorys.get(type);
 		if (facty == null) {
-			throw new RuntimeException("CachePoolFactory not defined for type:"
-					+ type);
+			throw new RuntimeException("CachePoolFactory not defined for type:" + type);
 		}
 		return facty;
 	}
@@ -174,22 +153,16 @@ public class CacheService {
 	public CachePool getCachePool(String poolName) {
 		CachePool pool = allPools.get(poolName);
 		if (pool == null) {
-			throw new IllegalArgumentException("can't find cache pool:"
-					+ poolName);
+			throw new IllegalArgumentException("can't find cache pool:" + poolName);
 		} else {
 			return pool;
 		}
-
 	}
 
 	public void clearCache() {
-
 		logger.info("clear all cache pool ");
 		for (CachePool pool : allPools.values()) {
-
 			pool.clearCache();
 		}
-
 	}
-
 }
