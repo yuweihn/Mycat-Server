@@ -40,6 +40,7 @@
 		-->
 		<property name="useOffHeapForMerge">1</property>
 
+		<!--<property name="usingAIO">1</property>-->
 		<!--
 			单位为m
 		-->
