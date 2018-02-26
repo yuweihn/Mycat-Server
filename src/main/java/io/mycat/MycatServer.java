@@ -527,7 +527,9 @@ public class MycatServer {
 	}
 
 	public void reloadDnIndex() {
-		if(MycatServer.getInstance().getProcessors() == null) return;
+		if(MycatServer.getInstance().getProcessors() == null) {
+			return;
+		}
 		// load datanode active index from properties
 		dnIndexProperties = loadDnIndexProps();
 		// init datahost
@@ -539,7 +541,6 @@ public class MycatServer {
 				LOGGER.info("reinit datahost: " + node.getHostName() + "  to use datasource index:" + index);
 			}
 			node.switchSource(Integer.parseInt(index), true, "reload dnindex");
-
 		}
 	}
 
