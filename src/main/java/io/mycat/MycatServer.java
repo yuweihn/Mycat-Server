@@ -675,7 +675,7 @@ public class MycatServer {
 			if(isUseZkSwitch()) {
 				// save to  zk
 				try {
-					dnindexLock.acquire(30,TimeUnit.SECONDS)   ;
+					dnindexLock.acquire(30, TimeUnit.SECONDS);
 					String path = ZKUtils.getZKBasePath() + "bindata/dnindex.properties";
 					CuratorFramework zk = ZKUtils.getConnection();
 					if(zk.checkExists().forPath(path) == null) {
@@ -685,13 +685,12 @@ public class MycatServer {
 						ByteArrayOutputStream out = new ByteArrayOutputStream();
 						Properties properties = new Properties();
 						properties.load(new ByteArrayInputStream(data));
-						 if(!String.valueOf(curIndex).equals(properties.getProperty(dataHost))) {
-							 properties.setProperty(dataHost, String.valueOf(curIndex));
-							 properties.store(out, "update");
-							 zk.setData().forPath(path, out.toByteArray());
-						 }
+						if(!String.valueOf(curIndex).equals(properties.getProperty(dataHost))) {
+							properties.setProperty(dataHost, String.valueOf(curIndex));
+							properties.store(out, "update");
+							zk.setData().forPath(path, out.toByteArray());
+						}
 					}
-
 				} finally {
 					dnindexLock.release();
 				}
@@ -706,7 +705,6 @@ public class MycatServer {
 				}
 			}
 		}
-
 	}
 
 
