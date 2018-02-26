@@ -23,6 +23,7 @@
  */
 package io.mycat;
 
+
 import com.google.common.io.Files;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -82,6 +83,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+
 
 /**
  * @author mycat
@@ -146,7 +148,6 @@ public class MycatServer {
 
 	private final AtomicBoolean startup = new AtomicBoolean(false);
 	private MycatServer() {
-		
 		//读取文件配置
 		this.config = new MycatConfig();
 		
@@ -278,13 +279,10 @@ public class MycatServer {
 
 	public void beforeStart() {
 		String home = SystemConfig.getHomePath();
-
-
-		//ZkConfig.instance().initZk();
+//		ZkConfig.getInstance().initZk();
 	}
 
 	public void startup() throws IOException {
-
 		SystemConfig system = config.getSystem();
 		int processorCount = system.getProcessors();
 		
@@ -344,13 +342,11 @@ public class MycatServer {
 				 * bufferPoolChunkSize对应每个bytebufferchunk的每个page的长度
 				 * bufferPoolPageNumber对应每个bytebufferlist有多少个bytebufferchunk
 				 */
-
 				totalNetWorkBufferSize = 6 * bufferPoolPageSize * bufferPoolPageNumber;
 				break;
 			case 2:
 				bufferPool = new NettyBufferPool(bufferPoolChunkSize);
 				LOGGER.info("Use Netty Buffer Pool");
-		
 				break;
 			default:
 				bufferPool = new DirectByteBufferPool(bufferPoolPageSize, bufferPoolChunkSize, bufferPoolPageNumber
@@ -425,7 +421,7 @@ public class MycatServer {
 		Map<String, PhysicalDBPool> dataHosts = config.getDataHosts();
 		LOGGER.info("Initialize dataHost ...");
 		for (PhysicalDBPool node : dataHosts.values()) {
-			String index = dnIndexProperties.getProperty(node.getHostName(),"0");
+			String index = dnIndexProperties.getProperty(node.getHostName(), "0");
 			if (!"0".equals(index)) {
 				LOGGER.info("init datahost: " + node.getHostName() + "  to use datasource index:" + index);
 			}
@@ -442,11 +438,11 @@ public class MycatServer {
 		heartbeatScheduler.scheduleAtFixedRate(dataSourceOldConsClear(), 0L, DEFAULT_OLD_CONNECTION_CLEAR_PERIOD, TimeUnit.MILLISECONDS);
 		scheduler.schedule(catletClassClear(), 30000, TimeUnit.MILLISECONDS);
        
-		if(system.getCheckTableConsistency()==1) {
+		if(system.getCheckTableConsistency() == 1) {
             scheduler.scheduleAtFixedRate(tableStructureCheck(), 0L, system.getCheckTableConsistencyPeriod(), TimeUnit.MILLISECONDS);
         }
 		
-		if(system.getUseSqlStat()==1) {
+		if(system.getUseSqlStat() == 1) {
 			scheduler.scheduleAtFixedRate(recycleSqlStat(), 0L, DEFAULT_SQL_STAT_RECYCLE_PERIOD, TimeUnit.MILLISECONDS);
 		}
 		
@@ -455,7 +451,7 @@ public class MycatServer {
 		}
 		
 		//定期清理结果集排行榜，控制拒绝策略
-		scheduler.scheduleAtFixedRate(resultSetMapClear(),0L,  system.getClearBigSqLResultSetMapMs(), TimeUnit.MILLISECONDS);
+		scheduler.scheduleAtFixedRate(resultSetMapClear(), 0L, system.getClearBigSqLResultSetMapMs(), TimeUnit.MILLISECONDS);
 		
  		
 //        new Thread(tableStructureCheck()).start();
@@ -475,14 +471,16 @@ public class MycatServer {
 	}
 
 	public void initRuleData() {
-		if(!isUseZk())  return;
-		InterProcessMutex	ruleDataLock =null;
+		if(!isUseZk()) {
+			return;
+		}
+		InterProcessMutex ruleDataLock = null;
 		try {
 			File file = new File(SystemConfig.getHomePath(), "conf" + File.separator + "ruledata");
-			String path =     ZKUtils.getZKBasePath() + "lock/ruledata.lock";
-			ruleDataLock =	 new InterProcessMutex(ZKUtils.getConnection(), path);
+			String path = ZKUtils.getZKBasePath() + "lock/ruledata.lock";
+			ruleDataLock = new InterProcessMutex(ZKUtils.getConnection(), path);
 			ruleDataLock.acquire(30, TimeUnit.SECONDS);
-		      File[]  childFiles =	file.listFiles();
+			File[]  childFiles = file.listFiles();
 			if(childFiles != null && childFiles.length > 0) {
 				String basePath = ZKUtils.getZKBasePath() + "ruledata/";
 				for (File childFile : childFiles) {
@@ -492,7 +490,6 @@ public class MycatServer {
 					}
 				}
 			}
-
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {
@@ -514,7 +511,6 @@ public class MycatServer {
             if (zk.checkExists().forPath(path) == null) {
                 zk.create().creatingParentsIfNeeded().forPath(path, Files.toByteArray(file));
             }
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
