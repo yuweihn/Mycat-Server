@@ -227,9 +227,9 @@ public class MycatServer {
 
 	public String genXATXID() {
 		long seq = this.xaIDInc.incrementAndGet();
-		if (seq < 0) {
+		if(seq < 0) {
 			synchronized (xaIDInc) {
-				if ( xaIDInc.get() < 0 ) {
+				if(xaIDInc.get() < 0) {
 					xaIDInc.set(0);
 				}
 				seq = xaIDInc.incrementAndGet();
