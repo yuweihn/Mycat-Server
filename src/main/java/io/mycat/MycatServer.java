@@ -187,10 +187,10 @@ public class MycatServer {
 		
 		//记录启动时间
 		this.startupTime = TimeUtil.currentTimeMillis();
-		 if(isUseZkSwitch()) {
-			 String path = ZKUtils.getZKBasePath() + "lock/dnindex.lock";
-			 dnindexLock = new InterProcessMutex(ZKUtils.getConnection(), path);
-		 }
+		if(isUseZkSwitch()) {
+			String path = ZKUtils.getZKBasePath() + "lock/dnindex.lock";
+			dnindexLock = new InterProcessMutex(ZKUtils.getConnection(), path);
+		}
 	}
 
 	public AtomicBoolean getStartup() {
