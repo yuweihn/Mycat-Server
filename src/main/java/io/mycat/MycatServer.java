@@ -89,7 +89,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author mycat
  */
 public class MycatServer {
-	
 	public static final String NAME = "MyCat";
 	private static final long LOG_WATCH_DELAY = 60000L;
 	private static final long TIME_UPDATE_PERIOD = 20L;

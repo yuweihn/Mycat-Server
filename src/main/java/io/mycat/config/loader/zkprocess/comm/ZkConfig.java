@@ -1,15 +1,14 @@
 package io.mycat.config.loader.zkprocess.comm;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
+import com.google.common.base.Strings;
+import io.mycat.config.loader.zkprocess.zktoxml.ZktoXmlMain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
-
-import io.mycat.config.loader.zkprocess.zktoxml.ZktoXmlMain;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 
 /**
@@ -53,18 +52,16 @@ public class ZkConfig {
     }
 
 
-    public String getZkURL()
-    {
-        return ZKPROPERTIES==null?null:ZKPROPERTIES.getProperty(ZkParamCfg.ZK_CFG_URL.getKey())  ;
+    public String getZkURL() {
+        return ZKPROPERTIES == null ? null : ZKPROPERTIES.getProperty(ZkParamCfg.ZK_CFG_URL.getKey())  ;
     }
-    public void initZk()
-    {
+    public void initZk() {
         try {
             if (Boolean.parseBoolean(ZKPROPERTIES.getProperty(ZkParamCfg.ZK_CFG_FLAG.getKey()))) {
                 ZktoXmlMain.loadZktoFile();
             }
         } catch (Exception e) {
-            LOGGER.error("error:",e);
+            LOGGER.error("error:", e);
         }
     }
 
@@ -75,7 +72,6 @@ public class ZkConfig {
     * @创建日期 2016年9月15日
     */
     public  static ZkConfig getInstance() {
-
         return ZKCFGINSTANCE;
     }
 
@@ -90,7 +86,6 @@ public class ZkConfig {
         if (null != param) {
             return ZKPROPERTIES.getProperty(param.getKey());
         }
-
         return null;
     }
 
@@ -124,12 +119,10 @@ public class ZkConfig {
             throw new RuntimeException("clusterId and zkURL and myid must not be null or empty!");
         }
         return pros;
-
     }
 
     public static void main(String[] args) {
         String zk = ZkConfig.getInstance().getValue(ZkParamCfg.ZK_CFG_CLUSTERID);
         System.out.println(zk);
     }
-
 }
