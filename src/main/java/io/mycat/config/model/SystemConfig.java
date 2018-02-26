@@ -23,10 +23,10 @@
  */
 package io.mycat.config.model;
 
+import io.mycat.config.Isolations;
+
 import java.io.File;
 import java.io.IOException;
-
-import io.mycat.config.Isolations;
 
 /**
  * 系统基础配置项
@@ -280,7 +280,7 @@ public final class SystemConfig {
 		this.useStreamOutput = 0;
 		this.systemReserveMemorySize = RESERVED_SYSTEM_MEMORY_BYTES;
 		this.dataNodeSortedTempDir = System.getProperty("user.dir");
-		this.XARecoveryLogBaseDir = SystemConfig.getHomePath()+"/tmlogs/";
+		this.XARecoveryLogBaseDir = SystemConfig.getHomePath() + "/tmlogs/";
 		this.XARecoveryLogBaseName ="tmlog";
 	}
 
@@ -434,22 +434,21 @@ public final class SystemConfig {
 
 	public static String getHomePath() {
 		String home = System.getProperty(SystemConfig.SYS_HOME);
-		if (home != null
-				&& home.endsWith(File.pathSeparator)) {
-				home = home.substring(0, home.length() - 1);
-				System.setProperty(SystemConfig.SYS_HOME, home);
+		if (home != null && home.endsWith(File.pathSeparator)) {
+			home = home.substring(0, home.length() - 1);
+			System.setProperty(SystemConfig.SYS_HOME, home);
 		}
 
 		// MYCAT_HOME为空，默认尝试设置为当前目录或上级目录。BEN
 		if(home == null) {
 			try {
 				String path = new File("..").getCanonicalPath().replaceAll("\\\\", "/");
-				File conf = new File(path+"/conf");
+				File conf = new File(path + "/conf");
 				if(conf.exists() && conf.isDirectory()) {
 					home = path;
 				} else {
 					path = new File(".").getCanonicalPath().replaceAll("\\\\", "/");
-					conf = new File(path+"/conf");
+					conf = new File(path + "/conf");
 					if(conf.exists() && conf.isDirectory()) {
 						home = path;
 					}
