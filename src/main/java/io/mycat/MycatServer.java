@@ -151,13 +151,13 @@ public class MycatServer {
 		this.config = new MycatConfig();
 		
 		//定时线程池，单线程线程池
-		scheduler = Executors.newSingleThreadScheduledExecutor();
+		this.scheduler = Executors.newSingleThreadScheduledExecutor();
 
 		//心跳调度独立出来，避免被其他任务影响
-		heartbeatScheduler = Executors.newSingleThreadScheduledExecutor();
+		this.heartbeatScheduler = Executors.newSingleThreadScheduledExecutor();
 		
 		//SQL记录器
-		this.sqlRecorder = new SQLRecorder(config.getSystem().getSqlRecordCount());
+		this.sqlRecorder = new SQLRecorder(this.config.getSystem().getSqlRecordCount());
 		
 		/**
 		 * 是否在线，MyCat manager中有命令控制
@@ -167,29 +167,29 @@ public class MycatServer {
 		this.isOnline = new AtomicBoolean(true);
 		
 		//缓存服务初始化
-		cacheService = new CacheService();
+		this.cacheService = new CacheService();
 		
 		//路由计算初始化
-		routerService = new RouteService(cacheService);
+		this.routerService = new RouteService(this.cacheService);
 		
 		// load datanode active index from properties
-		dnIndexProperties = loadDnIndexProps();
+		this.dnIndexProperties = loadDnIndexProps();
 		try {
 			//SQL解析器
-			sqlInterceptor = (SQLInterceptor) Class.forName(config.getSystem().getSqlInterceptor()).newInstance();
+			this.sqlInterceptor = (SQLInterceptor) Class.forName(this.config.getSystem().getSqlInterceptor()).newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		
 		//catlet加载器
-		catletClassLoader = new DynaClassLoader(SystemConfig.getHomePath() + File.separator + "catlet"
-                , config.getSystem().getCatletClassCheckSeconds());
+		this.catletClassLoader = new DynaClassLoader(SystemConfig.getHomePath() + File.separator + "catlet"
+                , this.config.getSystem().getCatletClassCheckSeconds());
 		
 		//记录启动时间
 		this.startupTime = TimeUtil.currentTimeMillis();
 		if(isUseZkSwitch()) {
 			String path = ZKUtils.getZKBasePath() + "lock/dnindex.lock";
-			dnindexLock = new InterProcessMutex(ZKUtils.getConnection(), path);
+			this.dnindexLock = new InterProcessMutex(ZKUtils.getConnection(), path);
 		}
 	}
 
