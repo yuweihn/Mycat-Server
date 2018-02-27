@@ -23,6 +23,7 @@
  */
 package io.mycat.backend.mysql.nio;
 
+
 import io.mycat.backend.datasource.PhysicalDatasource;
 import io.mycat.backend.heartbeat.DBHeartbeat;
 import io.mycat.backend.heartbeat.MySQLHeartbeat;
@@ -37,6 +38,7 @@ import java.io.*;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 
+
 /**
  * @author mycat
  */
@@ -44,16 +46,14 @@ public class MySQLDataSource extends PhysicalDatasource {
 
 	private final MySQLConnectionFactory factory;
 
-	public MySQLDataSource(DBHostConfig config, DataHostConfig hostConfig,
-			boolean isReadNode) {
+	public MySQLDataSource(DBHostConfig config, DataHostConfig hostConfig, boolean isReadNode) {
 		super(config, hostConfig, isReadNode);
 		this.factory = new MySQLConnectionFactory();
-
 	}
 
 	@Override
 	public void createNewConnection(ResponseHandler handler,String schema) throws IOException {
-		factory.make(this, handler,schema);
+		factory.make(this, handler, schema);
 	}
 	
 	private long getClientFlags() {		
@@ -96,7 +96,6 @@ public class MySQLDataSource extends PhysicalDatasource {
 	
 	@Override
 	public boolean testConnection(String schema) throws IOException {
-		
 		boolean isConnected = true;
 		
 		Socket socket = null;
@@ -105,13 +104,13 @@ public class MySQLDataSource extends PhysicalDatasource {
 		try {			
 			socket = new Socket(this.getConfig().getIp(), this.getConfig().getPort());
 			socket.setSoTimeout(1000 * 20);
-			socket.setReceiveBufferSize( 32768 );
-		    socket.setSendBufferSize( 32768 );
+			socket.setReceiveBufferSize(32768);
+		    socket.setSendBufferSize(32768);
 			socket.setTcpNoDelay(true);
 	        socket.setKeepAlive(true);
 	        
 	        in = new BufferedInputStream(socket.getInputStream(), 32768);
-			out = new BufferedOutputStream( socket.getOutputStream(), 32768 );
+			out = new BufferedOutputStream(socket.getOutputStream(), 32768);
 			
 			/**
 	         * Phase 1: MySQL to client. Send handshake packet.
@@ -120,7 +119,7 @@ public class MySQLDataSource extends PhysicalDatasource {
 			bin1.read(in);
 			
 			HandshakePacket handshake = new HandshakePacket();
-			handshake.read( bin1 );
+			handshake.read(bin1);
 			
 			/**
 	         * Phase 2: client to MySQL. Send auth packet.
@@ -146,23 +145,23 @@ public class MySQLDataSource extends PhysicalDatasource {
 	        BinaryPacket bin2 = new BinaryPacket();
 	        bin2.read(in);
 	        switch (bin2.data[0]) {
-	        case OkPacket.FIELD_COUNT:
-	            break;
-	        case ErrorPacket.FIELD_COUNT:
-	            ErrorPacket err = new ErrorPacket();
-	            err.read(bin2);
-	            isConnected = false;
-	        case EOFPacket.FIELD_COUNT:		        	
-	        	// 发送323响应认证数据包
-	    		Reply323Packet r323 = new Reply323Packet();
-	    		r323.packetId = ++bin2.packetId;
-	    		String passwd = this.getConfig().getPassword();
-	    		if (passwd != null && passwd.length() > 0) {
-	    			r323.seed = SecurityUtil.scramble323(passwd, new String(handshake.seed)).getBytes();
-	    		}
-	    		r323.write(out);
-	    		out.flush();
-	            break;
+				case OkPacket.FIELD_COUNT:
+					break;
+				case ErrorPacket.FIELD_COUNT:
+					ErrorPacket err = new ErrorPacket();
+					err.read(bin2);
+					isConnected = false;
+				case EOFPacket.FIELD_COUNT:
+					// 发送323响应认证数据包
+					Reply323Packet r323 = new Reply323Packet();
+					r323.packetId = ++bin2.packetId;
+					String passwd = this.getConfig().getPassword();
+					if (passwd != null && passwd.length() > 0) {
+						r323.seed = SecurityUtil.scramble323(passwd, new String(handshake.seed)).getBytes();
+					}
+					r323.write(out);
+					out.flush();
+					break;
 	        }			
 			
 		} catch (IOException e) {
@@ -183,8 +182,9 @@ public class MySQLDataSource extends PhysicalDatasource {
 			} catch (IOException e) {}
 
 			try {
-				if (socket != null)
+				if (socket != null) {
 					socket.close();
+				}
 			} catch (IOException e) {}
 		}
 		

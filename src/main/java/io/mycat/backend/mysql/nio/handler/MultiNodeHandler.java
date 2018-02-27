@@ -23,23 +23,25 @@
  */
 package io.mycat.backend.mysql.nio.handler;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import io.mycat.backend.BackendConnection;
 import io.mycat.config.ErrorCode;
 import io.mycat.net.mysql.ErrorPacket;
 import io.mycat.server.NonBlockingSession;
 import io.mycat.util.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantLock;
+
 
 /**
  * @author mycat
  */
 abstract class MultiNodeHandler implements ResponseHandler, Terminatable {
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(MultiNodeHandler.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MultiNodeHandler.class);
+
 	protected final ReentrantLock lock = new ReentrantLock();
 	protected final NonBlockingSession session;
 	private AtomicBoolean isFailed = new AtomicBoolean(false);
@@ -86,7 +88,6 @@ abstract class MultiNodeHandler implements ResponseHandler, Terminatable {
 	}
 
 	protected boolean canClose(BackendConnection conn, boolean tryErrorFinish) {
-
 		// realse this connection if safe
 		session.releaseConnectionIfSafe(conn, LOGGER.isDebugEnabled(), false);
 		boolean allFinished = false;
@@ -119,8 +120,8 @@ abstract class MultiNodeHandler implements ResponseHandler, Terminatable {
 		//null信息，结果mysql命令行等客户端查询结果是"Query OK"！！
 		// @author Uncle-pan
 		// @since 2016-03-26
-		if(canClose){
-			setFail("backend connect: "+e);
+		if(canClose) {
+			setFail("backend connect: " + e);
 		}
 		LOGGER.warn("backend connect", e);
 		this.tryErrorFinished(canClose);
@@ -142,7 +143,7 @@ abstract class MultiNodeHandler implements ResponseHandler, Terminatable {
 	public boolean clearIfSessionClosed(NonBlockingSession session) {
 		if (session.closed()) {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("session closed ,clear resources " + session);
+				LOGGER.debug("session closed, clear resources " + session);
 			}
 
 			session.clearResources(true);
@@ -151,7 +152,6 @@ abstract class MultiNodeHandler implements ResponseHandler, Terminatable {
 		} else {
 			return false;
 		}
-
 	}
 
 	protected boolean decrementCountBy(int finished) {
@@ -194,13 +194,12 @@ abstract class MultiNodeHandler implements ResponseHandler, Terminatable {
 
 	protected void tryErrorFinished(boolean allEnd) {
 		if (allEnd && !session.closed()) {
-			
 			if (errorRepsponsed.compareAndSet(false, true)) {
 				createErrPkg(this.error).write(session.getSource());
 			}
 			// clear session resources,release all
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("error all end ,clear session resource ");
+				LOGGER.debug("error all end, clear session resource.");
 			}
 			if (session.getSource().isAutocommit()) {
 				session.closeAndClearResources(error);
@@ -209,9 +208,7 @@ abstract class MultiNodeHandler implements ResponseHandler, Terminatable {
 				// clear resouces
 				clearResources();
 			}
-
 		}
-
 	}
 
 	public void connectionClose(BackendConnection conn, String reason) {

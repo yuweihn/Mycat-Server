@@ -1,17 +1,18 @@
 package io.mycat.backend.mysql.nio.handler;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.mycat.backend.BackendConnection;
 import io.mycat.net.mysql.OkPacket;
 import io.mycat.route.RouteResultsetNode;
 import io.mycat.server.NonBlockingSession;
 import io.mycat.server.parser.ServerParse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 
 /**
  * unlock tables 语句处理器
@@ -19,7 +20,6 @@ import io.mycat.server.parser.ServerParse;
  *
  */
 public class UnLockTablesHandler extends MultiNodeHandler implements ResponseHandler {
-	
 	private static final Logger LOGGER = LoggerFactory.getLogger(UnLockTablesHandler.class);
 
 	private final NonBlockingSession session;
@@ -39,11 +39,11 @@ public class UnLockTablesHandler extends MultiNodeHandler implements ResponseHan
 		this.reset(lockedConns.size());
 		// 客户端直接发送unlock tables命令，由于之前未发送lock tables语句，无法获取后端绑定的连接，此时直接返回OK包
 		if (lockedConns.size() == 0) {
-			LOGGER.warn("find no locked backend connection!"+session.getSource());
+			LOGGER.warn("find no locked backend connection!" + session.getSource());
 			OkPacket ok = new OkPacket();
-			ok.packetId = ++ packetId;
+			ok.packetId = ++packetId;
 			ok.packetLength = 7; // unlock table 命令返回MySQL协议包长度为7
-			ok.serverStatus = session.getSource().isAutocommit() ? 2:1;
+			ok.serverStatus = session.getSource().isAutocommit() ? 2 : 1;
 			ok.write(session.getSource());
 			return;
 		}
@@ -93,7 +93,7 @@ public class UnLockTablesHandler extends MultiNodeHandler implements ResponseHan
 				lock.lock();
 				try {
 					ok.packetId = ++ packetId;
-					ok.serverStatus = session.getSource().isAutocommit() ? 2:1;
+					ok.serverStatus = session.getSource().isAutocommit() ? 2 : 1;
 				} finally {
 					lock.unlock();
 				}
@@ -134,5 +134,4 @@ public class UnLockTablesHandler extends MultiNodeHandler implements ResponseHan
 		// TODO Auto-generated method stub
 
 	}
-
 }

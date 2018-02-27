@@ -23,13 +23,6 @@
  */
 package io.mycat.backend.mysql.nio.handler;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import io.mycat.MycatServer;
 import io.mycat.backend.BackendConnection;
@@ -41,6 +34,15 @@ import io.mycat.net.mysql.RowDataPacket;
 import io.mycat.route.RouteResultsetNode;
 import io.mycat.server.ServerConnection;
 import io.mycat.server.parser.ServerParse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
+
 
 /**
  * company where id=(select company_id from customer where id=3); the one which
@@ -50,8 +52,7 @@ import io.mycat.server.parser.ServerParse;
  * 
  */
 public class FetchStoreNodeOfChildTableHandler implements ResponseHandler {
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(FetchStoreNodeOfChildTableHandler.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(FetchStoreNodeOfChildTableHandler.class);
 	private String sql;
 	private volatile String result;
 	private volatile String dataNode;
@@ -59,10 +60,8 @@ public class FetchStoreNodeOfChildTableHandler implements ResponseHandler {
 	protected final ReentrantLock lock = new ReentrantLock();
 	
 	public String execute(String schema, String sql, List<String> dataNodes, ServerConnection sc) {
-		
 		String key = schema + ":" + sql;
-		CachePool cache = MycatServer.getInstance().getCacheService()
-				.getCachePool("ER_SQL2PARENTID");
+		CachePool cache = MycatServer.getInstance().getCacheService().getCachePool("ER_SQL2PARENTID");
 		String result = (String) cache.get(key);
 		if (result != null) {
 			return result;
@@ -116,13 +115,11 @@ public class FetchStoreNodeOfChildTableHandler implements ResponseHandler {
 			cache.putIfAbsent(key, dataNode);
 		}
 		return dataNode;
-		
 	}
 
 	public String execute(String schema, String sql, ArrayList<String> dataNodes) {
 		String key = schema + ":" + sql;
-		CachePool cache = MycatServer.getInstance().getCacheService()
-				.getCachePool("ER_SQL2PARENTID");
+		CachePool cache = MycatServer.getInstance().getCacheService().getCachePool("ER_SQL2PARENTID");
 		String result = (String) cache.get(key);
 		if (result != null) {
 			return result;
@@ -145,19 +142,14 @@ public class FetchStoreNodeOfChildTableHandler implements ResponseHandler {
 				}
 				RouteResultsetNode node = new RouteResultsetNode(dn, ServerParse.SELECT, sql);
 				node.setRunOnSlave(false);	// 获取 子表节点，最好走master为好
-
 				mysqlDN.getConnection(mysqlDN.getDatabase(), true, node, this, node);
-				 
-//				mysqlDN.getConnection(mysqlDN.getDatabase(), true,
-//						new RouteResultsetNode(dn, ServerParse.SELECT, sql),
-//						this, dn);
+//				mysqlDN.getConnection(mysqlDN.getDatabase(), true, new RouteResultsetNode(dn, ServerParse.SELECT, sql), this, dn);
 			} catch (Exception e) {
 				LOGGER.warn("get connection err " + e);
 			}
 			try {
 				Thread.sleep(200);
 			} catch (InterruptedException e) {
-
 			}
 		}
 
@@ -201,7 +193,6 @@ public class FetchStoreNodeOfChildTableHandler implements ResponseHandler {
 	public void connectionError(Throwable e, BackendConnection conn) {
 		finished.incrementAndGet();
 		LOGGER.warn("connectionError " + e);
-
 	}
 
 	@Override
@@ -209,10 +200,8 @@ public class FetchStoreNodeOfChildTableHandler implements ResponseHandler {
 		finished.incrementAndGet();
 		ErrorPacket err = new ErrorPacket();
 		err.read(data);
-		LOGGER.warn("errorResponse " + err.errno + " "
-				+ new String(err.message));
+		LOGGER.warn("errorResponse " + err.errno + " " + new String(err.message));
 		conn.release();
-
 	}
 
 	@Override
@@ -222,23 +211,19 @@ public class FetchStoreNodeOfChildTableHandler implements ResponseHandler {
 			finished.incrementAndGet();
 			conn.release();
 		}
-
 	}
 
 	@Override
 	public void rowResponse(byte[] row, BackendConnection conn) {
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("received rowResponse response," + getColumn(row)
-					+ " from  " + conn);
+			LOGGER.debug("received rowResponse response," + getColumn(row) + " from  " + conn);
 		}
 		if (result == null) {
 			result = getColumn(row);
 			dataNode = ((RouteResultsetNode) conn.getAttachment()).getName();
 		} else {
-			LOGGER.warn("find multi data nodes for child table store, sql is:  "
-					+ sql);
+			LOGGER.warn("find multi data nodes for child table store, sql is:  " + sql);
 		}
-
 	}
 
 	private String getColumn(byte[] row) {
@@ -258,7 +243,6 @@ public class FetchStoreNodeOfChildTableHandler implements ResponseHandler {
 		finished.incrementAndGet();
 		LOGGER.warn("executeException   " + e);
 		c.close("exception:" + e);
-
 	}
 
 	@Override
@@ -268,7 +252,6 @@ public class FetchStoreNodeOfChildTableHandler implements ResponseHandler {
 
 	@Override
 	public void connectionClose(BackendConnection conn, String reason) {
-
 		LOGGER.warn("connection closed " + conn + " reason:" + reason);
 	}
 
@@ -277,5 +260,4 @@ public class FetchStoreNodeOfChildTableHandler implements ResponseHandler {
 			byte[] eof, BackendConnection conn) {
 
 	}
-
 }

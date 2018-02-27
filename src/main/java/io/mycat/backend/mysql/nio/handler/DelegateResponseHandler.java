@@ -23,9 +23,10 @@
  */
 package io.mycat.backend.mysql.nio.handler;
 
-import java.util.List;
 
 import io.mycat.backend.BackendConnection;
+import java.util.List;
+
 
 /**
  * @author mycat
@@ -78,13 +79,10 @@ public class DelegateResponseHandler implements ResponseHandler {
 	@Override
 	public void writeQueueAvailable() {
 		target.writeQueueAvailable();
-		
 	}
 
 	@Override
 	public void connectionClose(BackendConnection conn, String reason) {
 		target.connectionClose(conn, reason);
 	}
-
-	
 }

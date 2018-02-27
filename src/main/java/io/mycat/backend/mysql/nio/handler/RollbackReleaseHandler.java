@@ -23,18 +23,19 @@
  */
 package io.mycat.backend.mysql.nio.handler;
 
-import java.util.List;
-
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import io.mycat.backend.BackendConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+
 
 /**
  * @author mycat
  */
 public class RollbackReleaseHandler implements ResponseHandler {
-	private static final Logger logger = LoggerFactory
-			.getLogger(RollbackReleaseHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(RollbackReleaseHandler.class);
 
 	public RollbackReleaseHandler() {
 	}
@@ -56,13 +57,12 @@ public class RollbackReleaseHandler implements ResponseHandler {
 
 	@Override
 	public void okResponse(byte[] ok, BackendConnection conn) {
-		logger.debug("autocomit is false,but no commit or rollback ,so mycat rollbacked backend conn "+conn);
+		logger.debug("autocomit is false, but no commit or rollback, so mycat rollbacked backend conn " + conn);
 		conn.release();
 	}
 
 	@Override
-	public void fieldEofResponse(byte[] header, List<byte[]> fields,
-			byte[] eof, BackendConnection conn) {
+	public void fieldEofResponse(byte[] header, List<byte[]> fields, byte[] eof, BackendConnection conn) {
 	}
 
 	@Override
@@ -83,5 +83,4 @@ public class RollbackReleaseHandler implements ResponseHandler {
 	public void connectionClose(BackendConnection conn, String reason) {
 
 	}
-
 }

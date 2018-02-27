@@ -1,8 +1,9 @@
 package io.mycat.backend.mysql.nio.handler;
 
-import java.util.List;
 
 import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
+import java.util.List;
+
 
 /**
  * 中间结果处理器
@@ -11,19 +12,8 @@ import com.alibaba.druid.sql.ast.expr.SQLCharExpr;
  * @param <T>
  */
 public interface MiddlerResultHandler<T> {
-
- 	
-	public List<SQLCharExpr> getResult();
-	
-	public void  add(T t );
-	
-	public String getDataType();
-	
-	public void secondEexcute();
-	
-	
-	  
-	
-	
-	
- }
+	List<SQLCharExpr> getResult();
+	void add(T t );
+	String getDataType();
+	void secondEexcute();
+}

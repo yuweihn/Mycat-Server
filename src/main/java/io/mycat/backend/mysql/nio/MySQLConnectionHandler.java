@@ -23,11 +23,6 @@
  */
 package io.mycat.backend.mysql.nio;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
-
 import io.mycat.backend.mysql.ByteUtil;
 import io.mycat.backend.mysql.nio.handler.LoadDataResponseHandler;
 import io.mycat.backend.mysql.nio.handler.ResponseHandler;
@@ -36,6 +31,11 @@ import io.mycat.net.mysql.EOFPacket;
 import io.mycat.net.mysql.ErrorPacket;
 import io.mycat.net.mysql.OkPacket;
 import io.mycat.net.mysql.RequestFilePacket;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * life cycle: from connection establish to close <br/>
@@ -43,8 +43,7 @@ import io.mycat.net.mysql.RequestFilePacket;
  * @author mycat
  */
 public class MySQLConnectionHandler extends BackendAsyncHandler {
-	private static final Logger logger = LoggerFactory
-			.getLogger(MySQLConnectionHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(MySQLConnectionHandler.class);
 	private static final int RESULT_STATUS_INIT = 0;
 	private static final int RESULT_STATUS_HEADER = 1;
 	private static final int RESULT_STATUS_FIELD_EOF = 2;
@@ -68,7 +67,6 @@ public class MySQLConnectionHandler extends BackendAsyncHandler {
 		if (responseHandler != null) {
 			responseHandler.connectionError(e, source);
 		}
-
 	}
 
 	public MySQLConnection getSource() {
@@ -103,8 +101,7 @@ public class MySQLConnectionHandler extends BackendAsyncHandler {
 			default:
 				resultStatus = RESULT_STATUS_HEADER;
 				header = data;
-				fields = new ArrayList<byte[]>((int) ByteUtil.readLength(data,
-						4));
+				fields = new ArrayList<byte[]>((int) ByteUtil.readLength(data, 4));
 			}
 			break;
 		case RESULT_STATUS_HEADER:
@@ -176,8 +173,7 @@ public class MySQLConnectionHandler extends BackendAsyncHandler {
 	private void handleRequestPacket(byte[] data) {
 		ResponseHandler respHand = responseHandler;
 		if (respHand != null && respHand instanceof LoadDataResponseHandler) {
-			((LoadDataResponseHandler) respHand).requestDataResponse(data,
-					source);
+			((LoadDataResponseHandler) respHand).requestDataResponse(data, source);
 		} else {
 			closeNoHandler();
 		}
@@ -211,8 +207,7 @@ public class MySQLConnectionHandler extends BackendAsyncHandler {
 	private void closeNoHandler() {
 		if (!source.isClosedOrQuit()) {
 			source.close("no handler");
-			logger.warn("no handler bind in this con " + this + " client:"
-					+ source);
+			logger.warn("no handler bind in this con " + this + " client:" + source);
 		}
 	}
 
@@ -226,5 +221,4 @@ public class MySQLConnectionHandler extends BackendAsyncHandler {
 			closeNoHandler();
 		}
 	}
-
 }

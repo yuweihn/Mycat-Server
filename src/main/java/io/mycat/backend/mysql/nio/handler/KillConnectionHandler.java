@@ -23,10 +23,6 @@
  */
 package io.mycat.backend.mysql.nio.handler;
 
-import java.io.UnsupportedEncodingException;
-import java.util.List;
-
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import io.mycat.backend.BackendConnection;
 import io.mycat.backend.mysql.nio.MySQLConnection;
@@ -34,19 +30,23 @@ import io.mycat.net.mysql.CommandPacket;
 import io.mycat.net.mysql.ErrorPacket;
 import io.mycat.net.mysql.MySQLPacket;
 import io.mycat.server.NonBlockingSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
 
 /**
  * @author mycat
  */
 public class KillConnectionHandler implements ResponseHandler {
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(KillConnectionHandler.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(KillConnectionHandler.class);
 
 	private final MySQLConnection killee;
 	private final NonBlockingSession session;
 
-	public KillConnectionHandler(BackendConnection killee,
-			NonBlockingSession session) {
+	public KillConnectionHandler(BackendConnection killee, NonBlockingSession session) {
 		this.killee = (MySQLConnection) killee;
 		this.session = session;
 	}
@@ -58,8 +58,7 @@ public class KillConnectionHandler implements ResponseHandler {
 		CommandPacket packet = new CommandPacket();
 		packet.packetId = 0;
 		packet.command = MySQLPacket.COM_QUERY;
-		packet.arg = new StringBuilder("KILL ").append(killee.getThreadId())
-				.toString().getBytes();
+		packet.arg = new StringBuilder("KILL ").append(killee.getThreadId()).toString().getBytes();
 		packet.write(mysqlCon);
 	}
 
@@ -71,12 +70,10 @@ public class KillConnectionHandler implements ResponseHandler {
 	@Override
 	public void okResponse(byte[] ok, BackendConnection conn) {
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("kill connection success connection id:"
-					+ killee.getThreadId());
+			LOGGER.debug("kill connection success connection id:" + killee.getThreadId());
 		}
 		conn.release();
 		killee.close("killed");
-
 	}
 
 	@Override
@@ -98,19 +95,18 @@ public class KillConnectionHandler implements ResponseHandler {
 		} catch (UnsupportedEncodingException e) {
 			msg = new String(err.message);
 		}
-		LOGGER.warn("kill backend connection " + killee + " failed: " + msg
-				+ " con:" + conn);
+		LOGGER.warn("kill backend connection " + killee + " failed: " + msg + " con:" + conn);
 		conn.release();
 		killee.close("exception:" + msg);
 	}
 
 	@Override
-	public void fieldEofResponse(byte[] header, List<byte[]> fields,
-			byte[] eof, BackendConnection conn) {
+	public void fieldEofResponse(byte[] header, List<byte[]> fields, byte[] eof, BackendConnection conn) {
 	}
 
 	@Override
 	public void rowResponse(byte[] row, BackendConnection conn) {
+
 	}
 
 	@Override
@@ -120,6 +116,6 @@ public class KillConnectionHandler implements ResponseHandler {
 
 	@Override
 	public void connectionClose(BackendConnection conn, String reason) {
-	}
 
+	}
 }

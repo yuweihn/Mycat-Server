@@ -1,11 +1,14 @@
 package io.mycat.backend.mysql.nio.handler;
 
+
 import java.util.List;
 
-public class SecondQueryHandler implements SecondHandler {
 
+public class SecondQueryHandler implements SecondHandler {
 	public MiddlerResultHandler middlerResultHandler;
-	public SecondQueryHandler(MiddlerResultHandler middlerResultHandler){
+
+
+	public SecondQueryHandler(MiddlerResultHandler middlerResultHandler) {
 		this.middlerResultHandler =  middlerResultHandler;
 	}
 
@@ -14,6 +17,4 @@ public class SecondQueryHandler implements SecondHandler {
 		// TODO Auto-generated method stub
 		
 	}
-	 
-
 }

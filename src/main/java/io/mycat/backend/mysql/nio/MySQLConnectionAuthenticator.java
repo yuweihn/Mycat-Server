@@ -23,6 +23,7 @@
  */
 package io.mycat.backend.mysql.nio;
 
+
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import io.mycat.MycatServer;
@@ -38,19 +39,18 @@ import io.mycat.net.mysql.HandshakePacket;
 import io.mycat.net.mysql.OkPacket;
 import io.mycat.net.mysql.Reply323Packet;
 
+
 /**
  * MySQL 验证处理器
  * 
  * @author mycat
  */
 public class MySQLConnectionAuthenticator implements NIOHandler {
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(MySQLConnectionAuthenticator.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MySQLConnectionAuthenticator.class);
 	private final MySQLConnection source;
 	private final ResponseHandler listener;
 
-	public MySQLConnectionAuthenticator(MySQLConnection source,
-			ResponseHandler listener) {
+	public MySQLConnectionAuthenticator(MySQLConnection source, ResponseHandler listener) {
 		this.source = source;
 		this.listener = listener;
 	}
@@ -74,10 +74,9 @@ public class MySQLConnectionAuthenticator implements NIOHandler {
 				// 处理认证结果
 				source.setHandler(new MySQLConnectionHandler(source));
 				source.setAuthenticated(true);
-				boolean clientCompress = Capabilities.CLIENT_COMPRESS==(Capabilities.CLIENT_COMPRESS & packet.serverCapabilities);
-				boolean usingCompress= MycatServer.getInstance().getConfig().getSystem().getUseCompression()==1 ;
-				if(clientCompress&&usingCompress)
-				{
+				boolean clientCompress = Capabilities.CLIENT_COMPRESS == (Capabilities.CLIENT_COMPRESS & packet.serverCapabilities);
+				boolean usingCompress = MycatServer.getInstance().getConfig().getSystem().getUseCompression() == 1 ;
+				if(clientCompress && usingCompress) {
 					source.setSupportCompress(true);
 				}
 				if (listener != null) {
@@ -88,10 +87,9 @@ public class MySQLConnectionAuthenticator implements NIOHandler {
 				ErrorPacket err = new ErrorPacket();
 				err.read(data);
 				String errMsg = new String(err.message);
-				LOGGER.warn("can't connect to mysql server ,errmsg:"+errMsg+" "+source);
+				LOGGER.warn("can't connect to mysql server, errmsg:" + errMsg + " " + source);
 				//source.close(errMsg);
 				throw new ConnectionException(err.errno, errMsg);
-
 			case EOFPacket.FIELD_COUNT:
 				auth323(data[3]);
 				break;
@@ -105,9 +103,7 @@ public class MySQLConnectionAuthenticator implements NIOHandler {
 				} else {
 					throw new RuntimeException("Unknown Packet!");
 				}
-
 			}
-
 		} catch (RuntimeException e) {
 			if (listener != null) {
 				listener.connectionError(e, source);
@@ -119,7 +115,7 @@ public class MySQLConnectionAuthenticator implements NIOHandler {
 
 	private void processHandShakePacket(byte[] data) {
 		// 设置握手数据包
-		HandshakePacket packet= new HandshakePacket();
+		HandshakePacket packet = new HandshakePacket();
 		packet.read(data);
 		source.setHandshake(packet);
 		source.setThreadId(packet.threadId);
@@ -141,10 +137,8 @@ public class MySQLConnectionAuthenticator implements NIOHandler {
 		String pass = source.getPassword();
 		if (pass != null && pass.length() > 0) {
 			byte[] seed = source.getHandshake().seed;
-			r323.seed = SecurityUtil.scramble323(pass, new String(seed))
-					.getBytes();
+			r323.seed = SecurityUtil.scramble323(pass, new String(seed)).getBytes();
 		}
 		r323.write(source);
 	}
-
 }

@@ -1,11 +1,5 @@
 package io.mycat.backend.mysql.nio.handler;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.mycat.MycatServer;
 import io.mycat.backend.BackendConnection;
@@ -15,6 +9,13 @@ import io.mycat.net.mysql.OkPacket;
 import io.mycat.route.RouteResultset;
 import io.mycat.route.RouteResultsetNode;
 import io.mycat.server.NonBlockingSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+
 
 /**
  * lock tables 语句处理器
@@ -22,7 +23,6 @@ import io.mycat.server.NonBlockingSession;
  * 
  */
 public class LockTablesHandler extends MultiNodeHandler {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(LockTablesHandler.class);
 
 	private final RouteResultset rrs;
@@ -88,7 +88,7 @@ public class LockTablesHandler extends MultiNodeHandler {
 				lock.lock();
 				try {
 					ok.packetId = ++ packetId;
-					ok.serverStatus = session.getSource().isAutocommit() ? 2:1;
+					ok.serverStatus = session.getSource().isAutocommit() ? 2 : 1;
 				} finally {
 					lock.unlock();
 				}
@@ -131,5 +131,4 @@ public class LockTablesHandler extends MultiNodeHandler {
 		// TODO Auto-generated method stub
 
 	}
-
 }
