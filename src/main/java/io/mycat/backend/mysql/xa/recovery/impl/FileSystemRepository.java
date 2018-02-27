@@ -1,5 +1,6 @@
 package io.mycat.backend.mysql.xa.recovery.impl;
 
+
 import io.mycat.MycatServer;
 import io.mycat.backend.mysql.xa.*;
 import io.mycat.backend.mysql.xa.recovery.*;
@@ -16,17 +17,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  * Created by zhangchao on 2016/10/13.
  */
 public class FileSystemRepository implements Repository{
-    public static final Logger logger = LoggerFactory
-            .getLogger(FileSystemRepository.class);
+    public static final Logger logger = LoggerFactory.getLogger(FileSystemRepository.class);
+
+
     private VersionedFile file;
     private FileChannel rwChannel = null;
 
     public FileSystemRepository()  {
-           init();
+        init();
     }
 
     @Override
@@ -47,14 +50,12 @@ public class FileSystemRepository implements Repository{
         createBaseDir(baseDir);
 
         file = new VersionedFile(baseDir, baseName, ".log");
-
     }
 
     private Serializer serializer = new Serializer();
 
     @Override
     public void put(String id, CoordinatorLogEntry coordinatorLogEntry) {
-
         try {
             initChannelIfNecessary();
             write(coordinatorLogEntry, true);
@@ -63,23 +64,20 @@ public class FileSystemRepository implements Repository{
         }
     }
 
-    private synchronized void initChannelIfNecessary()
-            throws FileNotFoundException {
+    private synchronized void initChannelIfNecessary() throws FileNotFoundException {
         if (rwChannel == null) {
             rwChannel = file.openNewVersionForNioWriting();
         }
     }
 
-    private void write(CoordinatorLogEntry coordinatorLogEntry,
-                       boolean flushImmediately) throws IOException {
+    private void write(CoordinatorLogEntry coordinatorLogEntry, boolean flushImmediately) throws IOException {
         String str = serializer.toJSON(coordinatorLogEntry);
         byte[] buffer = str.getBytes();
         ByteBuffer buff = ByteBuffer.wrap(buffer);
         writeToFile(buff, flushImmediately);
     }
 
-    private synchronized void writeToFile(ByteBuffer buff, boolean force)
-            throws IOException {
+    private synchronized void writeToFile(ByteBuffer buff, boolean force) throws IOException {
         rwChannel.write(buff);
         rwChannel.force(force);
     }
@@ -110,8 +108,7 @@ public class FileSystemRepository implements Repository{
         return Collections.emptyList();
     }
 
-    public static Collection<CoordinatorLogEntry> readFromInputStream(
-            InputStream in) {
+    public static Collection<CoordinatorLogEntry> readFromInputStream(InputStream in) {
         Map<String, CoordinatorLogEntry> coordinatorLogEntries = new HashMap<String, CoordinatorLogEntry>();
         BufferedReader br = null;
         try {
@@ -126,44 +123,34 @@ public class FileSystemRepository implements Repository{
         return coordinatorLogEntries.values();
     }
 
-    static Map<String, CoordinatorLogEntry> readContent(BufferedReader br)
-            throws IOException {
-
+    static Map<String, CoordinatorLogEntry> readContent(BufferedReader br) throws IOException {
         Map<String, CoordinatorLogEntry> coordinatorLogEntries = new HashMap<String, CoordinatorLogEntry>();
         try {
             String line;
             while ((line = br.readLine()) != null) {
                 CoordinatorLogEntry coordinatorLogEntry = deserialize(line);
-                coordinatorLogEntries.put(coordinatorLogEntry.id,
-                        coordinatorLogEntry);
+                coordinatorLogEntries.put(coordinatorLogEntry.id, coordinatorLogEntry);
             }
-
         } catch (EOFException unexpectedEOF) {
-            logger.info(
-                    "Unexpected EOF - logfile not closed properly last time?",
-                    unexpectedEOF);
+            logger.info("Unexpected EOF - logfile not closed properly last time?", unexpectedEOF);
             // merely return what was read so far...
         } catch (StreamCorruptedException unexpectedEOF) {
-            logger.info(
-                    "Unexpected EOF - logfile not closed properly last time?",
-                    unexpectedEOF);
+            logger.info("Unexpected EOF - logfile not closed properly last time?", unexpectedEOF);
             // merely return what was read so far...
         } catch (ObjectStreamException unexpectedEOF) {
-            logger.info(
-                    "Unexpected EOF - logfile not closed properly last time?",
-                    unexpectedEOF);
+            logger.info("Unexpected EOF - logfile not closed properly last time?", unexpectedEOF);
             // merely return what was read so far...
         } catch (DeserialisationException unexpectedEOF) {
-            logger.info("Unexpected EOF - logfile not closed properly last time? "
-                    + unexpectedEOF);
+            logger.info("Unexpected EOF - logfile not closed properly last time?", unexpectedEOF);
         }
         return coordinatorLogEntries;
     }
 
     private static void closeSilently(BufferedReader fis) {
         try {
-            if (fis != null)
+            if (fis != null) {
                 fis.close();
+            }
         } catch (IOException io) {
             logger.warn("Fail to close logfile after reading - ignoring");
         }
@@ -171,8 +158,7 @@ public class FileSystemRepository implements Repository{
 
     private static Deserializer deserializer = new Deserializer();
 
-    private static CoordinatorLogEntry deserialize(String line)
-            throws DeserialisationException {
+    private static CoordinatorLogEntry deserialize(String line) throws DeserialisationException {
         return deserializer.fromJSON(line);
     }
 
@@ -183,7 +169,6 @@ public class FileSystemRepository implements Repository{
         } catch (Exception e) {
             logger.warn("Error closing file - ignoring", e);
         }
-
     }
 
     protected void closeOutput() throws IllegalStateException {
@@ -197,10 +182,7 @@ public class FileSystemRepository implements Repository{
     }
 
     @Override
-    public synchronized void writeCheckpoint(
-            Collection<CoordinatorLogEntry> checkpointContent)
-             {
-
+    public synchronized void writeCheckpoint(Collection<CoordinatorLogEntry> checkpointContent) {
         try {
             closeOutput();
 
@@ -216,7 +198,6 @@ public class FileSystemRepository implements Repository{
         } catch (Exception e) {
             logger.error("Failed to write checkpoint", e);
         }
-
     }
 
     /**
@@ -224,10 +205,9 @@ public class FileSystemRepository implements Repository{
      * @param baseDir
      */
     public void createBaseDir(String baseDir){
-        File baseDirFolder = new File (baseDir);
+        File baseDirFolder = new File(baseDir);
         if (!baseDirFolder.exists()){
-                baseDirFolder.mkdirs();
+            baseDirFolder.mkdirs();
         }
     }
-
 }

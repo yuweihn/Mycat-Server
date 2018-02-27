@@ -23,10 +23,12 @@
  */
 package io.mycat.backend.mysql;
 
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 
 /**
  * @author mycat
@@ -187,16 +189,16 @@ public class StreamUtil {
             throw new EOFException();
         }
         switch (length) {
-        case 251:
-            return NULL_LENGTH;
-        case 252:
-            return readUB2(in);
-        case 253:
-            return readUB3(in);
-        case 254:
-            return readLong(in);
-        default:
-            return length;
+            case 251:
+                return NULL_LENGTH;
+            case 252:
+                return readUB2(in);
+            case 253:
+                return readUB3(in);
+            case 254:
+                return readLong(in);
+            default:
+                return length;
         }
     }
 
@@ -236,5 +238,4 @@ public class StreamUtil {
         }
         out.write(src);
     }
-
 }

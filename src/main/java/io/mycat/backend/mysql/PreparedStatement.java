@@ -23,16 +23,17 @@
  */
 package io.mycat.backend.mysql;
 
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  * @author mycat, CrazyPig
  */
 public class PreparedStatement {
-
     private long id;
     private String statement;
     private int columnsNumber;

@@ -23,11 +23,11 @@
  */
 package io.mycat.backend.mysql;
 
+
 /**
  * @author mycat
  */
 public class BindValue {
-
     public boolean isNull; /* NULL indicator */
     public boolean isLongData; /* long data indicator */
     public boolean isSet; /* has this parameter been set */
@@ -62,5 +62,4 @@ public class BindValue {
         this.doubleBinding = 0D;
         this.value = null;
     }
-
 }

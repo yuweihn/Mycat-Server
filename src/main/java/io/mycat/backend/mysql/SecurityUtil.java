@@ -23,8 +23,10 @@
  */
 package io.mycat.backend.mysql;
 
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
 
 /**
  * 加密解密工具类
@@ -32,7 +34,6 @@ import java.security.NoSuchAlgorithmException;
  * @author mycat
  */
 public class SecurityUtil {
-
     public static final byte[] scramble411(byte[] pass, byte[] seed) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA-1");
         byte[] pass1 = md.digest(pass);
@@ -98,5 +99,4 @@ public class SecurityUtil {
         result[1] = nr2 & 0x7fffffffL;
         return result;
     }
-
 }

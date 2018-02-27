@@ -23,12 +23,14 @@
  */
 package io.mycat.backend.mysql;
 
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Calendar;
+
 
 /**
  * @author mycat
@@ -199,7 +201,7 @@ public class MySQLMessage {
 
     public byte[] readBytesWithLength() {
         int length = (int) readLength();
-        if(length==NULL_LENGTH)
+        if(length == NULL_LENGTH)
         {
             return null;
         }
@@ -272,17 +274,17 @@ public class MySQLMessage {
             }
         }
         switch (offset) {
-        case -1:
-            String s1 = new String(b, position, length - position, charset);
-            position = length;
-            return s1;
-        case 0:
-            position++;
-            return null;
-        default:
-            String s2 = new String(b, position, offset - position, charset);
-            position = offset + 1;
-            return s2;
+            case -1:
+                String s1 = new String(b, position, length - position, charset);
+                position = length;
+                return s1;
+            case 0:
+                position++;
+                return null;
+            default:
+                String s2 = new String(b, position, offset - position, charset);
+                position = offset + 1;
+                return s2;
         }
     }
 
@@ -357,5 +359,4 @@ public class MySQLMessage {
         }
         return cal;
     }
-
 }

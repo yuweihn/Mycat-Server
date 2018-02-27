@@ -1,12 +1,13 @@
 package io.mycat.backend.mysql.xa;
 
+
 import java.io.Serializable;
+
 
 /**
  * Created by zhangchao on 2016/10/17.
  */
 public class ParticipantLogEntry implements Serializable {
-
     private static final long serialVersionUID = 1728296701394899871L;
 
     /**
@@ -37,8 +38,7 @@ public class ParticipantLogEntry implements Serializable {
      */
     public String resourceName;
 
-    public ParticipantLogEntry(String coordinatorId, String uri,
-                               long expires, String resourceName, int txState) {
+    public ParticipantLogEntry(String coordinatorId, String uri, long expires, String resourceName, int txState) {
         this.coordinatorId = coordinatorId;
         this.uri = uri;
         this.expires = expires;
@@ -47,13 +47,14 @@ public class ParticipantLogEntry implements Serializable {
     }
 
 
-
     @Override
     public boolean equals(Object other) {
         boolean ret = false;
         if (other instanceof ParticipantLogEntry) {
             ParticipantLogEntry o = (ParticipantLogEntry) other;
-            if (o.coordinatorId.equals(coordinatorId) && o.uri.equals(uri)) ret = true;
+            if (o.coordinatorId.equals(coordinatorId) && o.uri.equals(uri)) {
+                ret = true;
+            }
         }
         return ret;
     }
@@ -63,14 +64,10 @@ public class ParticipantLogEntry implements Serializable {
         return coordinatorId.hashCode();
     }
 
-
-
     @Override
     public String toString() {
         return "ParticipantLogEntry [id=" + coordinatorId
                 + ", uri=" + uri + ", expires=" + expires
                 + ", state=" + txState + ", resourceName=" + resourceName + "]";
     }
-
-
 }

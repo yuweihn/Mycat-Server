@@ -23,11 +23,11 @@
  */
 package io.mycat.backend.mysql;
 
+
 /**
  * @author mycat
  */
 public class ByteUtil {
-
     public static int readUB2(byte[] data, int offset) {
         int i = data[offset] & 0xff;
         i |= (data[++offset] & 0xff) << 8;
@@ -112,5 +112,4 @@ public class ByteUtil {
             return 9;
         }
     }
-
 }

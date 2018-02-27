@@ -23,13 +23,14 @@
  */
 package io.mycat.backend.mysql;
 
+
 import java.nio.ByteBuffer;
+
 
 /**
  * @author mycat
  */
 public class BufferUtil {
-
     public static final void writeUB2(ByteBuffer buffer, int i) {
         buffer.put((byte) (i & 0xff));
         buffer.put((byte) (i >>> 8));
@@ -143,5 +144,4 @@ public class BufferUtil {
             return 9 + length;
         }
     }
-
 }
