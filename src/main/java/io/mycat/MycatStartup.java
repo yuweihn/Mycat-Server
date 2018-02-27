@@ -24,15 +24,14 @@
 package io.mycat;
 
 
+import io.mycat.config.loader.zkprocess.comm.ZkConfig;
+import io.mycat.config.model.SystemConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.mycat.config.loader.zkprocess.comm.ZkConfig;
-import io.mycat.config.model.SystemConfig;
 
 /**
  * @author mycat

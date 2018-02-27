@@ -548,7 +548,7 @@ public class MycatServer {
 				} catch (Exception e) {
 					LOGGER.warn("catletClassClear err " + e);
 				}
-			};
+			}
 		};
 	}
 	
@@ -560,27 +560,26 @@ public class MycatServer {
 	private Runnable dataSourceOldConsClear() {
 		return new Runnable() {
 			@Override
-			public void run() {				
+			public void run() {
 				timerExecutor.execute(new Runnable() {
 					@Override
-					public void run() {		
-						
+					public void run() {
 						long sqlTimeout = MycatServer.getInstance().getConfig().getSystem().getSqlExecuteTimeout() * 1000L;
 						
-						//根据 lastTime 确认事务的执行， 超过 sqlExecuteTimeout 阀值 close connection 
+						//根据 lastTime 确认事务的执行， 超过 sqlExecuteTimeout 阀值 close connection
 						long currentTime = TimeUtil.currentTimeMillis();
 						Iterator<BackendConnection> iter = NIOProcessor.backends_old.iterator();
 						while(iter.hasNext()) {
-							BackendConnection con = iter.next();							
-							long lastTime = con.getLastTime();						
+							BackendConnection con = iter.next();
+							long lastTime = con.getLastTime();
 							if (currentTime - lastTime > sqlTimeout) {
 								con.close("clear old backend connection ...");
-								iter.remove();									
+								iter.remove();
 							}
 						}
-					}				
-				});				
-			};
+					}
+				});
+			}
 		};
 	}
 	
@@ -599,12 +598,12 @@ public class MycatServer {
 				    long bufferSize = bufferPool.size();
 				    long bufferCapacity = bufferPool.capacity();
 					long bufferUsagePercent = (bufferCapacity - bufferSize) * 100 / bufferCapacity;
-					if(bufferUsagePercent < config.getSystem().getBufferUsagePercent()){
+					if(bufferUsagePercent < config.getSystem().getBufferUsagePercent()) {
 						Map<String, UserStat> map = UserStatAnalyzer.getInstance().getUserStatMap();
 						Set<String> userSet = config.getUsers().keySet();
 						for (String user : userSet) {
 							UserStat userStat = map.get(user);
-							if(userStat != null){
+							if(userStat != null) {
 								SqlResultSizeRecorder recorder = userStat.getSqlResultSizeRecorder();
 								//System.out.println(recorder.getSqlResultSet().size());
 								recorder.clearSqlResultSet();
@@ -614,7 +613,7 @@ public class MycatServer {
 				} catch (Exception e) {
 					LOGGER.warn("resultSetMapClear err " + e);
 				}
-			};
+			}
 		};
 	}
 
@@ -702,7 +701,6 @@ public class MycatServer {
 			}
 		}
 	}
-
 
 	private boolean isUseZk() {
 		String loadZk = ZkConfig.getInstance().getValue(ZkParamCfg.ZK_CFG_FLAG);
@@ -793,7 +791,6 @@ public class MycatServer {
 						} catch (Exception e) {
 							LOGGER.warn("checkBackendCons caught err:" + e);
 						}
-
 					}
 				});
 				timerExecutor.execute(new Runnable() {
@@ -820,7 +817,6 @@ public class MycatServer {
 				timerExecutor.execute(new Runnable() {
 					@Override
 					public void run() {
-						
 						Map<String, PhysicalDBPool> nodes = config.getDataHosts();
 						for (PhysicalDBPool node : nodes.values()) {
 							node.heartbeatCheck(heartPeriod);
@@ -899,18 +895,18 @@ public class MycatServer {
 		//fetch the recovery log
 		CoordinatorLogEntry[] coordinatorLogEntries = getCoordinatorLogEntries();
 
-		for(int i = 0; i < coordinatorLogEntries.length; i++){
+		for(int i = 0; i < coordinatorLogEntries.length; i++) {
 			CoordinatorLogEntry coordinatorLogEntry = coordinatorLogEntries[i];
 			boolean needRollback = false;
 			for(int j = 0; j < coordinatorLogEntry.participants.length; j++) {
 				ParticipantLogEntry participantLogEntry = coordinatorLogEntry.participants[j];
-				if (participantLogEntry.txState == TxState.TX_PREPARED_STATE){
+				if (participantLogEntry.txState == TxState.TX_PREPARED_STATE) {
 					needRollback = true;
 					break;
 				}
 			}
-			if(needRollback){
-				for(int j = 0; j < coordinatorLogEntry.participants.length; j++){
+			if(needRollback) {
+				for(int j = 0; j < coordinatorLogEntry.participants.length; j++) {
 					ParticipantLogEntry participantLogEntry = coordinatorLogEntry.participants[j];
 					//XA rollback
 					String xacmd = "XA ROLLBACK " + coordinatorLogEntry.id + ';';
@@ -937,7 +933,7 @@ public class MycatServer {
 		}
 
 		//init into in memory cached
-		for(int i = 0; i < coordinatorLogEntries.length; i++){
+		for(int i = 0; i < coordinatorLogEntries.length; i++) {
 			MultiNodeCoordinator.inMemoryRepository.put(coordinatorLogEntries[i].id, coordinatorLogEntries[i]);
 		}
 		//discard the recovery log

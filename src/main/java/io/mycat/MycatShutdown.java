@@ -23,7 +23,9 @@
  */
 package io.mycat;
 
+
 import java.util.Date;
+
 
 /**
  * @author mycat
@@ -31,7 +33,7 @@ import java.util.Date;
 public final class MycatShutdown {
 
     public static void main(String[] args) {
-        System.out.println(new Date() + ",server shutdown!");
+        System.out.println(new Date() + ", server shutdown!");
     }
 
 }
