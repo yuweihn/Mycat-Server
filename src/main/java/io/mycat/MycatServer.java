@@ -144,6 +144,8 @@ public class MycatServer {
 	private long totalNetWorkBufferSize = 0;
 
 	private final AtomicBoolean startup = new AtomicBoolean(false);
+
+
 	private MycatServer() {
 		//读取文件配置
 		this.config = new MycatConfig();
