@@ -89,6 +89,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author mycat
  */
 public class MycatServer {
+	private static final Logger LOGGER = LoggerFactory.getLogger(MycatServer.class);
+
+
 	public static final String NAME = "MyCat";
 	private static final long LOG_WATCH_DELAY = 60000L;
 	private static final long TIME_UPDATE_PERIOD = 20L;
@@ -96,7 +99,6 @@ public class MycatServer {
 	private static final long DEFAULT_OLD_CONNECTION_CLEAR_PERIOD = 5 * 1000L;
 	
 	private static final MycatServer INSTANCE = new MycatServer();
-	private static final Logger LOGGER = LoggerFactory.getLogger("MycatServer");
 	private static final Repository fileRepository = new FileSystemRepository();
 	private final RouteService routerService;
 	private final CacheService cacheService;
@@ -126,10 +128,6 @@ public class MycatServer {
 	 */
 	private MyCatMemory myCatMemory = null;
 
-	public static final MycatServer getInstance() {
-		return INSTANCE;
-	}
-
 	private final MycatConfig config;
 	private final ScheduledExecutorService scheduler;
 	private final ScheduledExecutorService heartbeatScheduler;
@@ -142,8 +140,8 @@ public class MycatServer {
 	private NameableExecutor sequenceExecutor;
 	private NameableExecutor timerExecutor;
 	private ListeningExecutorService listeningExecutorService;
-	private  InterProcessMutex dnindexLock;
-	private  long totalNetWorkBufferSize = 0;
+	private InterProcessMutex dnindexLock;
+	private long totalNetWorkBufferSize = 0;
 
 	private final AtomicBoolean startup = new AtomicBoolean(false);
 	private MycatServer() {
@@ -191,6 +189,11 @@ public class MycatServer {
 			String path = ZKUtils.getZKBasePath() + "lock/dnindex.lock";
 			dnindexLock = new InterProcessMutex(ZKUtils.getConnection(), path);
 		}
+	}
+
+
+	public static final MycatServer getInstance() {
+		return INSTANCE;
 	}
 
 	public AtomicBoolean getStartup() {
