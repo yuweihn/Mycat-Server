@@ -43,7 +43,7 @@
 	</dataHost>
 	<!--
 	<dataHost name="sequoiadb1" maxCon="1000" minCon="1" balance="0" dbType="sequoiadb" dbDriver="jdbc">
-		<heartbeat> 		</heartbeat>
+		<heartbeat></heartbeat>
 		<writeHost host="hostM1" url="sequoiadb://1426587161.dbaas.sequoialab.net:11920/SAMPLE" user="jifeng" password="jifeng"></writeHost>
 	</dataHost>
 
@@ -59,7 +59,7 @@
 	</dataHost>
 
 	<dataHost name="sparksql" maxCon="1000" minCon="1" balance="0" dbType="spark" dbDriver="jdbc">
-		<heartbeat> </heartbeat>
+		<heartbeat></heartbeat>
 		<writeHost host="hostM1" url="jdbc:hive2://feng01:10000" user="jifeng" 	password="jifeng"></writeHost>
 	</dataHost>
 
