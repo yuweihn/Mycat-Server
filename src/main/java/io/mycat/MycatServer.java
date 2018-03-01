@@ -361,7 +361,7 @@ public class MycatServer {
 			/**
 		 * Off Heap For Merge/Order/Group/Limit 初始化
 		 */
-		if(system.getUseOffHeapForMerge() == 1){
+		if(system.getUseOffHeapForMerge() == 1) {
 			try {
 				myCatMemory = new MyCatMemory(system, totalNetWorkBufferSize);
 			} catch (NoSuchFieldException e) {
