@@ -492,8 +492,9 @@ public class MycatServer {
 			throw new RuntimeException(e);
 		} finally {
 			try {
-				if(ruleDataLock != null)
-				ruleDataLock.release();
+				if(ruleDataLock != null) {
+					ruleDataLock.release();
+				}
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}
