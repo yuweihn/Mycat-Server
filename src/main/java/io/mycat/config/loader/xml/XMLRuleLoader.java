@@ -23,18 +23,6 @@
  */
 package io.mycat.config.loader.xml;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLSyntaxErrorException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import io.mycat.config.model.rule.RuleConfig;
 import io.mycat.config.model.rule.TableRuleConfig;
 import io.mycat.config.util.ConfigException;
@@ -42,6 +30,17 @@ import io.mycat.config.util.ConfigUtil;
 import io.mycat.config.util.ParameterMapping;
 import io.mycat.route.function.AbstractPartitionAlgorithm;
 import io.mycat.util.SplitUtil;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLSyntaxErrorException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author mycat
@@ -157,7 +156,7 @@ public class XMLRuleLoader {
 		}
 	}
 
-	private RuleConfig loadRule(Element element) throws SQLSyntaxErrorException {
+	private RuleConfig loadRule(Element element) {
 		//读取columns
 		Element columnsEle = ConfigUtil.loadElement(element, "columns");
 		String column = columnsEle.getTextContent();
@@ -196,8 +195,7 @@ public class XMLRuleLoader {
 				String name = e.getAttribute("name");
 				//如果Map已有，则function重复
 				if (functions.containsKey(name)) {
-					throw new ConfigException("rule function " + name
-							+ " duplicated!");
+					throw new ConfigException("rule function " + name + " duplicated!");
 				}
 				//获取class标签
 				String clazz = e.getAttribute("class");
@@ -215,7 +213,7 @@ public class XMLRuleLoader {
 
 	private AbstractPartitionAlgorithm createFunction(String name, String clazz)
 			throws ClassNotFoundException, InstantiationException,
-			IllegalAccessException, InvocationTargetException {
+			IllegalAccessException {
 		Class<?> clz = Class.forName(clazz);
 		//判断是否继承AbstractPartitionAlgorithm
 		if (!AbstractPartitionAlgorithm.class.isAssignableFrom(clz)) {
