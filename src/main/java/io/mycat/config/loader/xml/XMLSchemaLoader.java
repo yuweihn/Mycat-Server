@@ -648,7 +648,7 @@ public class XMLSchemaLoader implements SchemaLoader {
 		String user = node.getAttribute("user");
 		String password = node.getAttribute("password");
 		String usingDecrypt = node.getAttribute("usingDecrypt");
-		String passwordEncryty= DecryptUtil.DBHostDecrypt(usingDecrypt, nodeHost, user, password);
+		String passwordEncrypt= DecryptUtil.DBHostDecrypt(usingDecrypt, nodeHost, user, password);
 		
 		String weightStr = node.getAttribute("weight");
 		int weight = "".equals(weightStr) ? PhysicalDBPool.WEIGHT : Integer.parseInt(weightStr) ;
@@ -677,7 +677,7 @@ public class XMLSchemaLoader implements SchemaLoader {
 			port = url.getPort();
 		}
 
-		DBHostConfig conf = new DBHostConfig(nodeHost, ip, port, nodeUrl, user, passwordEncryty,password);
+		DBHostConfig conf = new DBHostConfig(nodeHost, ip, port, nodeUrl, user, passwordEncrypt, password);
 		conf.setDbType(dbType);
 		conf.setMaxCon(maxCon);
 		conf.setMinCon(minCon);
@@ -779,7 +779,7 @@ public class XMLSchemaLoader implements SchemaLoader {
 
 			DataHostConfig hostConf = new DataHostConfig(name, dbType, dbDriver, writeDbConfs
                     , readHostsMap, switchType, slaveThreshold, tempReadHostAvailable);
-			
+
 			hostConf.setMaxCon(maxCon);
 			hostConf.setMinCon(minCon);
 			hostConf.setBalance(balance);
