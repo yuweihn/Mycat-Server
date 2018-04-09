@@ -68,8 +68,7 @@ public class XMLRuleLoader {
 	}
 
 	public Map<String, TableRuleConfig> getTableRules() {
-		return (Map<String, TableRuleConfig>) (tableRules.isEmpty() ? Collections
-				.emptyMap() : tableRules);
+		return (Map<String, TableRuleConfig>) (tableRules.isEmpty() ? Collections.emptyMap() : tableRules);
 	}
 
 	
@@ -82,8 +81,7 @@ public class XMLRuleLoader {
 			dtd = XMLRuleLoader.class.getResourceAsStream(dtdFile);
 			xml = XMLRuleLoader.class.getResourceAsStream(xmlFile);
 			//读取出语意树
-			Element root = ConfigUtil.getDocument(dtd, xml)
-					.getDocumentElement();
+			Element root = ConfigUtil.getDocument(dtd, xml).getDocumentElement();
 			//加载Function
 			loadFunctions(root);
 			//加载TableRule
@@ -119,7 +117,7 @@ public class XMLRuleLoader {
 	 * @param root
 	 * @throws SQLSyntaxErrorException
      */
-	private void loadTableRules(Element root) throws SQLSyntaxErrorException {
+	private void loadTableRules(Element root) {
 		//获取每个tableRule标签
 		NodeList list = root.getElementsByTagName("tableRule");
 		for (int i = 0, n = list.getLength(); i < n; ++i) {
@@ -129,15 +127,13 @@ public class XMLRuleLoader {
 				//先判断是否重复
 				String name = e.getAttribute("name");
 				if (tableRules.containsKey(name)) {
-					throw new ConfigException("table rule " + name
-							+ " duplicated!");
+					throw new ConfigException("table rule " + name + " duplicated!");
 				}
 				//获取rule标签
 				NodeList ruleNodes = e.getElementsByTagName("rule");
 				int length = ruleNodes.getLength();
 				if (length > 1) {
-					throw new ConfigException("only one rule can defined :"
-							+ name);
+					throw new ConfigException("only one rule can defined: " + name);
 				}
 				//目前只处理第一个，未来可能有多列复合逻辑需求
 				//RuleConfig是保存着rule与function对应关系的对象
@@ -146,8 +142,7 @@ public class XMLRuleLoader {
 				//判断function是否存在，获取function
 				AbstractPartitionAlgorithm func = functions.get(funName);
 				if (func == null) {
-					throw new ConfigException("can't find function of name :"
-							+ funName);
+					throw new ConfigException("can't find function of name: " + funName);
 				}
 				rule.setRuleAlgorithm(func);
 				//保存到tableRules
@@ -162,8 +157,7 @@ public class XMLRuleLoader {
 		String column = columnsEle.getTextContent();
 		String[] columns = SplitUtil.split(column, ',', true);
 		if (columns.length > 1) {
-			throw new ConfigException("table rule coulmns has multi values:"
-					+ columnsEle.getTextContent());
+			throw new ConfigException("table rule coulmns has multi values: " + columnsEle.getTextContent());
 		}
 		//读取algorithm
 		Element algorithmEle = ConfigUtil.loadElement(element, "algorithm");
@@ -212,8 +206,7 @@ public class XMLRuleLoader {
 	}
 
 	private AbstractPartitionAlgorithm createFunction(String name, String clazz)
-			throws ClassNotFoundException, InstantiationException,
-			IllegalAccessException {
+			throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		Class<?> clz = Class.forName(clazz);
 		//判断是否继承AbstractPartitionAlgorithm
 		if (!AbstractPartitionAlgorithm.class.isAssignableFrom(clz)) {
@@ -222,5 +215,4 @@ public class XMLRuleLoader {
 		}
 		return (AbstractPartitionAlgorithm) clz.newInstance();
 	}
-
 }
