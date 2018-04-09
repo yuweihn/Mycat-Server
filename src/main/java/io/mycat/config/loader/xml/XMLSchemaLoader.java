@@ -23,35 +23,29 @@
  */
 package io.mycat.config.loader.xml;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
+import io.mycat.backend.datasource.PhysicalDBPool;
+import io.mycat.config.loader.SchemaLoader;
+import io.mycat.config.model.*;
 import io.mycat.config.model.rule.RuleConfig;
+import io.mycat.config.model.rule.TableRuleConfig;
+import io.mycat.config.util.ConfigException;
+import io.mycat.config.util.ConfigUtil;
+import io.mycat.route.function.AbstractPartitionAlgorithm;
 import io.mycat.route.function.TableRuleAware;
+import io.mycat.util.DecryptUtil;
 import io.mycat.util.ObjectUtil;
+import io.mycat.util.SplitUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import io.mycat.backend.datasource.PhysicalDBPool;
-import io.mycat.config.loader.SchemaLoader;
-import io.mycat.config.model.DBHostConfig;
-import io.mycat.config.model.DataHostConfig;
-import io.mycat.config.model.DataNodeConfig;
-import io.mycat.config.model.SchemaConfig;
-import io.mycat.config.model.TableConfig;
-import io.mycat.config.model.TableConfigMap;
-import io.mycat.config.model.rule.TableRuleConfig;
-import io.mycat.config.util.ConfigException;
-import io.mycat.config.util.ConfigUtil;
-import io.mycat.route.function.AbstractPartitionAlgorithm;
-import io.mycat.util.DecryptUtil;
-import io.mycat.util.SplitUtil;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author mycat
@@ -726,9 +720,9 @@ public class XMLSchemaLoader implements SchemaLoader {
 			/**
 			 * 读取负载均衡配置
 			 * 1. balance="0", 不开启分离机制，所有读操作都发送到当前可用的 writeHost 上。
-			 * 2. balance="1"，全部的 readHost 和 stand by writeHost 参不 select 的负载均衡
-			 * 3. balance="2"，所有读操作都随机的在 writeHost、readhost 上分发。
-			 * 4. balance="3"，所有读请求随机的分发到 wiriterHost 对应的 readhost 执行，writerHost 不负担读压力
+			 * 2. balance="1"，全部的 readHost 和 stand by writeHost 参与 select 的负载均衡
+			 * 3. balance="2"，所有读操作都随机的在 writeHost、readHost 上分发。
+			 * 4. balance="3"，所有读请求随机的分发到 writeHost 对应的 readHost 执行，writeHost 不负担读压力
 			 */
 			int balance = Integer.parseInt(element.getAttribute("balance"));
 			/**
