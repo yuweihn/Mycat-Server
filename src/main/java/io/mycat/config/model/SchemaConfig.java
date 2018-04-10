@@ -178,7 +178,7 @@ public class SchemaConfig {
 				set.add(tc.getDataNodes().get(0));
 			}
 		}
-		
+
 		return set;
 	}
 
