@@ -50,7 +50,7 @@ public class DecryptUtil {
 	}
 	
 	public static String mycatDecrypt(String usingDecrypt, String user, String password) {
-		if("1".equals(usingDecrypt)){
+		if("1".equals(usingDecrypt)) {
         	//type:user:password
         	//0:test:test
         	boolean flag = false;
