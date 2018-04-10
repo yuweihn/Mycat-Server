@@ -1,5 +1,6 @@
 package io.mycat.config.model;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,11 +12,10 @@ import java.util.Map;
  *
  */
 public class UserPrivilegesConfig {
-	
 	private boolean check = false;
-	
 	private Map<String, SchemaPrivilege> schemaPrivileges = new HashMap<String, SchemaPrivilege>();
-	
+
+
 	public boolean isCheck() {
 		return check;
 	}
@@ -29,7 +29,7 @@ public class UserPrivilegesConfig {
 	}
 	
 	public SchemaPrivilege getSchemaPrivilege(String schemaName) {
-		SchemaPrivilege schemaPrivilege = schemaPrivileges.get( schemaName );
+		SchemaPrivilege schemaPrivilege = schemaPrivileges.get(schemaName);
 		return schemaPrivilege;
 	}
 	
@@ -37,7 +37,6 @@ public class UserPrivilegesConfig {
 	 * 库级权限
 	 */
 	public static class SchemaPrivilege {
-		
 		private String name;
 		private int[] dml = new int[]{0, 0, 0, 0};
 		
@@ -64,8 +63,8 @@ public class UserPrivilegesConfig {
 		}
 		
 		public TablePrivilege getTablePrivilege(String tableName) {
-			TablePrivilege tablePrivilege = tablePrivileges.get( tableName );
-			if ( tablePrivilege == null ) {
+			TablePrivilege tablePrivilege = tablePrivileges.get(tableName);
+			if (tablePrivilege == null) {
 				tablePrivilege = new TablePrivilege();
 				tablePrivilege.setName(tableName);
 				tablePrivilege.setDml(dml);
@@ -78,9 +77,8 @@ public class UserPrivilegesConfig {
 	 * 表级权限
 	 */
 	public static class TablePrivilege {
-
 		private String name;
-		private int[] dml = new int[] { 0, 0, 0, 0 };
+		private int[] dml = new int[] {0, 0, 0, 0};
 		
 		public String getName() {
 			return name;
