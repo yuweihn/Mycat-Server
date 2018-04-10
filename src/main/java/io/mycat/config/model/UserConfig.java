@@ -37,13 +37,13 @@ public class UserConfig {
     private int benchmark = 0;						//负载限制, 默认0表示不限制
     private UserPrivilegesConfig privilegesConfig;	//SQL表级的增删改查权限控制
 	private Set<String> schemas;
-
-    
     /**
      * 是否无密码登录的默认账户
      */
     private boolean defaultAccount = false;
     private boolean readOnly = false;
+
+
     
     public boolean isReadOnly() {
 		return readOnly;
