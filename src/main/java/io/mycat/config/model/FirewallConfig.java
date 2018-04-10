@@ -69,7 +69,7 @@ public final class FirewallConfig {
     
     private WallConfig wallConfig = new WallConfig();
      
-    private static WallProvider provider ;
+    private static WallProvider provider;
     
     public FirewallConfig(){}
     
