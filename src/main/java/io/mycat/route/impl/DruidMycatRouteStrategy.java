@@ -43,14 +43,14 @@ import java.util.*;
 public class DruidMycatRouteStrategy extends AbstractRouteStrategy {
 	public static final Logger LOGGER = LoggerFactory.getLogger(DruidMycatRouteStrategy.class);
 	
-	private static Map<Class<?>, RouteMiddlerReaultHandler> middlerResultHandler = new HashMap<>();
+	private static Map<Class<?>, RouteMiddlerReaultHandler> middleResultHandler = new HashMap<>();
 	
 	static{
-		middlerResultHandler.put(SQLQueryExpr.class, new SQLQueryResultHandler());
-		middlerResultHandler.put(SQLBinaryOpExpr.class, new BinaryOpResultHandler());
-		middlerResultHandler.put(SQLInSubQueryExpr.class, new InSubQueryResultHandler());
-		middlerResultHandler.put(SQLExistsExpr.class, new SQLExistsResultHandler());
-		middlerResultHandler.put(SQLAllExpr.class, new SQLAllResultHandler());
+		middleResultHandler.put(SQLQueryExpr.class, new SQLQueryResultHandler());
+		middleResultHandler.put(SQLBinaryOpExpr.class, new BinaryOpResultHandler());
+		middleResultHandler.put(SQLInSubQueryExpr.class, new InSubQueryResultHandler());
+		middleResultHandler.put(SQLExistsExpr.class, new SQLExistsResultHandler());
+		middleResultHandler.put(SQLAllExpr.class, new SQLAllResultHandler());
 	}
 	
 	
@@ -295,7 +295,7 @@ public class DruidMycatRouteStrategy extends AbstractRouteStrategy {
 	 */
 	private String buildSql(SQLStatement statement, SQLSelect sqlselect, List param) {
 		SQLObject parent = sqlselect.getParent();
-		RouteMiddlerReaultHandler handler = middlerResultHandler.get(parent.getClass());
+		RouteMiddlerReaultHandler handler = middleResultHandler.get(parent.getClass());
 		if(handler == null) {
 			throw new UnsupportedOperationException(parent.getClass() + " current is not supported ");
 		}
@@ -606,7 +606,7 @@ public class DruidMycatRouteStrategy extends AbstractRouteStrategy {
 //	}
 
 	public RouteResultset routeSystemInfo(SchemaConfig schema, int sqlType, String stmt
-			, RouteResultset rrs) throws SQLSyntaxErrorException {
+			, RouteResultset rrs) {
 		switch(sqlType) {
 			case ServerParse.SHOW:// if origSQL is like show tables
 				return analyseShowSQL(schema, rrs, stmt);
