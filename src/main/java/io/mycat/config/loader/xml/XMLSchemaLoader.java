@@ -523,8 +523,7 @@ public class XMLSchemaLoader implements SchemaLoader {
 	 * 检查分片表分片规则配置, 目前主要检查分片表分片算法定义与分片dataNode是否匹配<br>
 	 * 例如分片表定义如下:<br>
 	 * {@code
-	 * <table name="hotnews" primaryKey="ID" autoIncrement="true" dataNode="dn1,dn2"
-			   rule="mod-long" />
+	 * <table name="hotnews" primaryKey="ID" autoIncrement="true" dataNode="dn1,dn2" rule="mod-long" />
 	 * }
 	 * <br>
 	 * 分片算法如下:<br>
