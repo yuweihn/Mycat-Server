@@ -142,8 +142,8 @@ public final class SystemConfig {
 	public static final int MUTINODELIMIT_LAR_DATA = 1;
 	private int mutiNodeLimitType = MUTINODELIMIT_SMALL_DATA;
 
-	public static final int MUTINODELIMIT_PATCH_SIZE = 100;
-	private int mutiNodePatchSize = MUTINODELIMIT_PATCH_SIZE;
+	public static final int MUTI_NODE_LIMIT_PATCH_SIZE = 100;
+	private int mutiNodePatchSize = MUTI_NODE_LIMIT_PATCH_SIZE;
 
 	private String defaultSqlParser = DEFAULT_SQL_PARSER;
 	private int usingAIO = 0;
