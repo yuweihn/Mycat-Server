@@ -911,7 +911,7 @@ public class MycatServer {
 					//XA rollback
 					String xacmd = "XA ROLLBACK " + coordinatorLogEntry.id + ';';
 					OneRawSQLQueryResultHandler resultHandler = new OneRawSQLQueryResultHandler(new String[0], new XARollbackCallback());
-					outloop:
+					outLoop:
 					for (SchemaConfig schema : MycatServer.getInstance().getConfig().getSchemas().values()) {
 						for (TableConfig table : schema.getTables().values()) {
 							for (String dataNode : table.getDataNodes()) {
@@ -923,7 +923,7 @@ public class MycatServer {
 									SQLJob sqlJob = new SQLJob(xacmd, dn.getDatabase(), resultHandler, dn.getDbPool().getSource());
 									sqlJob.run();
 									LOGGER.debug(String.format("[XA ROLLBACK] [%s] Host:[%s] schema:[%s]", xacmd, dn.getName(), dn.getDatabase()));
-									break outloop;
+									break outLoop;
 								}
 							}
 						}
