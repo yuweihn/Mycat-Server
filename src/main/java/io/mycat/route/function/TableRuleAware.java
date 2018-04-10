@@ -7,7 +7,7 @@ package io.mycat.route.function;
  *  所以必须对应一张表单独一个实例      实现此接口后会根据不同表自动创建新实例
  */
 public interface TableRuleAware {
-     void setTableName(String tableName);
+    void setTableName(String tableName);
     void setRuleName(String ruleName);
     String getTableName();
     String getRuleName();
