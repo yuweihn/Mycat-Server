@@ -140,7 +140,7 @@ public class MycatServer {
 	private NameableExecutor sequenceExecutor;
 	private NameableExecutor timerExecutor;
 	private ListeningExecutorService listeningExecutorService;
-	private InterProcessMutex dnindexLock;
+	private InterProcessMutex dnIndexLock;
 	private long totalNetWorkBufferSize = 0;
 
 	private final AtomicBoolean startup = new AtomicBoolean(false);
@@ -189,7 +189,7 @@ public class MycatServer {
 		this.startupTime = TimeUtil.currentTimeMillis();
 		if(isUseZkSwitch()) {
 			String path = ZKUtils.getZKBasePath() + "lock/dnindex.lock";
-			this.dnindexLock = new InterProcessMutex(ZKUtils.getConnection(), path);
+			this.dnIndexLock = new InterProcessMutex(ZKUtils.getConnection(), path);
 		}
 	}
 
@@ -504,7 +504,7 @@ public class MycatServer {
 	private void initZkDnindex() {
 		try {
             File file = new File(SystemConfig.getHomePath(), "conf" + File.separator + "dnindex.properties");
-            dnindexLock.acquire(30, TimeUnit.SECONDS);
+			dnIndexLock.acquire(30, TimeUnit.SECONDS);
             String path = ZKUtils.getZKBasePath() + "bindata/dnindex.properties";
             CuratorFramework zk = ZKUtils.getConnection();
             if (zk.checkExists().forPath(path) == null) {
@@ -514,7 +514,7 @@ public class MycatServer {
             throw new RuntimeException(e);
         } finally {
             try {
-                dnindexLock.release();
+				dnIndexLock.release();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -670,7 +670,7 @@ public class MycatServer {
 			if(isUseZkSwitch()) {
 				// save to  zk
 				try {
-					dnindexLock.acquire(30, TimeUnit.SECONDS);
+					dnIndexLock.acquire(30, TimeUnit.SECONDS);
 					String path = ZKUtils.getZKBasePath() + "bindata/dnindex.properties";
 					CuratorFramework zk = ZKUtils.getConnection();
 					if(zk.checkExists().forPath(path) == null) {
@@ -687,7 +687,7 @@ public class MycatServer {
 						}
 					}
 				} finally {
-					dnindexLock.release();
+					dnIndexLock.release();
 				}
 			}
 		} catch (Exception e) {
