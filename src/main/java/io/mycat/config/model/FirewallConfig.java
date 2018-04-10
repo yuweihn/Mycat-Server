@@ -210,8 +210,8 @@ public final class FirewallConfig {
         TransformerFactory factory2 = TransformerFactory.newInstance();
         Transformer former = factory2.newTransformer();
         String systemId = xmldoc.getDoctype().getSystemId();
-        if(systemId != null){
-            former.setOutputProperty(javax.xml.transform.OutputKeys.DOCTYPE_SYSTEM, systemId);    
+        if(systemId != null) {
+            former.setOutputProperty(javax.xml.transform.OutputKeys.DOCTYPE_SYSTEM, systemId);
         }
         former.transform(new DOMSource(xmldoc), new StreamResult(new File(filename)));
 	}
