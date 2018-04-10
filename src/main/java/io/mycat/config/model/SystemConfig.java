@@ -42,7 +42,7 @@ public final class SystemConfig {
 
 	private static final String DEFAULT_SQL_PARSER = "druidparser";// fdbparser, druidparser
 	private static final short DEFAULT_BUFFER_CHUNK_SIZE = 4096;
-	private static final int DEFAULT_BUFFER_POOL_PAGE_SIZE = 512*1024*4;
+	private static final int DEFAULT_BUFFER_POOL_PAGE_SIZE = 512 * 1024 * 4;
 	private static final short DEFAULT_BUFFER_POOL_PAGE_NUMBER = 64;
 	private int processorBufferLocalPercent;
 	private static final int DEFAULT_PROCESSORS = Runtime.getRuntime().availableProcessors();
