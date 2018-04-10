@@ -23,11 +23,13 @@
  */
 package io.mycat.config.model;
 
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
 
 /**
  * @author mycat
@@ -46,7 +48,7 @@ public class SchemaConfig {
 	 */
 	private final int defaultMaxLimit;
 	private final boolean checkSQLSchema;
-	private  boolean needSupportMultiDBType=false;
+	private  boolean needSupportMultiDBType = false;
 	private  String defaultDataNodeDbType;
 	/**
 	 * key is join relation ,A.ID=B.PARENT_ID value is Root Table ,if a->b*->c*
@@ -55,11 +57,9 @@ public class SchemaConfig {
 	private final Map<String, TableConfig> joinRel2TableMap = new HashMap<String, TableConfig>();
 	private final String[] allDataNodeStrArr;
 
-	private  Map<String,String> dataNodeDbTypeMap=new HashMap<>();
+	private  Map<String, String> dataNodeDbTypeMap = new HashMap<>();
 
-	public SchemaConfig(String name, String dataNode,
-			Map<String, TableConfig> tables, int defaultMaxLimit,
-			boolean checkSQLschema) {
+	public SchemaConfig(String name, String dataNode, Map<String, TableConfig> tables, int defaultMaxLimit, boolean checkSQLschema) {
 		this.name = name;
 		this.dataNode = dataNode;
 		this.checkSQLSchema = checkSQLschema;
@@ -68,8 +68,7 @@ public class SchemaConfig {
 		buildJoinMap(tables);
 		this.noSharding = (tables == null || tables.isEmpty());
 		if (noSharding && dataNode == null) {
-			throw new RuntimeException(name
-					+ " in noSharding mode schema must have default dataNode ");
+			throw new RuntimeException(name + " in noSharding mode schema must have default dataNode ");
 		}
 		this.metaDataNodes = buildMetaDataNodes();
 		this.allDataNodes = buildAllDataNodes();
@@ -83,13 +82,11 @@ public class SchemaConfig {
 		}
 	}
 
-	public String getDefaultDataNodeDbType()
-	{
+	public String getDefaultDataNodeDbType() {
 		return defaultDataNodeDbType;
 	}
 
-	public void setDefaultDataNodeDbType(String defaultDataNodeDbType)
-	{
+	public void setDefaultDataNodeDbType(String defaultDataNodeDbType) {
 		this.defaultDataNodeDbType = defaultDataNodeDbType;
 	}
 
@@ -102,7 +99,6 @@ public class SchemaConfig {
 	}
 
 	private void buildJoinMap(Map<String, TableConfig> tables2) {
-
 		if (tables == null || tables.isEmpty()) {
 			return;
 		}
@@ -119,16 +115,13 @@ public class SchemaConfig {
 			}
 
 		}
-
 	}
 
-	public boolean isNeedSupportMultiDBType()
-	{
+	public boolean isNeedSupportMultiDBType() {
 		return needSupportMultiDBType;
 	}
 
-	public void setNeedSupportMultiDBType(boolean needSupportMultiDBType)
-	{
+	public void setNeedSupportMultiDBType(boolean needSupportMultiDBType) {
 		this.needSupportMultiDBType = needSupportMultiDBType;
 	}
 
@@ -160,13 +153,11 @@ public class SchemaConfig {
 		return allDataNodes;
 	}
 
-	public Map<String, String> getDataNodeDbTypeMap()
-	{
+	public Map<String, String> getDataNodeDbTypeMap() {
 		return dataNodeDbTypeMap;
 	}
 
-	public void setDataNodeDbTypeMap(Map<String, String> dataNodeDbTypeMap)
-	{
+	public void setDataNodeDbTypeMap(Map<String, String> dataNodeDbTypeMap) {
 		this.dataNodeDbTypeMap = dataNodeDbTypeMap;
 	}
 
@@ -212,7 +203,6 @@ public class SchemaConfig {
 	}
 
 	private static boolean isEmpty(String str) {
-		return ((str == null) || (str.length() == 0));
+		return str == null || str.length() == 0;
 	}
-
 }
