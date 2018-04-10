@@ -23,17 +23,18 @@
  */
 package io.mycat.config.model;
 
+
 import java.util.Set;
+
 
 /**
  * @author mycat
  */
 public class UserConfig {
-
     private String name;
     private String password;						//明文
     private String encryptPassword; 				//密文
-    private int benchmark = 0;						// 负载限制, 默认0表示不限制
+    private int benchmark = 0;						//负载限制, 默认0表示不限制
     private UserPrivilegesConfig privilegesConfig;	//SQL表级的增删改查权限控制
     
     /**
@@ -115,9 +116,4 @@ public class UserConfig {
 				+ ", benchmark=" + benchmark + ", privilegesConfig=" + privilegesConfig + ", defaultAccount="
 				+ defaultAccount + ", readOnly=" + readOnly + ", schemas=" + schemas + "]";
 	}
-
-	 
-	
-	
-
 }
