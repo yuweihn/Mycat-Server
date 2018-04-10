@@ -109,4 +109,13 @@
 		<property name="schemas">dev_mycat</property>
 		<property name="readOnly">false</property>
 	</user>
+
+	<!--
+	<cluster>
+		<node name="c1">
+			<property name="host">127.0.0.1</property>
+			<property name="weight">1</property>
+		</node>
+	</cluster>
+	-->
 </mycat:server>
