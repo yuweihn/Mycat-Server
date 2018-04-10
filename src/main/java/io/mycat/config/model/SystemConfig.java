@@ -23,10 +23,11 @@
  */
 package io.mycat.config.model;
 
-import io.mycat.config.Isolations;
 
+import io.mycat.config.Isolations;
 import java.io.File;
 import java.io.IOException;
+
 
 /**
  * 系统基础配置项
@@ -34,7 +35,6 @@ import java.io.IOException;
  * @author mycat
  */
 public final class SystemConfig {
-
 	public static final String SYS_HOME = "MYCAT_HOME";
 	private static final int DEFAULT_PORT = 8066;
 	private static final int DEFAULT_MANAGER_PORT = 9066;
@@ -52,7 +52,7 @@ public final class SystemConfig {
 														// net_buffer_length
 														// defaut 4M
     
-	private final  static String RESERVED_SYSTEM_MEMORY_BYTES = "384m";
+	private final static String RESERVED_SYSTEM_MEMORY_BYTES = "384m";
 	private final static String MEMORY_PAGE_SIZE = "1m";
 	private final static String SPILLS_FILE_BUFFER_SIZE = "2K";
 	private final static String DATANODE_SORTED_TEMP_DIR = "datanode";
@@ -110,18 +110,18 @@ public final class SystemConfig {
 	private short bufferPoolPageNumber;
 	
 	//大结果集阈值，默认512kb
-	private int maxResultSet=512*1024;
+	private int maxResultSet = 512 * 1024;
 	//大结果集拒绝策略次数过滤限制,默认10次
-	private int bigResultSizeSqlCount=10;
+	private int bigResultSizeSqlCount = 10;
 	//大结果集拒绝策咯，bufferpool使用率阈值(0-100)，默认80%
-	private int  bufferUsagePercent=80;
+	private int bufferUsagePercent = 80;
 	//大结果集保护策咯，0:不开启,1:级别1为在当前mucat bufferpool
 	//使用率大于bufferUsagePercent阈值时，拒绝超过defaultBigResultSizeSqlCount
 	//sql次数阈值并且符合超过大结果集阈值maxResultSet的所有sql
 	//默认值0
-	private int  flowControlRejectStrategy=0;
+	private int flowControlRejectStrategy = 0;
 	//清理大结果集记录周期
-	private long clearBigSqLResultSetMapMs=10*60*1000;
+	private long clearBigSqLResultSetMapMs = 10 * 60 * 1000L;
 
 	private int defaultMaxLimit = DEFAULT_MAX_LIMIT;
 	public static final int SEQUENCEHANDLER_LOCALFILE = 0;
@@ -133,11 +133,11 @@ public final class SystemConfig {
 	 * 注意！！！ 目前mycat支持的MySQL版本，如果后续有新的MySQL版本,请添加到此数组， 对于MySQL的其他分支，
 	 * 比如MariaDB目前版本号已经到10.1.x，但是其驱动程序仍然兼容官方的MySQL,因此这里版本号只需要MySQL官方的版本号即可。
 	 */
-	public static final String[] MySQLVersions = { "5.5", "5.6", "5.7" };
+	public static final String[] MySQLVersions = {"5.5", "5.6", "5.7"};
 	private int sequnceHandlerType = SEQUENCEHANDLER_LOCALFILE;
 	private String sqlInterceptor = "io.mycat.server.interceptor.impl.DefaultSqlInterceptor";
 	private String sqlInterceptorType = "select";
-	private String sqlInterceptorFile = System.getProperty("user.dir")+"/logs/sql.txt";
+	private String sqlInterceptorFile = System.getProperty("user.dir") + "/logs/sql.txt";
 	public static final int MUTINODELIMIT_SMALL_DATA = 0;
 	public static final int MUTINODELIMIT_LAR_DATA = 1;
 	private int mutiNodeLimitType = MUTINODELIMIT_SMALL_DATA;
@@ -149,8 +149,8 @@ public final class SystemConfig {
 	private int usingAIO = 0;
 	private int packetHeaderSize = 4;
 	private int maxPacketSize = 16 * 1024 * 1024;
-	private int mycatNodeId=1;
-	private int useCompression =0;	
+	private int mycatNodeId = 1;
+	private int useCompression = 0;
 	private int useSqlStat = 1;
 	//子查询中存在关联查询的情况下,检查关联字段中是否有分片字段 .默认 false
 	private boolean subqueryRelationshipCheck = false;
@@ -164,7 +164,7 @@ public final class SystemConfig {
 
 	private int checkTableConsistency = 0;
 	private long checkTableConsistencyPeriod = CHECKTABLECONSISTENCYPERIOD;
-	private final static long CHECKTABLECONSISTENCYPERIOD = 1 * 60 * 1000;
+	private final static long CHECKTABLECONSISTENCYPERIOD = 1 * 60 * 1000L;
 
 	private int processorBufferPoolType = 0;
 
@@ -224,7 +224,7 @@ public final class SystemConfig {
 	/**
 	 * 是否启用zk切换
 	 */
-	private boolean	useZKSwitch=DEFAULT_USE_ZK_SWITCH;
+	private boolean	useZKSwitch = DEFAULT_USE_ZK_SWITCH;
 
 	
  	/**
@@ -466,23 +466,19 @@ public final class SystemConfig {
 	}
 	
 	// 是否使用SQL统计
-	public int getUseSqlStat() 
-	{
+	public int getUseSqlStat() {
 		return useSqlStat;
 	}
 	
-	public void setUseSqlStat(int useSqlStat) 
-	{
+	public void setUseSqlStat(int useSqlStat) {
 		this.useSqlStat = useSqlStat;
 	}
 
-	public int getUseCompression()
-	{
+	public int getUseCompression() {
 		return useCompression;
 	}
 
-	public void setUseCompression(int useCompression)
-	{
+	public void setUseCompression(int useCompression) {
 		this.useCompression = useCompression;
 	}
 
@@ -954,6 +950,4 @@ public final class SystemConfig {
 	public void setSubqueryRelationshipCheck(boolean subqueryRelationshipCheck) {
 		this.subqueryRelationshipCheck = subqueryRelationshipCheck;
 	}
-	
-	
 }
