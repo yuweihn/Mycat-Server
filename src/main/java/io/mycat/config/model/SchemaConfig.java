@@ -99,10 +99,10 @@ public class SchemaConfig {
 	}
 
 	private void buildJoinMap(Map<String, TableConfig> tables2) {
-		if (tables == null || tables.isEmpty()) {
+		if (tables2 == null || tables2.isEmpty()) {
 			return;
 		}
-		for (TableConfig tc : tables.values()) {
+		for (TableConfig tc : tables2.values()) {
 			if (tc.isChildTable()) {
 				TableConfig rootTc = tc.getRootParent();
 				String joinRel1 = tc.getName() + '.' + tc.getJoinKey() + '=' + tc.getParentTC().getName() + '.' + tc.getParentKey();
