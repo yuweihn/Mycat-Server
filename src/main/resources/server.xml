@@ -121,7 +121,7 @@
 			<property name="weight">1</property>
 		</node>
 		<group name="grp1">
-			<property name="">c1,c2</property>
+			<property name="nodeList">c1,c2</property>
 		</group>
 	</cluster>
 	-->
