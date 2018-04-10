@@ -36,6 +36,8 @@ public class UserConfig {
     private String encryptPassword; 				//密文
     private int benchmark = 0;						//负载限制, 默认0表示不限制
     private UserPrivilegesConfig privilegesConfig;	//SQL表级的增删改查权限控制
+	private Set<String> schemas;
+
     
     /**
      * 是否无密码登陆的默认账户
@@ -50,8 +52,6 @@ public class UserConfig {
 	public void setReadOnly(boolean readOnly) {
 		this.readOnly = readOnly;
 	}
-
-	private Set<String> schemas;
 
     public String getName() {
         return name;
