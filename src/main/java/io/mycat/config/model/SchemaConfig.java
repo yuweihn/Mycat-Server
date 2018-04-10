@@ -113,7 +113,6 @@ public class SchemaConfig {
 				joinRel2TableMap.put(joinRel1, rootTc);
 				joinRel2TableMap.put(joinRel2, rootTc);
 			}
-
 		}
 	}
 
