@@ -568,13 +568,13 @@ public class MycatServer {
 						
 						//根据 lastTime 确认事务的执行， 超过 sqlExecuteTimeout 阀值 close connection
 						long currentTime = TimeUtil.currentTimeMillis();
-						Iterator<BackendConnection> iter = NIOProcessor.backends_old.iterator();
-						while(iter.hasNext()) {
-							BackendConnection con = iter.next();
+						Iterator<BackendConnection> itr = NIOProcessor.backends_old.iterator();
+						while(itr.hasNext()) {
+							BackendConnection con = itr.next();
 							long lastTime = con.getLastTime();
 							if (currentTime - lastTime > sqlTimeout) {
 								con.close("clear old backend connection ...");
-								iter.remove();
+								itr.remove();
 							}
 						}
 					}

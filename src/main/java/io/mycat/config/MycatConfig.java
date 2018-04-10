@@ -67,7 +67,6 @@ public class MycatConfig {
 	private final ReentrantLock lock;
 
 	public MycatConfig() {
-		
 		//读取schema.xml，rule.xml和server.xml
 		ConfigInitializer confInit = new ConfigInitializer(true);
 		this.system = confInit.getSystem();
@@ -215,13 +214,9 @@ public class MycatConfig {
 	}
 
 	public boolean canRollback() {
-		if (_users == null || _schemas == null || _dataNodes == null
-				|| _dataHosts == null || _cluster == null
-				|| _firewall == null || status == ROLLBACK) {
-			return false;
-		} else {
-			return true;
-		}
+        return _users != null && _schemas != null && _dataNodes != null
+                && _dataHosts != null && _cluster != null
+                && _firewall != null && status != ROLLBACK;
 	}
 
 	public void rollback(
