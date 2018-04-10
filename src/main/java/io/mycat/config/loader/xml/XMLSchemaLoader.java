@@ -23,6 +23,7 @@
  */
 package io.mycat.config.loader.xml;
 
+
 import io.mycat.backend.datasource.PhysicalDBPool;
 import io.mycat.config.loader.SchemaLoader;
 import io.mycat.config.model.*;
@@ -46,6 +47,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 
 /**
  * @author mycat
@@ -118,7 +120,6 @@ public class XMLSchemaLoader implements SchemaLoader {
 		} catch (Exception e) {
 			throw new ConfigException(e);
 		} finally {
-			
 			if (dtd != null) {
 				try {
 					dtd.close();

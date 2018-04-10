@@ -23,6 +23,7 @@
  */
 package io.mycat.config.loader.xml;
 
+
 import io.mycat.config.model.rule.RuleConfig;
 import io.mycat.config.model.rule.TableRuleConfig;
 import io.mycat.config.util.ConfigException;
@@ -41,6 +42,7 @@ import java.sql.SQLSyntaxErrorException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
 
 /**
  * @author mycat

@@ -23,6 +23,7 @@
  */
 package io.mycat.config;
 
+
 import io.mycat.backend.datasource.PhysicalDBNode;
 import io.mycat.backend.datasource.PhysicalDBPool;
 import io.mycat.config.model.FirewallConfig;
@@ -39,11 +40,11 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
+
 /**
  * @author mycat
  */
 public class MycatConfig {
-	
 	private static final int RELOAD = 1;
 	private static final int ROLLBACK = 2;
     private static final int RELOAD_ALL = 3;
