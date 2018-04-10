@@ -23,14 +23,14 @@
  */
 package io.mycat.config.model;
 
-import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import com.alibaba.druid.sql.ast.SQLDataType;
 import com.alibaba.druid.sql.ast.statement.SQLTableElement;
 import io.mycat.config.model.rule.RuleConfig;
 import io.mycat.util.SplitUtil;
+
+import java.util.*;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 
 /**
  * @author mycat
@@ -61,14 +61,13 @@ public class TableConfig {
 
 	private volatile List<SQLTableElement> tableElementList;
 	private volatile String tableStructureSQL;
-	private volatile Map<String,List<String>> dataNodeTableStructureSQLMap;
+	private volatile Map<String, List<String>> dataNodeTableStructureSQLMap;
 	private ReentrantReadWriteLock reentrantReadWriteLock = new ReentrantReadWriteLock(false);
 
 
-	public TableConfig(String name, String primaryKey, boolean autoIncrement,boolean needAddLimit, int tableType,
-			String dataNode,Set<String> dbType, RuleConfig rule, boolean ruleRequired,
-			TableConfig parentTC, boolean isChildTable, String joinKey,
-			String parentKey,String subTables) {
+	public TableConfig(String name, String primaryKey, boolean autoIncrement, boolean needAddLimit
+			, int tableType, String dataNode, Set<String> dbType, RuleConfig rule, boolean ruleRequired
+			, TableConfig parentTC, boolean isChildTable, String joinKey, String parentKey, String subTables) {
 		if (name == null) {
 			throw new IllegalArgumentException("table name is null");
 		} else if (dataNode == null) {
@@ -76,9 +75,9 @@ public class TableConfig {
 		}
 		this.primaryKey = primaryKey;
 		this.autoIncrement = autoIncrement;
-		this.needAddLimit=needAddLimit;
+		this.needAddLimit = needAddLimit;
 		this.tableType = tableType;
-		this.dbTypes=dbType;
+		this.dbTypes = dbType;
 		if (ruleRequired && rule == null) {
 			throw new IllegalArgumentException("ruleRequired but rule is null");
 		}
@@ -94,7 +93,7 @@ public class TableConfig {
 			dataNodes.add(dn);
 		}
 		
-		if(subTables!=null && !subTables.equals("")){
+		if(subTables != null && !subTables.equals("")) {
 			String sTables[] = SplitUtil.split(subTables, ',', '$', '-');
 			if (sTables == null || sTables.length <= 0) {
 				throw new IllegalArgumentException("invalid table subTables");
@@ -103,13 +102,13 @@ public class TableConfig {
 			for (String table : sTables) {
 				distTables.add(table);
 			}
-		}else{
+		} else {
 			this.distTables = new ArrayList<String>();
 		}	
 		
 		this.rule = rule;
 		this.partitionColumn = (rule == null) ? null : rule.getColumn();
-		partionKeyIsPrimaryKey=(partitionColumn==null)?primaryKey==null:partitionColumn.equals(primaryKey);
+		partionKeyIsPrimaryKey = (partitionColumn == null) ? primaryKey == null : partitionColumn.equals(primaryKey);
 		this.ruleRequired = ruleRequired;
 		this.childTable = isChildTable;
 		this.parentTC = parentTC;
@@ -164,11 +163,9 @@ public class TableConfig {
 			tableSb.append(tb.parentTC.name).append(',');
 			String relation = null;
 			if (level == 0) {
-				latestCond = " " + tb.parentTC.getName() + '.' + tb.parentKey
-						+ "=";
+				latestCond = " " + tb.parentTC.getName() + '.' + tb.parentKey + "=";
 			} else {
-				relation = tb.parentTC.getName() + '.' + tb.parentKey + '='
-						+ tb.name + '.' + tb.joinKey;
+				relation = tb.parentTC.getName() + '.' + tb.parentKey + '=' + tb.name + '.' + tb.joinKey;
 				condition.append(relation).append(" AND ");
 			}
 			level++;
@@ -185,7 +182,6 @@ public class TableConfig {
 				+ ((level < 2) ? latestCond : condition.toString() + latestCond);
 		// System.out.println(this.name+" sql " + sql);
 		return sql;
-
 	}
 
 	public String getPartitionColumn() {
@@ -264,11 +260,8 @@ public class TableConfig {
 	}
 
 	public boolean isDistTable(){
-		if(this.distTables!=null && !this.distTables.isEmpty() ){
-			return true;
-		}
-		return false;
-	}
+        return this.distTables != null && !this.distTables.isEmpty();
+    }
 
 	public List<SQLTableElement> getTableElementList() {
 		return tableElementList;
