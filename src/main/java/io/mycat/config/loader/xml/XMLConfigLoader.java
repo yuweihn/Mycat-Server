@@ -83,6 +83,7 @@ public class XMLConfigLoader implements ConfigLoader {
     public SystemConfig getSystemConfig() {
         return system;
     }
+
     @Override
     public Map<String, SchemaConfig> getSchemaConfigs() {
         return schemas;
@@ -102,5 +103,4 @@ public class XMLConfigLoader implements ConfigLoader {
     public SchemaConfig getSchemaConfig(String schema) {
         return schemas.get(schema);
     }
-
 }
