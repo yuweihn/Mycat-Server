@@ -23,13 +23,15 @@
  */
 package io.mycat.config.model.rule;
 
+
 import java.io.Serializable;
+
 
 /**
  * @author mycat
  */
 public class TableRuleConfig implements Serializable {
-    private  String name;
+    private String name;
     private final RuleConfig rule;
 
     public TableRuleConfig(String name, RuleConfig rule) {
@@ -37,10 +39,11 @@ public class TableRuleConfig implements Serializable {
             throw new IllegalArgumentException("name is null");
         }
         this.name = name;
+
         if (rule == null) {
             throw new IllegalArgumentException("no rule is found");
         }
-        this.rule =rule;
+        this.rule = rule;
     }
 
     public String getName() {
@@ -57,5 +60,4 @@ public class TableRuleConfig implements Serializable {
     public RuleConfig getRule() {
         return rule;
     }
-
 }
