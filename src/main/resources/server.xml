@@ -113,7 +113,11 @@
 	<!--
 	<cluster>
 		<node name="c1">
-			<property name="host">127.0.0.1</property>
+			<property name="host">192.168.1.1</property>
+			<property name="weight">1</property>
+		</node>
+		<node name="c2">
+			<property name="host">192.168.1.2</property>
 			<property name="weight">1</property>
 		</node>
 	</cluster>
