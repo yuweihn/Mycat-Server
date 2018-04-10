@@ -71,7 +71,7 @@ public class ZkConfig {
     * @return
     * @创建日期 2016年9月15日
     */
-    public  static ZkConfig getInstance() {
+    public static ZkConfig getInstance() {
         return ZKCFGINSTANCE;
     }
 
@@ -115,7 +115,7 @@ public class ZkConfig {
 
         String clusterId = pros.getProperty(ZkParamCfg.ZK_CFG_CLUSTERID.getKey());
 
-        if (Strings.isNullOrEmpty(clusterId) ||Strings.isNullOrEmpty(zkURL) || Strings.isNullOrEmpty(myid)) {
+        if (Strings.isNullOrEmpty(clusterId) || Strings.isNullOrEmpty(zkURL) || Strings.isNullOrEmpty(myid)) {
             throw new RuntimeException("clusterId and zkURL and myid must not be null or empty!");
         }
         return pros;
