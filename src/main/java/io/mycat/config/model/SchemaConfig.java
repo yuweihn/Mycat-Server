@@ -105,11 +105,8 @@ public class SchemaConfig {
 		for (TableConfig tc : tables.values()) {
 			if (tc.isChildTable()) {
 				TableConfig rootTc = tc.getRootParent();
-				String joinRel1 = tc.getName() + '.' + tc.getJoinKey() + '='
-						+ tc.getParentTC().getName() + '.' + tc.getParentKey();
-				String joinRel2 = tc.getParentTC().getName() + '.'
-						+ tc.getParentKey() + '=' + tc.getName() + '.'
-						+ tc.getJoinKey();
+				String joinRel1 = tc.getName() + '.' + tc.getJoinKey() + '=' + tc.getParentTC().getName() + '.' + tc.getParentKey();
+				String joinRel2 = tc.getParentTC().getName() + '.' + tc.getParentKey() + '=' + tc.getName() + '.' + tc.getJoinKey();
 				joinRel2TableMap.put(joinRel1, rootTc);
 				joinRel2TableMap.put(joinRel2, rootTc);
 			}
