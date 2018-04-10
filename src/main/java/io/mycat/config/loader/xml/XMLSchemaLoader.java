@@ -352,7 +352,7 @@ public class XMLSchemaLoader implements SchemaLoader {
 			
 			for (int j = 0; j < tableNames.length; j++) {
 				String tableName = tableNames[j];
-				TableRuleConfig	tableRuleConfig = tableRule ;
+				TableRuleConfig	tableRuleConfig = tableRule;
                 if(tableRuleConfig != null) {
                     //对于实现TableRuleAware的function进行特殊处理  根据每个表新建个实例
                     RuleConfig rule = tableRuleConfig.getRule();
