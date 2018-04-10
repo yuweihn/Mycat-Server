@@ -288,9 +288,9 @@ public class XMLSchemaLoader implements SchemaLoader {
 		
 		// 支持表名中包含引号[`] BEN GONG
 		Map<String, TableConfig> tables = new TableConfigMap();
-		NodeList nodeList = node.getElementsByTagName("table");
-		for (int i = 0; i < nodeList.getLength(); i++) {
-			Element tableElement = (Element) nodeList.item(i);
+		NodeList tableNodeList = node.getElementsByTagName("table");
+		for (int i = 0; i < tableNodeList.getLength(); i++) {
+			Element tableElement = (Element) tableNodeList.item(i);
 			String tableNameElement = tableElement.getAttribute("name").toUpperCase();
 
 			//TODO:路由, 增加对动态日期表的支持
