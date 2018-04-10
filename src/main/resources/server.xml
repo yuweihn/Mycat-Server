@@ -94,7 +94,7 @@
 		<property name="schemas">dev_mycat</property>
 		
 		<!-- 表级 DML 权限设置 -->
-		<!-- 		
+		<!--
 		<privileges check="false">
 			<schema name="dev_mycat" dml="0110">
 				<table name="tb01" dml="0000"></table>
