@@ -23,12 +23,13 @@
  */
 package io.mycat.config.model;
 
+
+
 /**
  * @author mycat
  * @author mycat
  */
 public final class MycatNodeConfig {
-
     private String name;
     private String host;
     private int port;
@@ -78,5 +79,4 @@ public final class MycatNodeConfig {
         return new StringBuilder().append("[name=").append(name).append(",host=").append(host).append(",port=")
                 .append(port).append(",weight=").append(weight).append(']').toString();
     }
-
 }
