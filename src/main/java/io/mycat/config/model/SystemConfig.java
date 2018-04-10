@@ -163,8 +163,8 @@ public final class SystemConfig {
 	private int handleDistributedTransactions = 0;
 
 	private int checkTableConsistency = 0;
-	private long checkTableConsistencyPeriod = CHECKTABLECONSISTENCYPERIOD;
-	private final static long CHECKTABLECONSISTENCYPERIOD = 1 * 60 * 1000L;
+	private final static long CHECK_TABLE_CONSISTENCY_PERIOD = 1 * 60 * 1000L;
+	private long checkTableConsistencyPeriod = CHECK_TABLE_CONSISTENCY_PERIOD;
 
 	private int processorBufferPoolType = 0;
 
