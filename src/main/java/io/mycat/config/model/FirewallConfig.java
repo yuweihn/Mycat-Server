@@ -71,9 +71,9 @@ public final class FirewallConfig {
      
     private static WallProvider provider ;
     
-    public FirewallConfig() { }
+    public FirewallConfig(){}
     
-    public void init(){
+    public void init() {
     	if(check) {
     		provider = new MySqlWallProvider(wallConfig);
     		provider.setBlackListEnable(true);
