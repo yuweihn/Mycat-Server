@@ -40,7 +40,7 @@ public class UserConfig {
 
     
     /**
-     * 是否无密码登陆的默认账户
+     * 是否无密码登录的默认账户
      */
     private boolean defaultAccount = false;
     private boolean readOnly = false;
