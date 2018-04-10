@@ -108,7 +108,7 @@ public class TableConfig {
 		
 		this.rule = rule;
 		this.partitionColumn = (rule == null) ? null : rule.getColumn();
-		partionKeyIsPrimaryKey = (partitionColumn == null) ? primaryKey == null : partitionColumn.equals(primaryKey);
+		this.partionKeyIsPrimaryKey = (partitionColumn == null) ? primaryKey == null : partitionColumn.equals(primaryKey);
 		this.ruleRequired = ruleRequired;
 		this.childTable = isChildTable;
 		this.parentTC = parentTC;
