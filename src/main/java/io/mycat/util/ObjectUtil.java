@@ -23,22 +23,20 @@
  */
 package io.mycat.util;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author mycat
@@ -47,24 +45,19 @@ public final class ObjectUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(ObjectUtil.class);
 
 
-    public static Object getStaticFieldValue(String className,String fieldName)
-    {
+    public static Object getStaticFieldValue(String className,String fieldName) {
         Class clazz = null;
-        try
-        {
+        try {
             clazz = Class.forName(className);
-           Field field = clazz.getField(fieldName);
-             if(field!=null) {
-                 return field.get(null);
-             }
-        } catch (ClassNotFoundException e)
-        {
+            Field field = clazz.getField(fieldName);
+            if(field!=null) {
+                return field.get(null);
+            }
+        } catch (ClassNotFoundException e) {
             //LOGGER.error("getStaticFieldValue", e);
-        } catch (NoSuchFieldException e)
-        {
+        } catch (NoSuchFieldException e) {
            // LOGGER.error("getStaticFieldValue", e);
-        } catch (IllegalAccessException e)
-        {
+        } catch (IllegalAccessException e) {
           //  LOGGER.error("getStaticFieldValue", e);
         }
         return null;
@@ -84,7 +77,6 @@ public final class ObjectUtil {
 		} catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
 		}
-
 	}
 	
     /**
@@ -267,23 +259,19 @@ public final class ObjectUtil {
             BeanInfo toBean = Introspector.getBeanInfo(toClass);
 
             PropertyDescriptor[] toPd = toBean.getPropertyDescriptors();
-            List<PropertyDescriptor> fromPd = Arrays.asList(fromBean
-                    .getPropertyDescriptors());
+            List<PropertyDescriptor> fromPd = Arrays.asList(fromBean.getPropertyDescriptors());
 
             for (PropertyDescriptor propertyDescriptor : toPd) {
                 propertyDescriptor.getDisplayName();
-                PropertyDescriptor pd = fromPd.get(fromPd
-                        .indexOf(propertyDescriptor));
-                if (pd.getDisplayName().equals(
-                        propertyDescriptor.getDisplayName())
+                PropertyDescriptor pd = fromPd.get(fromPd.indexOf(propertyDescriptor));
+                if (pd.getDisplayName().equals(propertyDescriptor.getDisplayName())
                         && !pd.getDisplayName().equals("class")
                         && propertyDescriptor.getWriteMethod() != null) {
-                        propertyDescriptor.getWriteMethod().invoke(toObj, pd.getReadMethod().invoke(fromObj, null));
+                    propertyDescriptor.getWriteMethod().invoke(toObj, pd.getReadMethod().invoke(fromObj, null));
                 }
-
             }
         } catch (IntrospectionException e) {
-          throw  new RuntimeException(e);
+            throw  new RuntimeException(e);
         } catch (IllegalArgumentException e) {
             throw  new RuntimeException(e);
         } catch (IllegalAccessException e) {
