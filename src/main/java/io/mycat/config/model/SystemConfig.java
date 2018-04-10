@@ -226,14 +226,13 @@ public final class SystemConfig {
 	 */
 	private boolean	useZKSwitch = DEFAULT_USE_ZK_SWITCH;
 
-	
+
+    private final static int DEFAULT_NONE_PASSWORD_LOGIN = 0;
  	/**
  	 * huangyiming add
 	 * 无密码登陆标示, 0:否,1:是,默认为0
 	 */
-	private int nonePasswordLogin = DEFAULT_NONEPASSWORDLOGIN ;
-
-	private final static int DEFAULT_NONEPASSWORDLOGIN = 0;
+	private int nonePasswordLogin = DEFAULT_NONE_PASSWORD_LOGIN;
 	
 	public String getDefaultSqlParser() {
 		return defaultSqlParser;
