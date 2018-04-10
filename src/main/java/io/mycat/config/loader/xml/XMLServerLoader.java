@@ -138,7 +138,7 @@ public class XMLServerLoader {
                 if (this.firewall.existsHost(host)) {
                     throw new ConfigException("host duplicated : " + host);
                 }
-                String []users = userStr.split(",");
+                String[] users = userStr.split(",");
                 List<UserConfig> userConfigs = new ArrayList<UserConfig>();
                 for(String user: users) {
                 	UserConfig uc = this.users.get(user);
