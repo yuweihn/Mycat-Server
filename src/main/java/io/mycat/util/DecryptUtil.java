@@ -49,16 +49,16 @@ public class DecryptUtil {
 		System.out.println(encrypt(password));
 	}
 	
-	public static String mycatDecrypt(String usingDecrypt,String user, String password) {
+	public static String mycatDecrypt(String usingDecrypt, String user, String password) {
 		if("1".equals(usingDecrypt)){
         	//type:user:password
         	//0:test:test
         	boolean flag = false;
         	try {
-        		String passwrods[] = DecryptUtil.decrypt(password).split(":");
-            	if("0".equals(passwrods[0]) && user.equals(passwrods[1])){
+        		String passwords[] = DecryptUtil.decrypt(password).split(":");
+            	if("0".equals(passwords[0]) && user.equals(passwords[1])) {
 					flag = true;
-					return passwrods[2];
+					return passwords[2];
             	}
             	if(flag == false) {
             		 throw new ConfigException("user " + user + " password need to decrypt, but decrypt password is wrong!");
