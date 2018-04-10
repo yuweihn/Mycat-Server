@@ -356,16 +356,16 @@ public class XMLSchemaLoader implements SchemaLoader {
                 if(tableRuleConfig != null) {
                     //对于实现TableRuleAware的function进行特殊处理  根据每个表新建个实例
                     RuleConfig rule = tableRuleConfig.getRule();
-                    if(rule.getRuleAlgorithm() instanceof TableRuleAware)  {
+                    if(rule.getRuleAlgorithm() instanceof TableRuleAware) {
                         tableRuleConfig = (TableRuleConfig) ObjectUtil.copyObject(tableRuleConfig);
-                        tableRules.remove(tableRuleConfig.getName())   ;
+                        tableRules.remove(tableRuleConfig.getName());
                         String newRuleName = tableRuleConfig.getName() + "_" + tableName;
                         tableRuleConfig.setName(newRuleName);
                         TableRuleAware tableRuleAware = (TableRuleAware) tableRuleConfig.getRule().getRuleAlgorithm();
                         tableRuleAware.setRuleName(newRuleName);
                         tableRuleAware.setTableName(tableName);
                         tableRuleConfig.getRule().getRuleAlgorithm().init();
-                        tableRules.put(newRuleName,tableRuleConfig);
+                        tableRules.put(newRuleName, tableRuleConfig);
                     }
                 }
 
