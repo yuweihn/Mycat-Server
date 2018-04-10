@@ -194,8 +194,9 @@ public class XMLSchemaLoader implements SchemaLoader {
 			}
 			//记录每种dataNode的DB类型
 			Map<String, String> dataNodeDbTypeMap = new HashMap<String, String>();
-			for (String dataNodeName : dataNodes.keySet()) {
-				DataNodeConfig dataNodeConfig = dataNodes.get(dataNodeName);
+			for (Map.Entry<String, DataNodeConfig> entry: dataNodes.entrySet()) {
+				String dataNodeName = entry.getKey();
+				DataNodeConfig dataNodeConfig = entry.getValue();
 				String dataHost = dataNodeConfig.getDataHost();
 				DataHostConfig dataHostConfig = dataHosts.get(dataHost);
 				if (dataHostConfig != null) {
