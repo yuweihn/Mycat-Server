@@ -126,8 +126,8 @@ public class XMLServerLoader {
      */
     private void loadFirewall(Element root) throws IllegalAccessException, InvocationTargetException {
         NodeList list = root.getElementsByTagName("host");
-        Map<String, List<UserConfig>> whitehost = new HashMap<>();
-        Map<Pattern, List<UserConfig>> whitehostMask = new HashMap<>();
+        Map<String, List<UserConfig>> whiteHost = new HashMap<>();
+        Map<Pattern, List<UserConfig>> whiteHostMask = new HashMap<>();
 
         for (int i = 0, n = list.getLength(); i < n; i++) {
             Node node = list.item(i);
@@ -151,15 +151,15 @@ public class XMLServerLoader {
                     userConfigs.add(uc);
                 }
                 if(host.contains("*") || host.contains("%")) {
-                    whitehostMask.put(FirewallConfig.getMaskPattern(host), userConfigs);
+                    whiteHostMask.put(FirewallConfig.getMaskPattern(host), userConfigs);
                 } else {
-                    whitehost.put(host, userConfigs);
+                    whiteHost.put(host, userConfigs);
                 }
             }
         }
 
-        firewall.setWhitehost(whitehost);
-        firewall.setWhitehostMask(whitehostMask);
+        firewall.setWhitehost(whiteHost);
+        firewall.setWhitehostMask(whiteHostMask);
 
         WallConfig wallConfig = new WallConfig();
         NodeList blacklist = root.getElementsByTagName("blacklist");
