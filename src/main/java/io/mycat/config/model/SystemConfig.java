@@ -253,7 +253,7 @@ public final class SystemConfig {
 		/**
 		 * 大结果集时 需增大 network buffer pool pages.
 		 */
-		this.bufferPoolPageNumber = (short) (DEFAULT_PROCESSORS*20);
+		this.bufferPoolPageNumber = (short) (DEFAULT_PROCESSORS * 20);
 
 		this.processorExecutor = (DEFAULT_PROCESSORS != 1) ? DEFAULT_PROCESSORS * 2 : 4;
 		this.managerExecutor = 2;
