@@ -143,8 +143,8 @@ public final class FirewallConfig {
 			if(list == null) {
 				return false;
 			}
-			for(UserConfig userConfig: list){
-				if(userConfig.getName().equals(user)){
+			for(UserConfig userConfig: list) {
+				if(userConfig.getName().equals(user)) {
 					return true;
 				}
 			}
