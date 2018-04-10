@@ -48,8 +48,8 @@ public class SchemaConfig {
 	 */
 	private final int defaultMaxLimit;
 	private final boolean checkSQLSchema;
-	private  boolean needSupportMultiDBType = false;
-	private  String defaultDataNodeDbType;
+	private boolean needSupportMultiDBType = false;
+	private String defaultDataNodeDbType;
 	/**
 	 * key is join relation ,A.ID=B.PARENT_ID value is Root Table ,if a->b*->c*
 	 * ,then A is root table
@@ -57,7 +57,7 @@ public class SchemaConfig {
 	private final Map<String, TableConfig> joinRel2TableMap = new HashMap<String, TableConfig>();
 	private final String[] allDataNodeStrArr;
 
-	private  Map<String, String> dataNodeDbTypeMap = new HashMap<>();
+	private Map<String, String> dataNodeDbTypeMap = new HashMap<>();
 
 	public SchemaConfig(String name, String dataNode, Map<String, TableConfig> tables, int defaultMaxLimit, boolean checkSQLschema) {
 		this.name = name;
@@ -66,7 +66,7 @@ public class SchemaConfig {
 		this.tables = tables;
 		this.defaultMaxLimit = defaultMaxLimit;
 		buildJoinMap(tables);
-		this.noSharding = (tables == null || tables.isEmpty());
+		this.noSharding = tables == null || tables.isEmpty();
 		if (noSharding && dataNode == null) {
 			throw new RuntimeException(name + " in noSharding mode schema must have default dataNode ");
 		}
