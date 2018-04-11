@@ -1,17 +1,20 @@
 package io.mycat.route.sequence.handler;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 public class IncrSequenceTimeHandler implements SequenceHandler {
     protected static final Logger LOGGER = LoggerFactory.getLogger(IncrSequenceTimeHandler.class);
 
 	private static final String SEQUENCE_DB_PROPS = "sequence_time_conf.properties";
 	private static final IncrSequenceTimeHandler instance = new IncrSequenceTimeHandler();
-	private static IdWorker workey = new IdWorker(1,1);
+	private static IdWorker worker = new IdWorker(1,1);
 
 
 	public static IncrSequenceTimeHandler getInstance() {
@@ -23,21 +26,21 @@ public class IncrSequenceTimeHandler implements SequenceHandler {
 	}
 
 
-	public void load(){
+	public void load() {
 		// load sequnce properties
 		Properties props = loadProps(SEQUENCE_DB_PROPS);
 
 		long workid = Long.parseLong(props.getProperty("WORKID"));
 		long dataCenterId = Long.parseLong(props.getProperty("DATAACENTERID"));
 
-		workey = new IdWorker(workid,dataCenterId);
+		worker = new IdWorker(workid, dataCenterId);
 	}
-	private Properties loadProps(String propsFile){
+	private Properties loadProps(String propsFile) {
 		Properties props = new Properties();
 		InputStream inp = Thread.currentThread().getContextClassLoader().getResourceAsStream(propsFile);
 
 		if (inp == null) {
-			throw new java.lang.RuntimeException("time sequnce properties not found " + propsFile);
+			throw new java.lang.RuntimeException("time sequence properties not found " + propsFile);
 		}
 		try {
 			props.load(inp);
@@ -48,7 +51,7 @@ public class IncrSequenceTimeHandler implements SequenceHandler {
 	}
 	@Override
 	public long nextId(String prefixName) {
-		return workey.nextId();
+		return worker.nextId();
 	}
 
 
@@ -96,11 +99,11 @@ public class IncrSequenceTimeHandler implements SequenceHandler {
 		public synchronized long nextId() {
 			long timestamp = timeGen();
 			if (timestamp < lastTimestamp) {
-			try {
-				throw new Exception("Clock moved backwards.  Refusing to generate id for "+ (lastTimestamp - timestamp) + " milliseconds");
-			} catch (Exception e) {
-				LOGGER.error("error",e);
-			}
+				try {
+					throw new Exception("Clock moved backwards.  Refusing to generate id for " + (lastTimestamp - timestamp) + " milliseconds");
+				} catch (Exception e) {
+					LOGGER.error("error", e);
+				}
 			}
 
 			if (lastTimestamp == timestamp) {
@@ -133,12 +136,5 @@ public class IncrSequenceTimeHandler implements SequenceHandler {
 		private long timeGen() {
 			return System.currentTimeMillis();
 		}
-
-
-
 	}
-
-
-
-
 }
