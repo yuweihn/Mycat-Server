@@ -23,6 +23,8 @@
  */
 package io.mycat.route.sequence.handler;
 
+
+
 /**
  * 
  * @author <a href="http://www.micmiu.com">Michael</a>
@@ -30,7 +32,5 @@ package io.mycat.route.sequence.handler;
  * @version 1.0
  */
 public interface SequenceHandler {
-
-	public long nextId(String prefixName);
-
+	long nextId(String prefixName);
 }
