@@ -40,8 +40,8 @@ public class PhysicalDBNode {
 	protected final PhysicalDBPool dbPool;
 
 
-	public PhysicalDBNode(String hostName, String database, PhysicalDBPool dbPool) {
-		this.name = hostName;
+	public PhysicalDBNode(String dnName, String database, PhysicalDBPool dbPool) {
+		this.name = dnName;
 		this.database = database;
 		this.dbPool = dbPool;
 	}
