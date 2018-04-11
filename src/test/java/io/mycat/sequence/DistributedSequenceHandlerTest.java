@@ -7,7 +7,6 @@ import org.apache.curator.test.TestingServer;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,7 +42,7 @@ public class DistributedSequenceHandlerTest {
      * @throws Exception
      */
     @Test
-    public void testUniqueInstanceID() throws Exception {
+    public void testUniqueInstanceID() {
         Set<Long> idSet = new HashSet<>();
         for (int i = 0; i < 16; i++) {
             idSet.add(distributedSequenceHandler[i].getInstanceId());
@@ -158,10 +157,7 @@ public class DistributedSequenceHandlerTest {
             System.out.println("Node ["+i + "]is leader:" + distributedSequenceHandler[i].getLeaderSelector().hasLeadership() );
             System.out.println(" InstanceID:" + distributedSequenceHandler[i].getInstanceId());
         }
-        try {
-            distributedSequenceHandler[leader].close();
-        } catch (IOException e) {
-        }
+        distributedSequenceHandler[leader].close();
 
         while (true) {
             follower++;
