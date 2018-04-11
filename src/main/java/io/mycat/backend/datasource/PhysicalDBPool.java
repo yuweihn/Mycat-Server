@@ -91,7 +91,7 @@ public class PhysicalDBPool {
 		this.readSources = readSources;
 		this.allDs = this.genAllDataSources();
 		
-		LOGGER.info("total resouces of dataHost " + this.hostName + " is :" + allDs.size());
+		LOGGER.info("total resources of dataHost " + this.hostName + " is :" + allDs.size());
 		setDataSourceProps();
 	}
 
