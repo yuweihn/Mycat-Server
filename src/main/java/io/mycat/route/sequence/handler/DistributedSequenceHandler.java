@@ -26,6 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+
 /**
  * 基于ZK与本地配置的分布式ID生成器(可以通过ZK获取集群（机房）唯一InstanceID，也可以通过配置文件配置InstanceID)
  * ID结构：long 64位，ID最大可占63位
@@ -147,7 +148,6 @@ public class DistributedSequenceHandler extends LeaderSelectorListenerAdapter im
             this.ready = true;
         }
         this.clusterId = Long.valueOf(props.getProperty("CLUSTERID"));
-
     }
 
     public void initializeZK(String zkAddress) {
@@ -263,8 +263,7 @@ public class DistributedSequenceHandler extends LeaderSelectorListenerAdapter im
             }
             if (children != null) {
                 for (String child : children) {
-                    String data = new String(
-                            client.getData().forPath(PATH.concat(INSTANCE_PATH.concat("/").concat(child))));
+                    String data = new String(client.getData().forPath(PATH.concat(INSTANCE_PATH.concat("/").concat(child))));
                     if (!"ready".equals(data)) {
                         mark[Integer.parseInt(data)] = 1;
                     }
@@ -288,8 +287,7 @@ public class DistributedSequenceHandler extends LeaderSelectorListenerAdapter im
                         String data = new String(client.getData().forPath(PATH.concat("/instance/" + child)));
                         if ("ready".equals(data)) {
                             int i = nextFree();
-                            client.setData().forPath(PATH.concat(INSTANCE_PATH.concat("/").concat(child)),
-                                    ("" + i).getBytes());
+                            client.setData().forPath(PATH.concat(INSTANCE_PATH.concat("/").concat(child)), ("" + i).getBytes());
                             mark2[i] = 1;
                         } else {
                             mark2[Integer.parseInt(data)] = 1;
@@ -320,7 +318,7 @@ public class DistributedSequenceHandler extends LeaderSelectorListenerAdapter im
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         CloseableUtils.closeQuietly(this.leaderSelector);
         CloseableUtils.closeQuietly(this.client);
     }
