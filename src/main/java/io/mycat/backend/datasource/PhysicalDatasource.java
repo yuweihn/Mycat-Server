@@ -380,7 +380,7 @@ public abstract class PhysicalDatasource {
 			try {
 				// creat new connection
 				this.createNewConnection(simpleHandler, null, schemas[i % schemas.length]);
-			} catch (IOException e) {
+			} catch (Exception e) {
 				LOGGER.warn("create connection err " + e);
 			}
 		}
