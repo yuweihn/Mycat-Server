@@ -36,9 +36,7 @@ import org.slf4j.LoggerFactory;
  * @version 1.0
  */
 public abstract class IncrSequenceHandler implements SequenceHandler {
-
-	public static final Logger logger = LoggerFactory
-			.getLogger(IncrSequenceHandler.class);
+	public static final Logger logger = LoggerFactory.getLogger(IncrSequenceHandler.class);
 
 	public static final String FILE_NAME = "sequence_conf.properties";
 

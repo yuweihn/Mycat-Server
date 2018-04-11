@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
+import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Executors;
@@ -73,7 +74,7 @@ public class DistributedSequenceHandler extends LeaderSelectorListenerAdapter im
     private long nextID = 0L;
 
     private final static String PATH = ZookeeperPath.ZK_SEPARATOR.getKey() + ZookeeperPath.FLOW_ZK_PATH_BASE.getKey()
-            + ZkConfig.getInstance().getValue(ZkParamCfg.ZK_CFG_CLUSTERID)
+            + io.mycat.config.loader.zkprocess.comm.ZkConfig.getInstance().getValue(ZkParamCfg.ZK_CFG_CLUSTERID)
             + ZookeeperPath.ZK_SEPARATOR.getKey() + ZookeeperPath.FLOW_ZK_PATH_SEQUENCE.getKey();
     // private final static String PATH = "/mycat/sequence";
     private final static String INSTANCE_PATH = ZookeeperPath.ZK_SEPARATOR.getKey()

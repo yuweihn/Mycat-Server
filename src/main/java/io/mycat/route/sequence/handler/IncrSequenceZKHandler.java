@@ -32,7 +32,6 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.locks.InterProcessSemaphoreMutex;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.curator.utils.ZKPaths;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
 import org.slf4j.Logger;
@@ -44,6 +43,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+
 
 /**
  * zookeeper 实现递增序列号
@@ -131,7 +131,6 @@ public class IncrSequenceZKHandler extends IncrSequenceHandler {
             tableParaValMap.put(table, paraValMap);
 
             String seqPath = PATH + ZookeeperPath.ZK_SEPARATOR.getKey() + table + SEQ;
-
             Stat stat = this.client.checkExists().forPath(seqPath);
 
             if (stat == null || (stat.getDataLength() == 0)) {
@@ -140,8 +139,7 @@ public class IncrSequenceZKHandler extends IncrSequenceHandler {
                 paraValMap.put(table + KEY_CUR_NAME, props.getProperty(table + KEY_CUR_NAME));
                 try {
                     String val = props.getProperty(table + KEY_MIN_NAME);
-                    client.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT)
-                            .forPath(PATH + "/" + table + SEQ, val.getBytes());
+                    client.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(PATH + "/" + table + SEQ, val.getBytes());
                 } catch (Exception e) {
                     LOGGER.debug("Node exists! Maybe other instance is initializing!");
                 }
@@ -157,7 +155,7 @@ public class IncrSequenceZKHandler extends IncrSequenceHandler {
             try {
                 threadLocalLoad();
             } catch (Exception e) {
-                LOGGER.error("Error caught while loding configuration within current thread:" + e.getCause());
+                LOGGER.error("Error caught while loading configuration within current thread:" + e.getCause());
             }
             tableParaValMap = tableParaValMapThreadLocal.get();
         }
@@ -205,7 +203,7 @@ public class IncrSequenceZKHandler extends IncrSequenceHandler {
             try {
                 interProcessSemaphoreMutex.release();
             } catch (Exception e) {
-                LOGGER.error("Error caught while realeasing distributed lock" + e.getCause());
+                LOGGER.error("Error caught while releasing distributed lock" + e.getCause());
             }
         }
         return true;
@@ -225,7 +223,7 @@ public class IncrSequenceZKHandler extends IncrSequenceHandler {
         return true;
     }
 
-    public static void main(String[] args) throws UnsupportedEncodingException {
+    public static void main(String[] args) {
         IncrSequenceZKHandler incrSequenceZKHandler = new IncrSequenceZKHandler();
         incrSequenceZKHandler.load();
         System.out.println(incrSequenceZKHandler.nextId("TRAVELRECORD"));
