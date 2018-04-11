@@ -1,17 +1,5 @@
 package io.mycat.route.sequence.handler;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
-
-import io.mycat.route.util.PropertiesUtil;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import io.mycat.MycatServer;
 import io.mycat.backend.BackendConnection;
@@ -22,17 +10,33 @@ import io.mycat.config.util.ConfigException;
 import io.mycat.net.mysql.ErrorPacket;
 import io.mycat.net.mysql.RowDataPacket;
 import io.mycat.route.RouteResultsetNode;
+import io.mycat.route.util.PropertiesUtil;
 import io.mycat.server.parser.ServerParse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+
 
 public class IncrSequenceMySQLHandler implements SequenceHandler {
-
-	protected static final Logger LOGGER = LoggerFactory
-			.getLogger(IncrSequenceMySQLHandler.class);
+	protected static final Logger LOGGER = LoggerFactory.getLogger(IncrSequenceMySQLHandler.class);
 
 	private static final String SEQUENCE_DB_PROPS = "sequence_db_conf.properties";
 	protected static final String errSeqResult = "-999999999,null";
 	protected static Map<String, String> latestErrors = new ConcurrentHashMap<String, String>();
-	private final FetchMySQLSequnceHandler mysqlSeqFetcher = new FetchMySQLSequnceHandler();
+	private final FetchMySQLSequenceHandler mysqlSeqFetcher = new FetchMySQLSequenceHandler();
+
+	/**
+	 * save sequnce -> curval
+	 */
+	private ConcurrentHashMap<String, SequenceVal> seqValueMap = new ConcurrentHashMap<String, SequenceVal>();
+
 
 	private static class IncrSequenceMySQLHandlerHolder {
 		private static final IncrSequenceMySQLHandler instance = new IncrSequenceMySQLHandler();
@@ -43,7 +47,6 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 	}
 
 	public IncrSequenceMySQLHandler() {
-
 		load();
 	}
 
@@ -56,8 +59,7 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 
 
 	private void removeDesertedSequenceVals(Properties props) {
-		Iterator<Map.Entry<String, SequenceVal>> i = seqValueMap.entrySet()
-				.iterator();
+		Iterator<Map.Entry<String, SequenceVal>> i = seqValueMap.entrySet().iterator();
 		while (i.hasNext()) {
 			Map.Entry<String, SequenceVal> entry = i.next();
 			if (!props.containsKey(entry.getKey())) {
@@ -67,7 +69,7 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 	}
 
 	private void putNewSequenceVals(Properties props) {
-		for (Map.Entry<Object, Object> entry : props.entrySet()) {
+		for (Map.Entry<Object, Object> entry: props.entrySet()) {
 			String seqName = (String) entry.getKey();
 			String dataNode = (String) entry.getValue();
 			if (!seqValueMap.containsKey(seqName)) {
@@ -78,24 +80,17 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 		}
 	}
 
-	/**
-	 * save sequnce -> curval
-	 */
-	private ConcurrentHashMap<String, SequenceVal> seqValueMap = new ConcurrentHashMap<String, SequenceVal>();
-
 	@Override
 	public long nextId(String seqName) {
 		SequenceVal seqVal = seqValueMap.get(seqName);
 		if (seqVal == null) {
-			throw new ConfigException("can't find definition for sequence :"
-					+ seqName);
+			throw new ConfigException("can't find definition for sequence: " + seqName);
 		}
 		if (!seqVal.isSuccessFetched()) {
 			return getSeqValueFromDB(seqVal);
 		} else {
 			return getNextValidSeqVal(seqVal);
 		}
-
 	}
 
 	private Long getNextValidSeqVal(SequenceVal seqVal) {
@@ -110,8 +105,7 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 
 	private long getSeqValueFromDB(SequenceVal seqVal) {
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("get next segement of sequence from db for sequnce:"
-					+ seqVal.seqName + " curVal " + seqVal.curVal);
+			LOGGER.debug("get next segment of sequence from db for sequence: " + seqVal.seqName + " curVal " + seqVal.curVal);
 		}
 		if (seqVal.fetching.compareAndSet(false, true)) {
 			seqVal.dbretVal = null;
@@ -121,10 +115,8 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 		}
 		Long[] values = seqVal.waitFinish();
 		if (values == null) {
-
-			throw new RuntimeException("can't fetch sequnce in db,sequnce :"
-					+ seqVal.seqName + " detail:"
-					+ mysqlSeqFetcher.getLastestError(seqVal.seqName));
+			throw new RuntimeException("can't fetch sequence in db, sequence: " + seqVal.seqName
+					+ " detail: " + mysqlSeqFetcher.getLastestError(seqVal.seqName));
 		} else {
 			if (seqVal.newValueSetted.compareAndSet(false, true)) {
 				seqVal.setCurValue(values[0]);
@@ -133,32 +125,26 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 			} else {
 				return seqVal.nextValue();
 			}
-
 		}
-
 	}
 }
 
-class FetchMySQLSequnceHandler implements ResponseHandler {
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(FetchMySQLSequnceHandler.class);
+class FetchMySQLSequenceHandler implements ResponseHandler {
+	private static final Logger LOGGER = LoggerFactory.getLogger(FetchMySQLSequenceHandler.class);
 
 	public void execute(SequenceVal seqVal) {
 		MycatConfig conf = MycatServer.getInstance().getConfig();
 		PhysicalDBNode mysqlDN = conf.getDataNodes().get(seqVal.dataNode);
 		try {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("execute in datanode " + seqVal.dataNode
-						+ " for fetch sequnce sql " + seqVal.sql);
+				LOGGER.debug("execute in datanode " + seqVal.dataNode + " for fetch sequence sql " + seqVal.sql);
 			}
 			// 修正获取seq的逻辑，在读写分离的情况下只能走写节点。修改Select模式为Update模式。
 			mysqlDN.getConnection(mysqlDN.getDatabase(), true,
-					new RouteResultsetNode(seqVal.dataNode, ServerParse.UPDATE,
-							seqVal.sql), this, seqVal);
+					new RouteResultsetNode(seqVal.dataNode, ServerParse.UPDATE, seqVal.sql), this, seqVal);
 		} catch (Exception e) {
 			LOGGER.warn("get connection err " + e);
 		}
-
 	}
 
 	public String getLastestError(String seqName) {
@@ -167,7 +153,6 @@ class FetchMySQLSequnceHandler implements ResponseHandler {
 
 	@Override
 	public void connectionAcquired(BackendConnection conn) {
-
 		conn.setResponseHandler(this);
 		try {
 			conn.query(((SequenceVal) conn.getAttachment()).sql);
@@ -180,12 +165,11 @@ class FetchMySQLSequnceHandler implements ResponseHandler {
 	public void connectionError(Throwable e, BackendConnection conn) {
 		((SequenceVal) conn.getAttachment()).dbfinished = true;
 		LOGGER.warn("connectionError " + e);
-
 	}
 
 	@Override
 	public void errorResponse(byte[] data, BackendConnection conn) {
-		SequenceVal seqVal = ((SequenceVal) conn.getAttachment());
+		SequenceVal seqVal = (SequenceVal) conn.getAttachment();
 		seqVal.dbfinished = true;
 
 		ErrorPacket err = new ErrorPacket();
@@ -194,7 +178,6 @@ class FetchMySQLSequnceHandler implements ResponseHandler {
 		LOGGER.warn("errorResponse " + err.errno + " " + errMsg);
 		IncrSequenceMySQLHandler.latestErrors.put(seqVal.seqName, errMsg);
 		conn.release();
-
 	}
 
 	@Override
@@ -204,7 +187,6 @@ class FetchMySQLSequnceHandler implements ResponseHandler {
 			((SequenceVal) conn.getAttachment()).dbfinished = true;
 			conn.release();
 		}
-
 	}
 
 	@Override
@@ -216,8 +198,7 @@ class FetchMySQLSequnceHandler implements ResponseHandler {
 		SequenceVal seqVal = (SequenceVal) conn.getAttachment();
 		if (IncrSequenceMySQLHandler.errSeqResult.equals(columnVal)) {
 			seqVal.dbretVal = IncrSequenceMySQLHandler.errSeqResult;
-			LOGGER.warn(" sequnce sql returned err value ,sequence:"
-					+ seqVal.seqName + " " + columnVal + " sql:" + seqVal.sql);
+			LOGGER.warn("Sequence sql returned err value, sequence: " + seqVal.seqName + " " + columnVal + " sql: " + seqVal.sql);
 		} else {
 			seqVal.dbretVal = columnVal;
 		}
@@ -225,19 +206,18 @@ class FetchMySQLSequnceHandler implements ResponseHandler {
 
 	@Override
 	public void rowEofResponse(byte[] eof, BackendConnection conn) {
-		SequenceVal sequenceVal = ((SequenceVal) conn.getAttachment());
+		SequenceVal sequenceVal = (SequenceVal) conn.getAttachment();
 		conn.release();
 		sequenceVal.dbfinished = true;
 	}
 
 	private void executeException(BackendConnection c, Throwable e) {
-		SequenceVal seqVal = ((SequenceVal) c.getAttachment());
+		SequenceVal seqVal = (SequenceVal) c.getAttachment();
 		seqVal.dbfinished = true;
-		String errMgs=e.toString();
+		String errMgs = e.toString();
 		IncrSequenceMySQLHandler.latestErrors.put(seqVal.seqName, errMgs);
-		LOGGER.warn("executeException   " + errMgs);
-		c.close("exception:" +errMgs);
-
+		LOGGER.warn("executeException: " + errMgs);
+		c.close("exception: " + errMgs);
 	}
 
 	@Override
@@ -247,16 +227,12 @@ class FetchMySQLSequnceHandler implements ResponseHandler {
 
 	@Override
 	public void connectionClose(BackendConnection conn, String reason) {
-
 		LOGGER.warn("connection closed " + conn + " reason:" + reason);
 	}
 
 	@Override
-	public void fieldEofResponse(byte[] header, List<byte[]> fields,
-			byte[] eof, BackendConnection conn) {
-
+	public void fieldEofResponse(byte[] header, List<byte[]> fields, byte[] eof, BackendConnection conn) {
 	}
-
 }
 
 class SequenceVal {
@@ -278,11 +254,7 @@ class SequenceVal {
 	}
 
 	public boolean isNexValValid(Long nexVal) {
-		if (nexVal < this.maxSegValue) {
-			return true;
-		} else {
-			return false;
-		}
+        return nexVal < this.maxSegValue;
 	}
 
 //	FetchMySQLSequnceHandler seqHandler;
@@ -296,23 +268,20 @@ class SequenceVal {
 		long start = System.currentTimeMillis();
 		long end = start + 10 * 1000;
 		while (System.currentTimeMillis() < end) {
-			
-			if(dbfinished){
+			if(dbfinished) {
 				if (dbretVal == IncrSequenceMySQLHandler.errSeqResult) {
-					throw new java.lang.RuntimeException(
-							"sequnce not found in db table ");
+					throw new RuntimeException("sequence not found in db table ");
 				}
 				
 				String[] items = dbretVal.split(",");
 				Long curVal = Long.parseLong(items[0]);
 				int span = Integer.parseInt(items[1]);
-				return new Long[] { curVal, curVal + span };
-			}else{
+				return new Long[] {curVal, curVal + span};
+			} else {
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
-					IncrSequenceMySQLHandler.LOGGER
-							.warn("wait db fetch sequnce err " + e);
+					IncrSequenceMySQLHandler.LOGGER.warn("wait db fetch sequence err " + e);
 				}
 			}
 		}
@@ -325,8 +294,7 @@ class SequenceVal {
 
 	public long nextValue() {
 		if (successFetched == false) {
-			throw new java.lang.RuntimeException(
-					"sequnce fetched failed  from db ");
+			throw new java.lang.RuntimeException("sequence fetched failed  from db ");
 		}
 		return curVal.incrementAndGet();
 	}
