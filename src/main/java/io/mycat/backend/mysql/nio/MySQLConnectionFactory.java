@@ -55,7 +55,7 @@ public class MySQLConnectionFactory extends BackendConnectionFactory {
 		c.setSchema(schema);
 		c.setHandler(new MySQLConnectionAuthenticator(c, handler));
 		c.setPool(pool);
-		c.setIdleTimeout(pool.getConfig().getIdleTimeout());
+		c.setIdleTimeout(dsc.getIdleTimeout());
 		if (channel instanceof AsynchronousSocketChannel) {
 			((AsynchronousSocketChannel) channel).connect(
 					new InetSocketAddress(dsc.getIp(), dsc.getPort()), c, (CompletionHandler) MycatServer.getInstance().getConnector());
