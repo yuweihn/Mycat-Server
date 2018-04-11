@@ -23,8 +23,10 @@
  */
 package io.mycat.config.model;
 
+
+
+
 public class DBHostConfig {
-	
 	private long idleTimeout = SystemConfig.DEFAULT_IDLE_TIMEOUT; // 连接池中连接空闲超时时间
 	private final String hostName;
 	private final String ip;
@@ -33,10 +35,10 @@ public class DBHostConfig {
 	private final String user;
 	private final String password;
     private final String encryptPassword; //密文
-	private int maxCon ;
-	private int minCon ;
+	private int maxCon;
+	private int minCon;
 	private String dbType;
-	private String filters="mergeStat";
+	private String filters = "mergeStat";
 	private long logTime = 300000;
 	private int weight;				
 
@@ -48,8 +50,8 @@ public class DBHostConfig {
 		this.dbType = dbType;
 	}
 
-	public DBHostConfig(String hostName, String ip, int port, String url,
-			String user, String password,String encryptPassword) {
+	public DBHostConfig(String hostName, String ip, int port, String url, String user
+			, String password, String encryptPassword) {
 		super();
 		this.hostName = hostName;
 		this.ip = ip;
@@ -138,5 +140,4 @@ public class DBHostConfig {
 	public String toString() {
 		return "DBHostConfig [hostName=" + hostName + ", url=" + url + "]";
 	}
-
 }
