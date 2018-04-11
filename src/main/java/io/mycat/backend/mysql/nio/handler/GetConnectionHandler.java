@@ -63,7 +63,7 @@ public class GetConnectionHandler implements ResponseHandler {
 	public void connectionAcquired(BackendConnection conn) {
 		successCons.add(conn);
 		finishedCount.addAndGet(1);
-		logger.info("connected successfuly " + conn);
+		logger.info("connected successfully " + conn);
         conn.release();
 	}
 
