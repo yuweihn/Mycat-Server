@@ -52,7 +52,7 @@ public class MySQLDataSource extends PhysicalDatasource {
 	}
 
 	@Override
-	public void createNewConnection(ResponseHandler handler,String schema) throws IOException {
+	public void createNewConnection(ResponseHandler handler, String schema) throws IOException {
 		factory.make(this, handler, schema);
 	}
 	
