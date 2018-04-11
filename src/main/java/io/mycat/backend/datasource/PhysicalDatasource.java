@@ -297,7 +297,7 @@ public abstract class PhysicalDatasource {
 
 	/**
 	 * 
-	 * @param ildeCloseCount
+	 * @param idleCloseCount
 	 * 首先，从已创建的连接中选择本次心跳需要关闭的空闲连接数（由当前连接连接数-减去配置的最小连接数。
 	 * 然后依次关闭这些连接。由于连接空闲心跳检测与业务是同时并发的，在心跳关闭阶段，可能有连接被使用，导致需要关闭的空闲连接数减少.
 	 * 
@@ -311,12 +311,12 @@ public abstract class PhysicalDatasource {
 	 *     使用循环操作，首先在关闭之前，先再一次判断是否需要关闭连接，然后每次从ConnMap中获取一个空闲连接，然后进行关闭
 	 * edit by dingw at 2017.06.16
 	 */
-	private void closeByIdleMany(int ildeCloseCount) {
-		LOGGER.info("too many ilde cons ,close some for datasouce  " + name);
-		List<BackendConnection> readyCloseCons = new ArrayList<BackendConnection>(ildeCloseCount);
+	private void closeByIdleMany(int idleCloseCount) {
+		LOGGER.info("too many idle cons ,close some for datasource  " + name);
+		List<BackendConnection> readyCloseCons = new ArrayList<BackendConnection>(idleCloseCount);
 		for (ConQueue queue: conMap.getAllConQueue()) {
-			readyCloseCons.addAll(queue.getIdleConsToClose(ildeCloseCount));
-			if (readyCloseCons.size() >= ildeCloseCount) {
+			readyCloseCons.addAll(queue.getIdleConsToClose(idleCloseCount));
+			if (readyCloseCons.size() >= idleCloseCount) {
 				break;
 			}
 		}
