@@ -1,11 +1,10 @@
 package io.mycat.route.sequence.handler;
 
 
+import io.mycat.route.util.PropertiesUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 
@@ -14,7 +13,7 @@ public class IncrSequenceTimeHandler implements SequenceHandler {
 
 	private static final String SEQUENCE_DB_PROPS = "sequence_time_conf.properties";
 	private static final IncrSequenceTimeHandler instance = new IncrSequenceTimeHandler();
-	private static IdWorker worker = new IdWorker(1,1);
+	private static IdWorker worker = new IdWorker(1, 1);
 
 
 	public static IncrSequenceTimeHandler getInstance() {
@@ -28,27 +27,14 @@ public class IncrSequenceTimeHandler implements SequenceHandler {
 
 	public void load() {
 		// load sequnce properties
-		Properties props = loadProps(SEQUENCE_DB_PROPS);
+		Properties props = PropertiesUtil.loadProps(SEQUENCE_DB_PROPS);
 
-		long workid = Long.parseLong(props.getProperty("WORKID"));
+		long workId = Long.parseLong(props.getProperty("WORKID"));
 		long dataCenterId = Long.parseLong(props.getProperty("DATAACENTERID"));
 
-		worker = new IdWorker(workid, dataCenterId);
+		worker = new IdWorker(workId, dataCenterId);
 	}
-	private Properties loadProps(String propsFile) {
-		Properties props = new Properties();
-		InputStream inp = Thread.currentThread().getContextClassLoader().getResourceAsStream(propsFile);
 
-		if (inp == null) {
-			throw new java.lang.RuntimeException("time sequence properties not found " + propsFile);
-		}
-		try {
-			props.load(inp);
-		} catch (IOException e) {
-			throw new java.lang.RuntimeException(e);
-		}
-		return props;
-	}
 	@Override
 	public long nextId(String prefixName) {
 		return worker.nextId();
@@ -83,17 +69,17 @@ public class IncrSequenceTimeHandler implements SequenceHandler {
 
 		private long sequence = 0L;
 		private final long workerId;
-		private final long datacenterId;
+		private final long dataCenterId;
 
-		public IdWorker(long workerId, long datacenterId) {
+		public IdWorker(long workerId, long dataCenterId) {
 			if (workerId > maxWorkerId || workerId < 0) {
 				throw new IllegalArgumentException("worker Id can't be greater than %d or less than 0");
 			}
-			if (datacenterId > maxDatacenterId || datacenterId < 0) {
+			if (dataCenterId > maxDatacenterId || dataCenterId < 0) {
 				throw new IllegalArgumentException("datacenter Id can't be greater than %d or less than 0");
 			}
 			this.workerId = workerId;
-			this.datacenterId = datacenterId;
+			this.dataCenterId = dataCenterId;
 		}
 
 		public synchronized long nextId() {
@@ -119,7 +105,7 @@ public class IncrSequenceTimeHandler implements SequenceHandler {
 			lastTimestamp = timestamp;
 			// ID偏移组合生成最终的ID，并返回ID
 			long nextId = ((timestamp - twepoch) << timestampLeftShift)
-					| (datacenterId << datacenterIdShift)
+					| (dataCenterId << datacenterIdShift)
 					| (workerId << workerIdShift) | sequence;
 
 			return nextId;
