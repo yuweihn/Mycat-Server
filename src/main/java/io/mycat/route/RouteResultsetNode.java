@@ -23,17 +23,18 @@
  */
 package io.mycat.route;
 
+
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Set;
 
 import io.mycat.server.parser.ServerParse;
 import io.mycat.sqlengine.mpp.LoadData;
 
+
 /**
  * @author mycat
  */
-public final class RouteResultsetNode implements Serializable , Comparable<RouteResultsetNode> {
+public final class RouteResultsetNode implements Serializable, Comparable<RouteResultsetNode> {
 	/**
 	 *
 	 */
@@ -47,8 +48,8 @@ public final class RouteResultsetNode implements Serializable , Comparable<Route
     private boolean callStatement = false; // 处理call关键字
 	private int limitStart;
 	private int limitSize;
-	private int totalNodeSize =0; //方便后续jdbc批量获取扩展
-   private Procedure procedure;
+	private int totalNodeSize = 0; //方便后续jdbc批量获取扩展
+	private Procedure procedure;
 	private LoadData loadData;
 	private RouteResultset source;
 	
@@ -59,39 +60,37 @@ public final class RouteResultsetNode implements Serializable , Comparable<Route
 	private String subTableName; // 分表的表名
 
 	//迁移算法用     -2代表不是slot分片  ，-1代表扫描所有分片
-	private int slot=-2;
+	private int slot = -2;
+	private Map hintMap;
+
 	
 	public RouteResultsetNode(String name, int sqlType, String srcStatement) {
 		this.name = name;
-		limitStart=0;
+		limitStart = 0;
 		this.limitSize = -1;
 		this.sqlType = sqlType;
 		this.srcStatement = srcStatement;
 		this.statement = srcStatement;
-		canRunInReadDB = (sqlType == ServerParse.SELECT || sqlType == ServerParse.SHOW);
-		hasBlanceFlag = (statement != null)
-				&& statement.startsWith("/*balance*/");
+		canRunInReadDB = sqlType == ServerParse.SELECT || sqlType == ServerParse.SHOW;
+		hasBlanceFlag = statement != null && statement.startsWith("/*balance*/");
 	}
 
 	public Boolean getRunOnSlave() {
 		return runOnSlave;
 	}
 	public boolean isUpdateSql() {
-		int type=sqlType;
-		return ServerParse.INSERT==type||ServerParse.UPDATE==type||ServerParse.DELETE==type||ServerParse.DDL==type;
+		int type = sqlType;
+		return ServerParse.INSERT == type || ServerParse.UPDATE == type || ServerParse.DELETE == type || ServerParse.DDL == type;
 	}
 	public void setRunOnSlave(Boolean runOnSlave) {
 		this.runOnSlave = runOnSlave;
 	}
-	  private Map hintMap;
 
-    public Map getHintMap()
-    {
+    public Map getHintMap() {
         return hintMap;
     }
 
-    public void setHintMap(Map hintMap)
-    {
+    public void setHintMap(Map hintMap) {
         this.hintMap = hintMap;
     }
 
@@ -123,15 +122,15 @@ public final class RouteResultsetNode implements Serializable , Comparable<Route
 	 * @return
 	 */
 	public boolean canRunnINReadDB(boolean autocommit) {
-		return canRunInReadDB && ( autocommit || (!autocommit && hasBlanceFlag) );
+//		return canRunInReadDB && (autocommit || (!autocommit && hasBlanceFlag));
+		return canRunInReadDB && (autocommit || hasBlanceFlag);
 	}
 	
 //	public boolean canRunnINReadDB(boolean autocommit) {
-//		return canRunInReadDB && autocommit && !hasBlanceFlag
-//			|| canRunInReadDB && !autocommit && hasBlanceFlag;
+//		return canRunInReadDB && autocommit && !hasBlanceFlag || canRunInReadDB && !autocommit && hasBlanceFlag;
 //	}
-  public Procedure getProcedure()
-    {
+
+	public Procedure getProcedure() {
         return procedure;
     }
 
@@ -143,18 +142,15 @@ public final class RouteResultsetNode implements Serializable , Comparable<Route
 		this.slot = slot;
 	}
 
-	public void setProcedure(Procedure procedure)
-    {
+	public void setProcedure(Procedure procedure) {
         this.procedure = procedure;
     }
 
-    public boolean isCallStatement()
-    {
+    public boolean isCallStatement() {
         return callStatement;
     }
 
-    public void setCallStatement(boolean callStatement)
-    {
+    public void setCallStatement(boolean callStatement) {
         this.callStatement = callStatement;
     }
 	public String getName() {
@@ -169,43 +165,35 @@ public final class RouteResultsetNode implements Serializable , Comparable<Route
 		return statement;
 	}
 
-	public int getLimitStart()
-	{
+	public int getLimitStart() {
 		return limitStart;
 	}
 
-	public void setLimitStart(int limitStart)
-	{
+	public void setLimitStart(int limitStart) {
 		this.limitStart = limitStart;
 	}
 
-	public int getLimitSize()
-	{
+	public int getLimitSize() {
 		return limitSize;
 	}
 
-	public void setLimitSize(int limitSize)
-	{
+	public void setLimitSize(int limitSize) {
 		this.limitSize = limitSize;
 	}
 
-	public int getTotalNodeSize()
-	{
+	public int getTotalNodeSize() {
 		return totalNodeSize;
 	}
 
-	public void setTotalNodeSize(int totalNodeSize)
-	{
+	public void setTotalNodeSize(int totalNodeSize) {
 		this.totalNodeSize = totalNodeSize;
 	}
 
-	public LoadData getLoadData()
-	{
+	public LoadData getLoadData() {
 		return loadData;
 	}
 
-	public void setLoadData(LoadData loadData)
-	{
+	public void setLoadData(LoadData loadData) {
 		this.loadData = loadData;
 	}
 
@@ -221,11 +209,11 @@ public final class RouteResultsetNode implements Serializable , Comparable<Route
 		}
 		if (obj instanceof RouteResultsetNode) {
 			RouteResultsetNode rrn = (RouteResultsetNode) obj;
-			if(subTableName!=null){
+			if(subTableName != null) {
 				if (equals(name, rrn.getName()) && equals(subTableName, rrn.getSubTableName())) {
 					return true;
 				}
-			}else{
+			} else {
 				if (equals(name, rrn.getName())) {
 					return true;
 				}
@@ -261,9 +249,9 @@ public final class RouteResultsetNode implements Serializable , Comparable<Route
 		return !canRunInReadDB;
 	}
 	public boolean isDisctTable() {
-		if(subTableName!=null && !subTableName.equals("")){
+		if(subTableName != null && !subTableName.equals("")) {
 			return true;
-		};
+		}
 		return false;
 	}
 	
@@ -280,10 +268,10 @@ public final class RouteResultsetNode implements Serializable , Comparable<Route
 			return 1;
 		}
 		int c = this.name.compareTo(obj.name);
-		if(!this.isDisctTable()){
+		if(!this.isDisctTable()) {
 			return c;
-		}else{
-			if(c==0){
+		} else {
+			if(c == 0) {
 				return this.subTableName.compareTo(obj.subTableName);
 			}
 			return c;
