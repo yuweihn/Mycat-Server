@@ -43,8 +43,8 @@ import java.security.NoSuchAlgorithmException;
  * @author mycat
  */
 public class MySQLDataSource extends PhysicalDatasource {
-
 	private final MySQLConnectionFactory factory;
+
 
 	public MySQLDataSource(DBHostConfig config, DataHostConfig hostConfig, boolean isReadNode) {
 		super(config, hostConfig, isReadNode);
@@ -95,7 +95,7 @@ public class MySQLDataSource extends PhysicalDatasource {
 	}
 	
 	@Override
-	public boolean testConnection(String schema) throws IOException {
+	public boolean testConnection(String schema) {
 		boolean isConnected = true;
 		
 		Socket socket = null;
@@ -129,7 +129,7 @@ public class MySQLDataSource extends PhysicalDatasource {
 			authPacket.clientFlags = getClientFlags();
 			authPacket.maxPacketSize = 1024 * 1024 * 16;
 			authPacket.charsetIndex = handshake.serverCharsetIndex & 0xff;
-			authPacket.user = this.getConfig().getUser();;
+			authPacket.user = this.getConfig().getUser();
 			try {
 				authPacket.password = passwd(this.getConfig().getPassword(), handshake);
 			} catch (NoSuchAlgorithmException e) {

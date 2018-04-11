@@ -23,31 +23,33 @@
  */
 package io.mycat.backend.heartbeat;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.concurrent.locks.ReentrantLock;
-
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import io.mycat.backend.datasource.PhysicalDBPool;
 import io.mycat.backend.datasource.PhysicalDatasource;
 import io.mycat.backend.mysql.nio.MySQLDataSource;
 import io.mycat.config.model.DataHostConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.locks.ReentrantLock;
+
 
 /**
  * @author mycat
  */
 public class MySQLHeartbeat extends DBHeartbeat {
-
-	private static final int MAX_RETRY_COUNT = 5;
 	public static final Logger LOGGER = LoggerFactory.getLogger(MySQLHeartbeat.class);
 
+	private static final int MAX_RETRY_COUNT = 5;
 	private final MySQLDataSource source;
 
 	private final ReentrantLock lock;
 	private final int maxRetryCount;
 
 	private MySQLDetector detector;
+
 
 	public MySQLHeartbeat(MySQLDataSource source) {
 		this.source = source;
@@ -154,15 +156,15 @@ public class MySQLHeartbeat extends DBHeartbeat {
 	public void setResult(int result, MySQLDetector detector, String msg) {
 		this.isChecking.set(false);
 		switch (result) {
-		case OK_STATUS:
-			setOk(detector);
-			break;
-		case ERROR_STATUS:
-			setError(detector);
-			break;
-		case TIMEOUT_STATUS:
-			setTimeout(detector);
-			break;
+			case OK_STATUS:
+				setOk(detector);
+				break;
+			case ERROR_STATUS:
+				setError(detector);
+				break;
+			case TIMEOUT_STATUS:
+				setTimeout(detector);
+				break;
 		}
 		if (this.status != OK_STATUS) {
 			switchSourceIfNeed("heartbeat error");
@@ -171,20 +173,20 @@ public class MySQLHeartbeat extends DBHeartbeat {
 
 	private void setOk(MySQLDetector detector) {
 		switch (status) {
-		case DBHeartbeat.TIMEOUT_STATUS:
-			this.status = DBHeartbeat.INIT_STATUS;
-			this.errorCount = 0;
-			if (isStop.get()) {
-				detector.quit();
-			} else {
-				heartbeat();// timeout, heart beat again
-			}
-			break;
-		case DBHeartbeat.OK_STATUS:
-			break;
-		default:
-			this.status = OK_STATUS;
-			this.errorCount = 0;
+			case DBHeartbeat.TIMEOUT_STATUS:
+				this.status = DBHeartbeat.INIT_STATUS;
+				this.errorCount = 0;
+				if (isStop.get()) {
+					detector.quit();
+				} else {
+					heartbeat();// timeout, heart beat again
+				}
+				break;
+			case DBHeartbeat.OK_STATUS:
+				break;
+			default:
+				this.status = OK_STATUS;
+				this.errorCount = 0;
 		}
 		if (isStop.get()) {
 			detector.quit();
@@ -194,13 +196,10 @@ public class MySQLHeartbeat extends DBHeartbeat {
 	private void setError(MySQLDetector detector) {
 		// should continues check error status
 		if (++errorCount < maxRetryCount) {
-
             if (detector != null && !detector.isQuit()) {
                 heartbeat(); // error count not enough, heart beat again
             }
-
-		}else
-        {
+		} else {
             if (detector != null ) {
                 detector.quit();
             }
@@ -221,8 +220,7 @@ public class MySQLHeartbeat extends DBHeartbeat {
 		int switchType = source.getHostConfig().getSwitchType();
 		if (switchType == DataHostConfig.NOT_SWITCH_DS) {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("not switch datasource ,for switchType is "
-						+ DataHostConfig.NOT_SWITCH_DS);
+				LOGGER.debug("not switch datasource ,for switchType is " + DataHostConfig.NOT_SWITCH_DS);
 				return;
 			}
 			return;
@@ -256,8 +254,7 @@ public class MySQLHeartbeat extends DBHeartbeat {
 									break;
 								} else {
 									LOGGER.warn("ignored  datasource ,slave is not  synchronized to master , slave behind master :"
-											+ theSourceHB.getSlaveBehindMaster()
-											+ " " + theSource.getConfig());
+											+ theSourceHB.getSlaveBehindMaster() + " " + theSource.getConfig());
 								}
 							} else {
 								// normal switch
@@ -265,11 +262,9 @@ public class MySQLHeartbeat extends DBHeartbeat {
 								pool.switchSource(nextId, true, reason);
                                 break;
 							}
-
 						}
 						nextId = pool.next(nextId);
 					}
-
 				}
 			}
 		}
