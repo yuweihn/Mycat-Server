@@ -41,7 +41,7 @@ import java.nio.channels.NetworkChannel;
  * @author mycat
  */
 public class MySQLConnectionFactory extends BackendConnectionFactory {
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public MySQLConnection make(MySQLDataSource pool, ResponseHandler handler, String schema) throws IOException {
 		DBHostConfig dsc = pool.getConfig();
 		NetworkChannel channel = openSocketChannel(MycatServer.getInstance().isAIO());
