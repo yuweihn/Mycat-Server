@@ -239,7 +239,7 @@ public class ConfigInitializer {
 				conf.setMinCon(2);
 			}
 			//建立PhysicalDBPool
-			PhysicalDBPool pool = getPhysicalDBPool(conf, configLoader);
+			PhysicalDBPool pool = getPhysicalDBPool(conf);
 			nodes.put(pool.getHostName(), pool);
 		}
 		return nodes;
@@ -273,7 +273,7 @@ public class ConfigInitializer {
 		return dataSources;
 	}
 
-	private PhysicalDBPool getPhysicalDBPool(DataHostConfig conf, ConfigLoader configLoader) {
+	private PhysicalDBPool getPhysicalDBPool(DataHostConfig conf) {
 		String name = conf.getName();
 		//数据库类型，我们这里只讨论MySQL
 		String dbType = conf.getDbType();
