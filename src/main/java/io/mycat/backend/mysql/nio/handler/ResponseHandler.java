@@ -30,7 +30,6 @@ import java.util.List;
 
 /**
  * @author mycat
- * @author mycat
  */
 public interface ResponseHandler {
 	/**
