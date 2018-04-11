@@ -279,7 +279,7 @@ public class PhysicalDBPool {
 
 	private boolean initSource(int index, PhysicalDatasource ds) {
 		int initSize = ds.getConfig().getMinCon();
-		LOGGER.info("init backend myqsl source ,create connections total " + initSize + " for " + ds.getName() + " index :" + index);
+		LOGGER.info("init backend mysql source, create connections total " + initSize + " for " + ds.getName() + " index: " + index);
 		
 		CopyOnWriteArrayList<BackendConnection> list = new CopyOnWriteArrayList<BackendConnection>();
 		GetConnectionHandler getConHandler = new GetConnectionHandler(list, initSize);
