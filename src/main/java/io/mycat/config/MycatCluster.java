@@ -23,20 +23,22 @@
  */
 package io.mycat.config;
 
+
+import io.mycat.config.model.ClusterConfig;
+import io.mycat.config.model.MycatNodeConfig;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.mycat.config.model.ClusterConfig;
-import io.mycat.config.model.MycatNodeConfig;
 
 /**
  * @author mycat
  */
 public final class MycatCluster {
-
     private final Map<String, MycatNode> nodes;
     private final Map<String, List<String>> groups;
+
 
     public MycatCluster(ClusterConfig clusterConf) {
         this.nodes = new HashMap<String, MycatNode>(clusterConf.getNodes().size());
@@ -55,5 +57,4 @@ public final class MycatCluster {
     public Map<String, List<String>> getGroups() {
         return groups;
     }
-
 }

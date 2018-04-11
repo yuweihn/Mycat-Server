@@ -85,7 +85,7 @@ public class ConfigInitializer {
 		
 		//权限管理
 		this.firewall = configLoader.getFirewallConfig();
-		this.cluster = initCobarCluster(configLoader);
+		this.cluster = initMycatCluster(configLoader);
 		
 		//不同类型的全局序列处理器的配置加载
 		if (system.getSequnceHandlerType() == SystemConfig.SEQUENCEHANDLER_MYSQLDB) {
@@ -225,7 +225,7 @@ public class ConfigInitializer {
 		return this.dataHosts;
 	}
 
-	private MycatCluster initCobarCluster(ConfigLoader configLoader) {
+	private MycatCluster initMycatCluster(ConfigLoader configLoader) {
 		return new MycatCluster(configLoader.getClusterConfig());
 	}
 
