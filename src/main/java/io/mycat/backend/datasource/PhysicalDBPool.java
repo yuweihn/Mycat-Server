@@ -40,7 +40,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 
 public class PhysicalDBPool {
-	
 	protected static final Logger LOGGER = LoggerFactory.getLogger(PhysicalDBPool.class);
 	
 	public static final int BALANCE_NONE = 0;
@@ -73,11 +72,8 @@ public class PhysicalDBPool {
 	private final DataHostConfig dataHostConfig;
 	private String slaveIDs;
 
-	public PhysicalDBPool(String name, DataHostConfig conf,
-			PhysicalDatasource[] writeSources,
-			Map<Integer, PhysicalDatasource[]> readSources, int balance,
-			int writeType) {
-		
+	public PhysicalDBPool(String name, DataHostConfig conf, PhysicalDatasource[] writeSources
+			, Map<Integer, PhysicalDatasource[]> readSources, int balance, int writeType) {
 		this.hostName = name;
 		this.dataHostConfig = conf;
 		this.writeSources = writeSources;
@@ -96,7 +92,6 @@ public class PhysicalDBPool {
 		this.allDs = this.genAllDataSources();
 		
 		LOGGER.info("total resouces of dataHost " + this.hostName + " is :" + allDs.size());
-		
 		setDataSourceProps();
 	}
 
@@ -176,7 +171,6 @@ public class PhysicalDBPool {
 				throw new java.lang.IllegalArgumentException("writeType is " + writeType + ", so can't return one write datasource.");
 			}
 		}
-
 	}
 
 	public int getActivedIndex() {
@@ -205,7 +199,6 @@ public class PhysicalDBPool {
 		try {
 			int current = activedIndex;
 			if (current != newIndex) {
-				
 				// switch index
 				activedIndex = newIndex;
 				
@@ -249,7 +242,6 @@ public class PhysicalDBPool {
 		for (int i = 0; i < writeSources.length; i++) {
 			int j = loop(i + index);
 			if (initSource(j, writeSources[j])) {
-
                 //不切换-1时，如果主写挂了   不允许切换过去
 				boolean isNotSwitchDs = dataHostConfig.getSwitchType() == DataHostConfig.NOT_SWITCH_DS;
 				if (isNotSwitchDs && j > 0) {
@@ -287,7 +279,6 @@ public class PhysicalDBPool {
 
 	private boolean initSource(int index, PhysicalDatasource ds) {
 		int initSize = ds.getConfig().getMinCon();
-		
 		LOGGER.info("init backend myqsl source ,create connections total " + initSize + " for " + ds.getName() + " index :" + index);
 		
 		CopyOnWriteArrayList<BackendConnection> list = new CopyOnWriteArrayList<BackendConnection>();
@@ -333,7 +324,6 @@ public class PhysicalDBPool {
 				LOGGER.error(s.toString());
 			}
 		}
-
 	}
 
 	/**
@@ -354,13 +344,13 @@ public class PhysicalDBPool {
 	}
 
 	public void startHeartbeat() {
-		for (PhysicalDatasource source : this.allDs) {
+		for (PhysicalDatasource source: this.allDs) {
 			source.startHeartbeat();
 		}
 	}
 
 	public void stopHeartbeat() {
-		for (PhysicalDatasource source : this.allDs) {
+		for (PhysicalDatasource source: this.allDs) {
 			source.stopHeartbeat();
 		}
 	}
@@ -371,7 +361,7 @@ public class PhysicalDBPool {
 	 */
 	public void clearDataSources(String reason) {
 		LOGGER.info("clear datasours of pool " + this.hostName);
-		for (PhysicalDatasource source : this.allDs) {			
+		for (PhysicalDatasource source: this.allDs) {
 			LOGGER.info("clear datasoure of pool  " + this.hostName + " ds:" + source.getConfig());
 			source.clearCons(reason);
 			source.stopHeartbeat();
@@ -380,14 +370,14 @@ public class PhysicalDBPool {
 
 	public Collection<PhysicalDatasource> genAllDataSources() {
 		LinkedList<PhysicalDatasource> allSources = new LinkedList<PhysicalDatasource>();
-		for (PhysicalDatasource ds : writeSources) {
+		for (PhysicalDatasource ds: writeSources) {
 			if (ds != null) {
 				allSources.add(ds);
 			}
 		}
 		
-		for (PhysicalDatasource[] dataSources : this.readSources.values()) {
-			for (PhysicalDatasource ds : dataSources) {
+		for (PhysicalDatasource[] dataSources: this.readSources.values()) {
+			for (PhysicalDatasource ds: dataSources) {
 				if (ds != null) {
 					allSources.add(ds);
 				}
@@ -413,30 +403,30 @@ public class PhysicalDBPool {
 		PhysicalDatasource theNode = null;
 		ArrayList<PhysicalDatasource> okSources = null;
 		switch (banlance) {
-		case BALANCE_ALL_BACK: {			
-			// all read nodes and the standard by masters
-			okSources = getAllActiveRWSources(true, false, checkSlaveSynStatus());
-			if (okSources.isEmpty()) {
-				theNode = this.getSource();
-			} else {
-				theNode = randomSelect(okSources);
+			case BALANCE_ALL_BACK: {
+				// all read nodes and the standard by masters
+				okSources = getAllActiveRWSources(true, false, checkSlaveSynStatus());
+				if (okSources.isEmpty()) {
+					theNode = this.getSource();
+				} else {
+					theNode = randomSelect(okSources);
+				}
+				break;
 			}
-			break;
-		}
-		case BALANCE_ALL: {
-			okSources = getAllActiveRWSources(true, true, checkSlaveSynStatus());
-			theNode = randomSelect(okSources);
-			break;
-		}
-        case BALANCE_ALL_READ: {
-            okSources = getAllActiveRWSources(false, false, checkSlaveSynStatus());
-            theNode = randomSelect(okSources);
-            break;
-        }
-		case BALANCE_NONE:
-		default:
-			// return default write data source
-			theNode = this.getSource();
+			case BALANCE_ALL: {
+				okSources = getAllActiveRWSources(true, true, checkSlaveSynStatus());
+				theNode = randomSelect(okSources);
+				break;
+			}
+			case BALANCE_ALL_READ: {
+				okSources = getAllActiveRWSources(false, false, checkSlaveSynStatus());
+				theNode = randomSelect(okSources);
+				break;
+			}
+			case BALANCE_NONE:
+			default:
+				// return default write data source
+				theNode = this.getSource();
 		}
 		
 		if (LOGGER.isDebugEnabled()) {
@@ -546,8 +536,8 @@ public class PhysicalDBPool {
 	        for (int i = 0; i < length; i++) {
 	            int weight = okSources.get(i).getConfig().getWeight();
 	            totalWeight += weight; 		// 累计总权重
-	            if (sameWeight && i > 0 && weight != okSources.get(i-1).getConfig().getWeight()) {	  // 计算所有权重是否一样
-	                sameWeight = false; 	
+	            if (sameWeight && i > 0 && weight != okSources.get(i - 1).getConfig().getWeight()) {	  // 计算所有权重是否一样
+	                sameWeight = false;
 	            }
 	        }
 	        
@@ -602,9 +592,8 @@ public class PhysicalDBPool {
      *
      * @return
      */
-	private ArrayList<PhysicalDatasource> getAllActiveRWSources(
-    		boolean includeWriteNode, boolean includeCurWriteNode, boolean filterWithSlaveThreshold) {
-		
+	private ArrayList<PhysicalDatasource> getAllActiveRWSources(boolean includeWriteNode
+			, boolean includeCurWriteNode, boolean filterWithSlaveThreshold) {
 		int curActive = activedIndex;
 		ArrayList<PhysicalDatasource> okSources = new ArrayList<PhysicalDatasource>(this.allDs.size());
 		
