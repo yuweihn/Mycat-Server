@@ -114,7 +114,6 @@ public class ConfigInitializer {
 		// 检查user与schema配置对应以及schema配置不为空
 		if (users == null || users.isEmpty()) {
 			throw new ConfigException("SelfCheck### user all node is empty!");
-			
 		} else {
 			for (UserConfig uc: users.values()) {
 				if (uc == null) {
@@ -133,10 +132,10 @@ public class ConfigInitializer {
 					}
 				}
 			}
-		}	
+		}
 
 		// schema 配置检测		
-		for (SchemaConfig sc : schemas.values()) {
+		for (SchemaConfig sc: schemas.values()) {
 			if (null == sc) {
 				throw new ConfigException("SelfCheck### schema all node is empty!");
 			} else {
@@ -162,14 +161,13 @@ public class ConfigInitializer {
 				String database = dataNode.getDatabase();		
 				PhysicalDBPool pool = dataNode.getDbPool();
 				
-				for (PhysicalDatasource ds : pool.getAllDataSources()) {							
+				for (PhysicalDatasource ds: pool.getAllDataSources()) {
 					String key = ds.getName() + "_" + database;
 					if (map.get(key) == null) {
 						map.put(key, false);
-						
-						boolean isConnected = false;
+
 						try {
-							isConnected = ds.testConnection(database);
+							boolean isConnected = ds.testConnection(database);
 							map.put(key, isConnected);
 						} catch (IOException e) {
 							LOGGER.warn("test conn error:", e);
@@ -180,7 +178,7 @@ public class ConfigInitializer {
 			
 			//
 			boolean isConnectivity = true;
-			for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+			for (Map.Entry<String, Boolean> entry: map.entrySet()) {
 				String key = entry.getKey();
 				Boolean value = entry.getValue();
 				if (!value && isConnectivity) {
