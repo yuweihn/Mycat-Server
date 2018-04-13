@@ -549,7 +549,7 @@ public abstract class PhysicalDatasource {
 //		}
 		
 		if(!ok) {
-			LOGGER.warn("can't return to pool ,so close con " + c);
+			LOGGER.warn("can't return to pool, so close con " + c);
 			c.close("can't return to pool ");
 		}
 	}
