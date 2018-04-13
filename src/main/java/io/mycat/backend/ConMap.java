@@ -47,12 +47,13 @@ public class ConMap {
 	}
 
 	private BackendConnection tryTakeCon(ConQueue queue, boolean autoCommit) {
-		BackendConnection con = null;
-		if (queue != null && ((con = queue.takeIdleCon(autoCommit)) != null)) {
-			return con;
-		} else {
-			return null;
-		}
+//		BackendConnection con = null;
+//		if (queue != null && ((con = queue.takeIdleCon(autoCommit)) != null)) {
+//			return con;
+//		} else {
+//			return null;
+//		}
+		return queue == null ? null : queue.takeIdleCon(autoCommit);
 	}
 
 	public Collection<ConQueue> getAllConQueue() {
