@@ -63,7 +63,7 @@ public class PhysicalDBPool {
 	
 	protected final ReentrantLock switchLock = new ReentrantLock();
 	private final Collection<PhysicalDatasource> allDs;
-	private final int banlance;
+	private final int balance;
 	private final int writeType;
 	private final Random random = new Random();
 	private final Random wnrandom = new Random();
@@ -76,7 +76,7 @@ public class PhysicalDBPool {
 		this.hostName = name;
 		this.dataHostConfig = conf;
 		this.writeSources = writeSources;
-		this.banlance = balance;
+		this.balance = balance;
 		this.writeType = writeType;
 		
 		Iterator<Map.Entry<Integer, PhysicalDatasource[]>> entryItor = readSources.entrySet().iterator();
@@ -400,7 +400,7 @@ public class PhysicalDBPool {
 			, Object attachment, String database) throws Exception {
 		PhysicalDatasource theNode = null;
 		ArrayList<PhysicalDatasource> okSources = null;
-		switch (banlance) {
+		switch (balance) {
 			case BALANCE_ALL_BACK: {
 				// all read nodes and the standard by masters
 				okSources = getAllActiveRWSources(true, false, checkSlaveSynStatus());
@@ -560,7 +560,7 @@ public class PhysicalDBPool {
 	
 	//
     public int getBalance() {
-        return banlance;
+        return balance;
     }
     
 	private boolean isAlive(PhysicalDatasource theSource) {
