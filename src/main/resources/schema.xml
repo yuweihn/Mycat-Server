@@ -4,7 +4,7 @@
 
 	<schema name="dev_mycat" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn1">
 		<!-- auto sharding by id (long) -->
-		<table name="user_test" dataNode="dn1,dn2" rule="sharding-by-murmur"/>
+		<table name="user_test" dataNode="dn1,dn2,dn3,dn4" rule="sharding-by-murmur"/>
 		<table name="sequence" dataNode="dn1,dn2" rule="sharding-by-segmentMod2"/>
 
 		<!--&lt;!&ndash; global table is auto cloned to all defined data nodes ,so can join-->
@@ -29,6 +29,8 @@
 	<!-- <dataNode name="dn1$0-743" dataHost="localhost1" database="db$0-743" /> -->
 	<dataNode name="dn1" dataHost="localhost1" database="dev_01" />
 	<dataNode name="dn2" dataHost="localhost1" database="dev_02" />
+	<dataNode name="dn3" dataHost="localhost2" database="dev_01" />
+	<dataNode name="dn4" dataHost="localhost2" database="dev_02" />
 	<!--
 	<dataNode name="dn4" dataHost="sequoiadb1" database="SAMPLE" />
 	<dataNode name="jdbc_dn1" dataHost="jdbchost" database="db1" />
@@ -40,6 +42,14 @@
 		<heartbeat>select user()</heartbeat>
 		<!-- can have multi write hosts -->
 		<writeHost host="hostM1" url="dev-mysql.yuweix.com:3307" user="yuwei" password="dev">
+		</writeHost>
+		<!-- <writeHost host="hostM2" url="localhost:3316" user="root" password="123456"/> -->
+	</dataHost>
+	<dataHost name="localhost2" maxCon="200" minCon="10" balance="0"
+			  writeType="0" dbType="mysql" dbDriver="native" switchType="1"  slaveThreshold="100">
+		<heartbeat>select user()</heartbeat>
+		<!-- can have multi write hosts -->
+		<writeHost host="hostM1" url="dev-mysql.zhonganiot.com:3307" user="yuwei" password="dev">
 		</writeHost>
 		<!-- <writeHost host="hostM2" url="localhost:3316" user="root" password="123456"/> -->
 	</dataHost>
