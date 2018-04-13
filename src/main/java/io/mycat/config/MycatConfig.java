@@ -76,7 +76,7 @@ public class MycatConfig {
 		this.dataHosts = confInit.getDataHosts();
 
 		this.dataNodes = confInit.getDataNodes();
-		for (PhysicalDBPool dbPool : dataHosts.values()) {
+		for (PhysicalDBPool dbPool: dataHosts.values()) {
 			dbPool.setSchemas(getDataNodeSchemasOfDataHost(dbPool.getHostName()));
 		}
 		
