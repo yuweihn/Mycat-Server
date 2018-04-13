@@ -83,7 +83,6 @@ public class GetConnectionHandler implements ResponseHandler {
 	@Override
 	public void okResponse(byte[] ok, BackendConnection conn) {
 		logger.info("received ok resp: " + conn + " " + new String(ok));
-
 	}
 
 	@Override
