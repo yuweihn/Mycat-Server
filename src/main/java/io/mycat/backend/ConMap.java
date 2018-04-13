@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentMap;
 
 
 public class ConMap {
-	// key -schema
+	// key - schema
 	private final ConcurrentHashMap<String, ConQueue> items = new ConcurrentHashMap<String, ConQueue>();
 
 	public ConQueue getSchemaConQueue(String schema) {
