@@ -1,7 +1,10 @@
 package io.mycat.backend;
 
+
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 
 public class ConQueue {
 	private final ConcurrentLinkedQueue<BackendConnection> autoCommitCons = new ConcurrentLinkedQueue<BackendConnection>();
@@ -15,7 +18,6 @@ public class ConQueue {
 		if (!autoCommit) {
 			f1 = manCommitCons;
 			f2 = autoCommitCons;
-
 		}
 		BackendConnection con = f1.poll();
 		if (con == null || con.isClosedOrQuit()) {
@@ -26,7 +28,6 @@ public class ConQueue {
 		} else {
 			return con;
 		}
-
 	}
 
 	public long getExecuteCount() {
@@ -38,20 +39,11 @@ public class ConQueue {
 	}
 
 	public boolean removeCon(BackendConnection con) {
-		boolean removed = autoCommitCons.remove(con);
-		if (!removed) {
-			return manCommitCons.remove(con);
-		}
-		return removed;
+		return autoCommitCons.remove(con) || manCommitCons.remove(con);
 	}
 
 	public boolean isSameCon(BackendConnection con) {
-		if (autoCommitCons.contains(con)) {
-			return true;
-		} else if (manCommitCons.contains(con)) {
-			return true;
-		}
-		return false;
+		return autoCommitCons.contains(con) || manCommitCons.contains(con);
 	}
 
 	public ConcurrentLinkedQueue<BackendConnection> getAutoCommitCons() {
@@ -62,23 +54,20 @@ public class ConQueue {
 		return manCommitCons;
 	}
 
-	public ArrayList<BackendConnection> getIdleConsToClose(int count) {
-		ArrayList<BackendConnection> readyCloseCons = new ArrayList<BackendConnection>(
-				count);
+	public List<BackendConnection> getIdleConsToClose(int count) {
+		List<BackendConnection> readyCloseCons = new ArrayList<BackendConnection>(count);
 		while (!manCommitCons.isEmpty() && readyCloseCons.size() < count) {
 			BackendConnection theCon = manCommitCons.poll();
-			if (theCon != null&&!theCon.isBorrowed()) {
+			if (theCon != null && !theCon.isBorrowed()) {
 				readyCloseCons.add(theCon);
 			}
 		}
 		while (!autoCommitCons.isEmpty() && readyCloseCons.size() < count) {
 			BackendConnection theCon = autoCommitCons.poll();
-			if (theCon != null&&!theCon.isBorrowed()) {
+			if (theCon != null && !theCon.isBorrowed()) {
 				readyCloseCons.add(theCon);
 			}
-
 		}
 		return readyCloseCons;
 	}
-
 }

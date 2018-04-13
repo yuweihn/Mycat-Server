@@ -438,20 +438,19 @@ public class PhysicalDBPool {
 	/**
 	 * slave 读负载均衡，也就是 readSource 之间实现负载均衡
 	 * @param schema
-	 * @param autocommit
+	 * @param autoCommit
 	 * @param handler
 	 * @param attachment
 	 * @param database
 	 * @throws Exception
 	 */
-    public void getReadBanlanceCon(String schema, boolean autocommit, ResponseHandler handler
+    public void getReadBanlanceCon(String schema, boolean autoCommit, ResponseHandler handler
 			, Object attachment, String database) throws Exception {
-		ArrayList<PhysicalDatasource> okSources = null;
-		okSources = getAllActiveRWSources(false, false, checkSlaveSynStatus());
+		ArrayList<PhysicalDatasource> okSources = getAllActiveRWSources(false, false, checkSlaveSynStatus());
 		PhysicalDatasource theNode = randomSelect(okSources);
 		//统计节点读操作次数
 		theNode.setReadCount();
-		theNode.getConnection(schema, autocommit, handler, attachment);
+		theNode.getConnection(schema, autoCommit, handler, attachment);
 	}
     
     /**

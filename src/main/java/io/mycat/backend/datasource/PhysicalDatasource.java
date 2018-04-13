@@ -303,11 +303,11 @@ public abstract class PhysicalDatasource {
 	 * 
 	 * 所以每次关闭新连接时，先判断当前空闲连接数是否大于配置的最少空闲连接，如果为否，则结束本次关闭空闲连接操作。
 	 * 该方法修改之前：
-	 *      首先从ConnMap中获取 ildeCloseCount 个连接，然后关闭；在关闭中，可能又有连接被使用，导致可能多关闭一些链接，
+	 *      首先从ConnMap中获取 idleCloseCount 个连接，然后关闭；在关闭中，可能又有连接被使用，导致可能多关闭一些链接，
 	 *      导致相对频繁的创建新连接和关闭连接
 	 *      
 	 * 该方法修改之后：
-	 *     ildeCloseCount 为预期要关闭的连接
+	 *     idleCloseCount 为预期要关闭的连接
 	 *     使用循环操作，首先在关闭之前，先再一次判断是否需要关闭连接，然后每次从ConnMap中获取一个空闲连接，然后进行关闭
 	 * edit by dingw at 2017.06.16
 	 */
