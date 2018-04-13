@@ -24,11 +24,11 @@
 package io.mycat.route;
 
 
-import java.io.Serializable;
-import java.util.Map;
-
 import io.mycat.server.parser.ServerParse;
 import io.mycat.sqlengine.mpp.LoadData;
+
+import java.io.Serializable;
+import java.util.Map;
 
 
 /**
@@ -44,7 +44,7 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 	private final String srcStatement;
 	private final int sqlType;
 	private volatile boolean canRunInReadDB;
-	private final boolean hasBlanceFlag;
+	private final boolean hasBalanceFlag;
     private boolean callStatement = false; // 处理call关键字
 	private int limitStart;
 	private int limitSize;
@@ -66,13 +66,13 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 	
 	public RouteResultsetNode(String name, int sqlType, String srcStatement) {
 		this.name = name;
-		limitStart = 0;
+		this.limitStart = 0;
 		this.limitSize = -1;
 		this.sqlType = sqlType;
 		this.srcStatement = srcStatement;
 		this.statement = srcStatement;
-		canRunInReadDB = sqlType == ServerParse.SELECT || sqlType == ServerParse.SHOW;
-		hasBlanceFlag = statement != null && statement.startsWith("/*balance*/");
+		this.canRunInReadDB = sqlType == ServerParse.SELECT || sqlType == ServerParse.SHOW;
+		this.hasBalanceFlag = statement != null && statement.startsWith("/*balance*/");
 	}
 
 	public Boolean getRunOnSlave() {
@@ -121,9 +121,9 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 	 * @param autocommit
 	 * @return
 	 */
-	public boolean canRunnINReadDB(boolean autocommit) {
+	public boolean canRunINReadDB(boolean autocommit) {
 //		return canRunInReadDB && (autocommit || (!autocommit && hasBlanceFlag));
-		return canRunInReadDB && (autocommit || hasBlanceFlag);
+		return canRunInReadDB && (autocommit || hasBalanceFlag);
 	}
 	
 //	public boolean canRunnINReadDB(boolean autocommit) {
@@ -210,13 +210,9 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 		if (obj instanceof RouteResultsetNode) {
 			RouteResultsetNode rrn = (RouteResultsetNode) obj;
 			if(subTableName != null) {
-				if (equals(name, rrn.getName()) && equals(subTableName, rrn.getSubTableName())) {
-					return true;
-				}
+				return equals(name, rrn.getName()) && equals(subTableName, rrn.getSubTableName());
 			} else {
-				if (equals(name, rrn.getName())) {
-					return true;
-				}
+				return equals(name, rrn.getName());
 			}
 		}
 		return false;
@@ -249,10 +245,7 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 		return !canRunInReadDB;
 	}
 	public boolean isDisctTable() {
-		if(subTableName != null && !subTableName.equals("")) {
-			return true;
-		}
-		return false;
+		return subTableName != null && !subTableName.equals("");
 	}
 	
 
@@ -278,8 +271,8 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 		}
 	}
 	
-	public boolean isHasBlanceFlag() {
-		return hasBlanceFlag;
+	public boolean isHasBalanceFlag() {
+		return hasBalanceFlag;
 	}
 
 	public RouteResultset getSource() {
