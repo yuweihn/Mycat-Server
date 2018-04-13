@@ -445,11 +445,10 @@ public class PhysicalDBPool {
 	 * @throws Exception
 	 */
     public void getReadBanlanceCon(String schema, boolean autocommit, ResponseHandler handler
-			, Object attachment, String database)throws Exception {
-		PhysicalDatasource theNode = null;
+			, Object attachment, String database) throws Exception {
 		ArrayList<PhysicalDatasource> okSources = null;
 		okSources = getAllActiveRWSources(false, false, checkSlaveSynStatus());
-		theNode = randomSelect(okSources);
+		PhysicalDatasource theNode = randomSelect(okSources);
 		//统计节点读操作次数
 		theNode.setReadCount();
 		theNode.getConnection(schema, autocommit, handler, attachment);
