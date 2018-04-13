@@ -96,13 +96,11 @@ public class MycatConfig {
 		return system;
 	}
 
-	public void setSocketParams(AbstractConnection con, boolean isFrontChannel)
-			throws IOException {
-		
+	public void setSocketParams(AbstractConnection con, boolean isFrontChannel) throws IOException {
 		int sorcvbuf = 0;
 		int sosndbuf = 0;
 		int soNoDelay = 0;
-		if ( isFrontChannel ) {
+		if (isFrontChannel) {
 			sorcvbuf = system.getFrontsocketsorcvbuf();
 			sosndbuf = system.getFrontsocketsosndbuf();
 			soNoDelay = system.getFrontSocketNoDelay();
@@ -123,7 +121,6 @@ public class MycatConfig {
 		con.setPacketHeaderSize(system.getPacketHeaderSize());
 		con.setIdleTimeout(system.getIdleTimeout());
 		con.setCharset(system.getCharset());
-
 	}
 
 	public Map<String, UserConfig> getUsers() {
@@ -200,18 +197,11 @@ public class MycatConfig {
 		return rollbackTime;
 	}
 
-	public void reload(
-			Map<String, UserConfig> newUsers, 
-			Map<String, SchemaConfig> newSchemas,
-			Map<String, PhysicalDBNode> newDataNodes, 
-			Map<String, PhysicalDBPool> newDataHosts, 
-			MycatCluster newCluster,
-			FirewallConfig newFirewall, 
-			boolean reloadAll) {
-		
+	public void reload(Map<String, UserConfig> newUsers, Map<String, SchemaConfig> newSchemas, Map<String, PhysicalDBNode> newDataNodes
+			, Map<String, PhysicalDBPool> newDataHosts, MycatCluster newCluster, FirewallConfig newFirewall, boolean reloadAll) {
 		apply(newUsers, newSchemas, newDataNodes, newDataHosts, newCluster, newFirewall, reloadAll);
 		this.reloadTime = TimeUtil.currentTimeMillis();
-		this.status = reloadAll?RELOAD_ALL:RELOAD;
+		this.status = reloadAll ? RELOAD_ALL : RELOAD;
 	}
 
 	public boolean canRollback() {
@@ -220,39 +210,26 @@ public class MycatConfig {
                 && _firewall != null && status != ROLLBACK;
 	}
 
-	public void rollback(
-			Map<String, UserConfig> users,
-			Map<String, SchemaConfig> schemas,
-			Map<String, PhysicalDBNode> dataNodes,
-			Map<String, PhysicalDBPool> dataHosts, 
-			MycatCluster cluster,
-			FirewallConfig firewall) {
-		
-		apply(users, schemas, dataNodes, dataHosts, cluster, firewall, status==RELOAD_ALL);
+	public void rollback(Map<String, UserConfig> users, Map<String, SchemaConfig> schemas, Map<String, PhysicalDBNode> dataNodes
+			, Map<String, PhysicalDBPool> dataHosts, MycatCluster cluster, FirewallConfig firewall) {
+		apply(users, schemas, dataNodes, dataHosts, cluster, firewall, status == RELOAD_ALL);
 		this.rollbackTime = TimeUtil.currentTimeMillis();
 		this.status = ROLLBACK;
 	}
 
-	private void apply(Map<String, UserConfig> newUsers,
-			Map<String, SchemaConfig> newSchemas,
-			Map<String, PhysicalDBNode> newDataNodes,
-			Map<String, PhysicalDBPool> newDataHosts, 
-			MycatCluster newCluster,
-			FirewallConfig newFirewall,
-			boolean isLoadAll) {
-		
+	private void apply(Map<String, UserConfig> newUsers, Map<String, SchemaConfig> newSchemas, Map<String, PhysicalDBNode> newDataNodes
+			, Map<String, PhysicalDBPool> newDataHosts, MycatCluster newCluster, FirewallConfig newFirewall, boolean isLoadAll) {
 		final ReentrantLock lock = this.lock;
 		lock.lock();
 		try {
-			
 			// old 处理
 			// 1、停止老的数据源心跳
 			// 2、备份老的数据源配置
 			//--------------------------------------------
-			if (isLoadAll) {				
+			if (isLoadAll) {
 				Map<String, PhysicalDBPool> oldDataHosts = this.dataHosts;
 				if (oldDataHosts != null) {
-					for (PhysicalDBPool oldDbPool : oldDataHosts.values()) {
+					for (PhysicalDBPool oldDbPool: oldDataHosts.values()) {
 						if (oldDbPool != null) {
 							oldDbPool.stopHeartbeat();
 						}
@@ -273,22 +250,21 @@ public class MycatConfig {
 			//---------------------------------------------------
 			if (isLoadAll) {
 				if (newDataHosts != null) {
-					for (PhysicalDBPool newDbPool : newDataHosts.values()) {
-						if ( newDbPool != null) {
+					for (PhysicalDBPool newDbPool: newDataHosts.values()) {
+						if (newDbPool != null) {
 							newDbPool.startHeartbeat();
 						}
 					}
 				}
 				this.dataNodes = newDataNodes;
 				this.dataHosts = newDataHosts;
-			}			
+			}
 			this.users = newUsers;
 			this.schemas = newSchemas;
 			this.cluster = newCluster;
 			this.firewall = newFirewall;
-			
 		} finally {
 			lock.unlock();
 		}
-	}	
+	}
 }

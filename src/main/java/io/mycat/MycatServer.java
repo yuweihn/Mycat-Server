@@ -49,6 +49,7 @@ import io.mycat.config.model.SchemaConfig;
 import io.mycat.config.model.SystemConfig;
 import io.mycat.config.model.TableConfig;
 import io.mycat.config.table.structure.MySQLTableStructureDetector;
+import io.mycat.config.util.DnPropertyUtil;
 import io.mycat.manager.ManagerConnectionFactory;
 import io.mycat.memory.MyCatMemory;
 import io.mycat.net.*;
@@ -173,7 +174,7 @@ public class MycatServer {
 		this.routerService = new RouteService(this.cacheService);
 		
 		// load datanode active index from properties
-		this.dnIndexProperties = loadDnIndexProps();
+		this.dnIndexProperties = DnPropertyUtil.loadDnIndexProps();
 		try {
 			//SQL解析器
 			this.sqlInterceptor = (SQLInterceptor) Class.forName(this.config.getSystem().getSqlInterceptor()).newInstance();
@@ -243,11 +244,11 @@ public class MycatServer {
 		return "'Mycat." + this.getConfig().getSystem().getMycatNodeId() + "." + seq + "'";
 	}
 
-	public String getXATXIDGLOBAL(){
+	public String getXATXIDGLOBAL() {
 		return "'" + getUUID() + "'";
 	}
 
-	public static String getUUID(){
+	public static String getUUID() {
 		String s = UUID.randomUUID().toString();
 		//去掉“-”符号
 		return s.substring(0, 8) + s.substring(9, 13) + s.substring(14, 18) + s.substring(19, 23) + s.substring(24);
@@ -314,7 +315,7 @@ public class MycatServer {
 		ServerConnectionFactory sf = new ServerConnectionFactory();
 		SocketAcceptor manager = null;
 		SocketAcceptor server = null;
-		aio = (system.getUsingAIO() == 1);
+		aio = system.getUsingAIO() == 1;
 
 		// startup processors
 		int threadPoolSize = system.getProcessorExecutor();
@@ -329,7 +330,7 @@ public class MycatServer {
 		int socketBufferLocalPercent = system.getProcessorBufferLocalPercent();
 		int bufferPoolType = system.getProcessorBufferPoolType();
 
-		switch (bufferPoolType){
+		switch (bufferPoolType) {
 			case 0:
 				bufferPool = new DirectByteBufferPool(bufferPoolPageSize, bufferPoolChunkSize, bufferPoolPageNumber
 						, system.getFrontSocketSoRcvbuf());
@@ -418,7 +419,7 @@ public class MycatServer {
 		// init datahost
 		Map<String, PhysicalDBPool> dataHosts = config.getDataHosts();
 		LOGGER.info("Initialize dataHost ...");
-		for (PhysicalDBPool node : dataHosts.values()) {
+		for (PhysicalDBPool node: dataHosts.values()) {
 			String index = dnIndexProperties.getProperty(node.getHostName(), "0");
 			if (!"0".equals(index)) {
 				LOGGER.info("init datahost: " + node.getHostName() + "  to use datasource index:" + index);
@@ -444,7 +445,7 @@ public class MycatServer {
 			scheduler.scheduleAtFixedRate(recycleSqlStat(), 0L, DEFAULT_SQL_STAT_RECYCLE_PERIOD, TimeUnit.MILLISECONDS);
 		}
 		
-		if(system.getUseGlobleTableCheck() == 1){	// 全局表一致性检测是否开启
+		if(system.getUseGlobleTableCheck() == 1) {	// 全局表一致性检测是否开启
 			scheduler.scheduleAtFixedRate(glableTableConsistencyCheck(), 0L, system.getGlableTableCheckPeriod(), TimeUnit.MILLISECONDS);
 		}
 		
@@ -452,7 +453,7 @@ public class MycatServer {
 		scheduler.scheduleAtFixedRate(resultSetMapClear(), 0L, system.getClearBigSqLResultSetMapMs(), TimeUnit.MILLISECONDS);
 		
  		
-//        new Thread(tableStructureCheck()).start();
+//		new Thread(tableStructureCheck()).start();
 
 		//XA Init recovery Log
 		LOGGER.info("===============================================");
@@ -478,10 +479,10 @@ public class MycatServer {
 			String path = ZKUtils.getZKBasePath() + "lock/ruledata.lock";
 			ruleDataLock = new InterProcessMutex(ZKUtils.getConnection(), path);
 			ruleDataLock.acquire(30, TimeUnit.SECONDS);
-			File[]  childFiles = file.listFiles();
+			File[] childFiles = file.listFiles();
 			if(childFiles != null && childFiles.length > 0) {
 				String basePath = ZKUtils.getZKBasePath() + "ruledata/";
-				for (File childFile : childFiles) {
+				for (File childFile: childFiles) {
 					CuratorFramework zk = ZKUtils.getConnection();
 					if (zk.checkExists().forPath(basePath + childFile.getName()) == null) {
 						zk.create().creatingParentsIfNeeded().forPath(basePath + childFile.getName(), Files.toByteArray(childFile));
@@ -526,14 +527,14 @@ public class MycatServer {
 			return;
 		}
 		// load datanode active index from properties
-		dnIndexProperties = loadDnIndexProps();
+		dnIndexProperties = DnPropertyUtil.loadDnIndexProps();
 		// init datahost
 		Map<String, PhysicalDBPool> dataHosts = config.getDataHosts();
 		LOGGER.info("reInitialize dataHost ...");
 		for (PhysicalDBPool node : dataHosts.values()) {
 			String index = dnIndexProperties.getProperty(node.getHostName(), "0");
 			if (!"0".equals(index)) {
-				LOGGER.info("reinit datahost: " + node.getHostName() + "  to use datasource index:" + index);
+				LOGGER.info("reinit datahost: " + node.getHostName() + "  to use datasource index: " + index);
 			}
 			node.switchSource(Integer.parseInt(index), true, "reload dnindex");
 		}
@@ -551,7 +552,6 @@ public class MycatServer {
 			}
 		};
 	}
-	
 
 	/**
 	 * 清理 reload @@config_all 后，老的 connection 连接
@@ -582,8 +582,7 @@ public class MycatServer {
 			}
 		};
 	}
-	
-	
+
 	/**
 	 * 在bufferpool使用率大于使用率阈值时不清理
 	 * 在bufferpool使用率小于使用率阈值时清理大结果集清单内容
@@ -601,7 +600,7 @@ public class MycatServer {
 					if(bufferUsagePercent < config.getSystem().getBufferUsagePercent()) {
 						Map<String, UserStat> map = UserStatAnalyzer.getInstance().getUserStatMap();
 						Set<String> userSet = config.getUsers().keySet();
-						for (String user : userSet) {
+						for (String user: userSet) {
 							UserStat userStat = map.get(user);
 							if(userStat != null) {
 								SqlResultSizeRecorder recorder = userStat.getSqlResultSizeRecorder();
@@ -615,29 +614,6 @@ public class MycatServer {
 				}
 			}
 		};
-	}
-
-	private Properties loadDnIndexProps() {
-		Properties prop = new Properties();
-		File file = new File(SystemConfig.getHomePath(), "conf" + File.separator + "dnindex.properties");
-		if (!file.exists()) {
-			return prop;
-		}
-		FileInputStream filein = null;
-		try {
-			filein = new FileInputStream(file);
-			prop.load(filein);
-		} catch (Exception e) {
-			LOGGER.warn("load DataNodeIndex err:" + e);
-		} finally {
-			if (filein != null) {
-				try {
-					filein.close();
-				} catch (IOException e) {
-				}
-			}
-		}
-		return prop;
 	}
 
 	/**
@@ -785,7 +761,7 @@ public class MycatServer {
 					@Override
 					public void run() {
 						try {
-							for (NIOProcessor p : processors) {
+							for (NIOProcessor p: processors) {
 								p.checkBackendCons();
 							}
 						} catch (Exception e) {
@@ -797,7 +773,7 @@ public class MycatServer {
 					@Override
 					public void run() {
 						try {
-							for (NIOProcessor p : processors) {
+							for (NIOProcessor p: processors) {
 								p.checkFrontCons();
 							}
 						} catch (Exception e) {
@@ -818,7 +794,7 @@ public class MycatServer {
 					@Override
 					public void run() {
 						Map<String, PhysicalDBPool> nodes = config.getDataHosts();
-						for (PhysicalDBPool node : nodes.values()) {
+						for (PhysicalDBPool node: nodes.values()) {
 							node.heartbeatCheck(heartPeriod);
 						}
 						
@@ -844,7 +820,7 @@ public class MycatServer {
 					@Override
 					public void run() {
 						Map<String, PhysicalDBPool> nodes = config.getDataHosts();
-						for (PhysicalDBPool node : nodes.values()) {
+						for (PhysicalDBPool node: nodes.values()) {
 							node.doHeartbeat();
 						}
 					}
@@ -859,7 +835,7 @@ public class MycatServer {
 			@Override
 			public void run() {
 				Map<String, UserStat> statMap = UserStatAnalyzer.getInstance().getUserStatMap();
-				for (UserStat userStat : statMap.values()) {
+				for (UserStat userStat: statMap.values()) {
 					userStat.getSqlLastStat().recycle();
 					userStat.getSqlRecorder().recycle();
 					userStat.getSqlHigh().recycle();
@@ -870,7 +846,7 @@ public class MycatServer {
 	}
 
 	//定时检查不同分片表结构一致性
-	private Runnable tableStructureCheck(){
+	private Runnable tableStructureCheck() {
 		return new MySQLTableStructureDetector();
 	}
 	
@@ -912,9 +888,9 @@ public class MycatServer {
 					String xacmd = "XA ROLLBACK " + coordinatorLogEntry.id + ';';
 					OneRawSQLQueryResultHandler resultHandler = new OneRawSQLQueryResultHandler(new String[0], new XARollbackCallback());
 					outLoop:
-					for (SchemaConfig schema : MycatServer.getInstance().getConfig().getSchemas().values()) {
-						for (TableConfig table : schema.getTables().values()) {
-							for (String dataNode : table.getDataNodes()) {
+					for (SchemaConfig schema: MycatServer.getInstance().getConfig().getSchemas().values()) {
+						for (TableConfig table: schema.getTables().values()) {
+							for (String dataNode: table.getDataNodes()) {
 								PhysicalDBNode dn = MycatServer.getInstance().getConfig().getDataNodes().get(dataNode);
 								if (dn.getDbPool().getSource().getConfig().getIp().equals(participantLogEntry.uri)
 										&& dn.getDatabase().equals(participantLogEntry.resourceName)) {

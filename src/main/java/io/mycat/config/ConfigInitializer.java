@@ -54,7 +54,7 @@ import java.util.Set;
  * @author mycat
  */
 public class ConfigInitializer {
-	private static final Logger LOGGER = Logger.getLogger( ConfigInitializer.class );
+	private static final Logger LOGGER = Logger.getLogger(ConfigInitializer.class);
 	
 	private volatile SystemConfig system;
 	private volatile MycatCluster cluster;

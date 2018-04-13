@@ -1,13 +1,16 @@
 package io.mycat.config.util;
 
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.mycat.config.model.SystemConfig;
+
 
 /**
  * 
@@ -15,8 +18,7 @@ import io.mycat.config.model.SystemConfig;
  *
  */
 public class DnPropertyUtil {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger("DnPropertyUtil");
+	private static final Logger LOGGER = LoggerFactory.getLogger(DnPropertyUtil.class);
 	
 	/**
 	 * 加载dnindex.properties属性文件
@@ -24,8 +26,7 @@ public class DnPropertyUtil {
 	 */
 	public static Properties loadDnIndexProps() {
 		Properties prop = new Properties();
-		File file = new File(SystemConfig.getHomePath(), "conf"
-				+ File.separator + "dnindex.properties");
+		File file = new File(SystemConfig.getHomePath(), "conf" + File.separator + "dnindex.properties");
 		if (!file.exists()) {
 			return prop;
 		}
@@ -45,5 +46,4 @@ public class DnPropertyUtil {
 		}
 		return prop;
 	}
-	
 }

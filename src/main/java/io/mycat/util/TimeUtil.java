@@ -23,6 +23,7 @@
  */
 package io.mycat.util;
 
+
 /**
  * 弱精度的计时器，考虑性能不使用同步策略。
  * 
@@ -41,5 +42,4 @@ public class TimeUtil {
     public static final void update() {
         CURRENT_TIME = System.currentTimeMillis();
     }
-
 }
