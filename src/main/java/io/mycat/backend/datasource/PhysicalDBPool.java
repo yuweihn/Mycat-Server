@@ -35,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 
@@ -280,9 +279,8 @@ public class PhysicalDBPool {
 	private boolean initSource(int index, PhysicalDatasource ds) {
 		int initSize = ds.getConfig().getMinCon();
 		LOGGER.info("init backend mysql source, create connections total " + initSize + " for " + ds.getName() + " index: " + index);
-		
-		CopyOnWriteArrayList<BackendConnection> list = new CopyOnWriteArrayList<BackendConnection>();
-		GetConnectionHandler getConHandler = new GetConnectionHandler(list, initSize);
+
+		GetConnectionHandler getConHandler = new GetConnectionHandler(initSize);
 		// long start = System.currentTimeMillis();
 		// long timeOut = start + 5000 * 1000L;
 
@@ -307,7 +305,7 @@ public class PhysicalDBPool {
 //		for (BackendConnection c : list) {
 //			c.release();
 //		}
-		return !list.isEmpty();
+		return getConHandler.finished();
 	}
 
 	public void doHeartbeat() {
