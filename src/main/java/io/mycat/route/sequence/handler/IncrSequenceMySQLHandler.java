@@ -33,7 +33,7 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 	private final FetchMySQLSequenceHandler mysqlSeqFetcher = new FetchMySQLSequenceHandler();
 
 	/**
-	 * save sequnce -> curval
+	 * save sequence -> curVal
 	 */
 	private ConcurrentHashMap<String, SequenceVal> seqValueMap = new ConcurrentHashMap<String, SequenceVal>();
 
