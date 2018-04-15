@@ -51,7 +51,7 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 	}
 
 	public void load() {
-		// load sequnce properties
+		// load sequence properties
 		Properties props = PropertiesUtil.loadProps(SEQUENCE_DB_PROPS);
 		removeDesertedSequenceVals(props);
 		putNewSequenceVals(props);
