@@ -23,6 +23,7 @@
  */
 package io.mycat.backend.mysql.nio;
 
+
 import io.mycat.backend.mysql.xa.TxState;
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
@@ -46,12 +47,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+
 /**
  * @author mycat
  */
 public class MySQLConnection extends BackendAIOConnection {
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(MySQLConnection.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MySQLConnection.class);
 	private static final long CLIENT_FLAGS = initClientFlags();
 	private volatile long lastTime; 
 	private volatile String schema = null;
@@ -67,9 +68,8 @@ public class MySQLConnection extends BackendAIOConnection {
 		flag |= Capabilities.CLIENT_LONG_FLAG;
 		flag |= Capabilities.CLIENT_CONNECT_WITH_DB;
 		// flag |= Capabilities.CLIENT_NO_SCHEMA;
-		boolean usingCompress=MycatServer.getInstance().getConfig().getSystem().getUseCompression()==1 ;
-		if(usingCompress)
-		{
+		boolean usingCompress = MycatServer.getInstance().getConfig().getSystem().getUseCompression() == 1 ;
+		if(usingCompress) {
 			 flag |= Capabilities.CLIENT_COMPRESS;
 		}
 		flag |= Capabilities.CLIENT_ODBC;
@@ -99,20 +99,16 @@ public class MySQLConnection extends BackendAIOConnection {
 	static {
 		_READ_UNCOMMITTED.packetId = 0;
 		_READ_UNCOMMITTED.command = MySQLPacket.COM_QUERY;
-		_READ_UNCOMMITTED.arg = "SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED"
-				.getBytes();
+		_READ_UNCOMMITTED.arg = "SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED".getBytes();
 		_READ_COMMITTED.packetId = 0;
 		_READ_COMMITTED.command = MySQLPacket.COM_QUERY;
-		_READ_COMMITTED.arg = "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED"
-				.getBytes();
+		_READ_COMMITTED.arg = "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED".getBytes();
 		_REPEATED_READ.packetId = 0;
 		_REPEATED_READ.command = MySQLPacket.COM_QUERY;
-		_REPEATED_READ.arg = "SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ"
-				.getBytes();
+		_REPEATED_READ.arg = "SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ".getBytes();
 		_SERIALIZABLE.packetId = 0;
 		_SERIALIZABLE.command = MySQLPacket.COM_QUERY;
-		_SERIALIZABLE.arg = "SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE"
-				.getBytes();
+		_SERIALIZABLE.arg = "SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE".getBytes();
 		_AUTOCOMMIT_ON.packetId = 0;
 		_AUTOCOMMIT_ON.command = MySQLPacket.COM_QUERY;
 		_AUTOCOMMIT_ON.arg = "SET autocommit=1".getBytes();
@@ -282,26 +278,25 @@ public class MySQLConnection extends BackendAIOConnection {
 	}
 
 	private static void getCharsetCommand(StringBuilder sb, int clientCharIndex) {
-		sb.append("SET names ").append(CharsetUtil.getCharset(clientCharIndex))
-				.append(";");
+		sb.append("SET names ").append(CharsetUtil.getCharset(clientCharIndex)).append(";");
 	}
 
 	private static void getTxIsolationCommand(StringBuilder sb, int txIsolation) {
 		switch (txIsolation) {
-		case Isolations.READ_UNCOMMITTED:
-			sb.append("SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;");
-			return;
-		case Isolations.READ_COMMITTED:
-			sb.append("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;");
-			return;
-		case Isolations.REPEATED_READ:
-			sb.append("SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;");
-			return;
-		case Isolations.SERIALIZABLE:
-			sb.append("SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;");
-			return;
-		default:
-			throw new UnknownTxIsolationException("txIsolation:" + txIsolation);
+			case Isolations.READ_UNCOMMITTED:
+				sb.append("SET SESSION TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;");
+				return;
+			case Isolations.READ_COMMITTED:
+				sb.append("SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED;");
+				return;
+			case Isolations.REPEATED_READ:
+				sb.append("SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;");
+				return;
+			case Isolations.SERIALIZABLE:
+				sb.append("SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;");
+				return;
+			default:
+				throw new UnknownTxIsolationException("txIsolation:" + txIsolation);
 		}
 	}
 
@@ -321,9 +316,8 @@ public class MySQLConnection extends BackendAIOConnection {
 		private final AtomicInteger synCmdCount;
 		private final boolean xaStarted;
 
-		public StatusSync(boolean xaStarted, String schema,
-				Integer charsetIndex, Integer txtIsolation, Boolean autocommit,
-				int synCount) {
+		public StatusSync(boolean xaStarted, String schema, Integer charsetIndex
+				, Integer txtIsolation, Boolean autocommit, int synCount) {
 			super();
 			this.xaStarted = xaStarted;
 			this.schema = schema;
@@ -339,15 +333,10 @@ public class MySQLConnection extends BackendAIOConnection {
 				this.updateConnectionInfo(conn);
 				conn.metaDataSyned = true;
 				return false;
-			} else if (remains < 0) {
-				return true;
-			}
-			return false;
+			} else return remains < 0;
 		}
 
-		private void updateConnectionInfo(MySQLConnection conn)
-
-		{
+		private void updateConnectionInfo(MySQLConnection conn) {
 			if (schema != null) {
 				conn.schema = schema;
 				conn.oldSchema = conn.schema;
@@ -362,7 +351,6 @@ public class MySQLConnection extends BackendAIOConnection {
 				conn.autocommit = autocommit;
 			}
 		}
-
 	}
 
 	/**
@@ -380,25 +368,21 @@ public class MySQLConnection extends BackendAIOConnection {
 			}
 			return executed;
 		}
-
 	}
 
-	public void execute(RouteResultsetNode rrn, ServerConnection sc,
-			boolean autocommit) throws UnsupportedEncodingException {
+	public void execute(RouteResultsetNode rrn, ServerConnection sc, boolean autocommit) {
 		if (!modifiedSQLExecuted && rrn.isModifySQL()) {
 			modifiedSQLExecuted = true;
 		}
 		String xaTXID = null;
-		if(sc.getSession2().getXaTXID()!=null){
-			xaTXID = sc.getSession2().getXaTXID()+",'"+getSchema()+"'";
+		if(sc.getSession2().getXaTXID() != null){
+			xaTXID = sc.getSession2().getXaTXID() + ",'" + getSchema() + "'";
 		}
-		synAndDoExecute(xaTXID, rrn, sc.getCharsetIndex(), sc.getTxIsolation(),
-				autocommit);
+		synAndDoExecute(xaTXID, rrn, sc.getCharsetIndex(), sc.getTxIsolation(), autocommit);
 	}
 
-	private void synAndDoExecute(String xaTxID, RouteResultsetNode rrn,
-			int clientCharSetIndex, int clientTxIsoLation,
-			boolean clientAutoCommit) {
+	private void synAndDoExecute(String xaTxID, RouteResultsetNode rrn, int clientCharSetIndex
+			, int clientTxIsoLation, boolean clientAutoCommit) {
 		String xaCmd = null;
 
 		boolean conAutoComit = this.autocommit;
@@ -428,7 +412,7 @@ public class MySQLConnection extends BackendAIOConnection {
 		}
 		int txIsoLationSyn = (txIsolation == clientTxIsoLation) ? 0 : 1;
 		int autoCommitSyn = (conAutoComit == expectAutocommit) ? 0 : 1;
-		int synCount = schemaSyn + charsetSyn + txIsoLationSyn + autoCommitSyn + (xaCmd!=null?1:0);
+		int synCount = schemaSyn + charsetSyn + txIsoLationSyn + autoCommitSyn + (xaCmd != null ? 1 : 0);
 		if (synCount == 0 && this.xaStatus != TxState.TX_STARTED_STATE) {
 			// not need syn connection
 			sendQueryCmd(rrn.getStatement());
@@ -455,23 +439,20 @@ public class MySQLConnection extends BackendAIOConnection {
 		}
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("con need syn ,total syn cmd " + synCount
-					+ " commands " + sb.toString() + "schema change:"
-					+ (schemaCmd != null) + " con:" + this);
+					+ " commands " + sb.toString() + "schema change:" + (schemaCmd != null) + " con:" + this);
 		}
 		metaDataSyned = false;
-		statusSync = new StatusSync(xaCmd != null, conSchema,
-				clientCharSetIndex, clientTxIsoLation, expectAutocommit,
-				synCount);
+		statusSync = new StatusSync(xaCmd != null, conSchema, clientCharSetIndex
+				, clientTxIsoLation, expectAutocommit, synCount);
 		// syn schema
 		if (schemaCmd != null) {
 			schemaCmd.write(this);
 		}
 		// and our query sql to multi command at last
-		sb.append(rrn.getStatement()+";");
+		sb.append(rrn.getStatement() + ";");
 		// syn and execute others
 		this.sendQueryCmd(sb.toString());
 		// waiting syn result...
-
 	}
 
 	private static CommandPacket getChangeSchemaCommand(String schema) {
@@ -486,14 +467,10 @@ public class MySQLConnection extends BackendAIOConnection {
 	 * by wuzh ,execute a query and ignore transaction settings for performance
 	 * 
 	 * @param query
-	 * @throws UnsupportedEncodingException
 	 */
-	public void query(String query) throws UnsupportedEncodingException {
-		RouteResultsetNode rrn = new RouteResultsetNode("default",
-				ServerParse.SELECT, query);
-
+	public void query(String query) {
+		RouteResultsetNode rrn = new RouteResultsetNode("default", ServerParse.SELECT, query);
 		synAndDoExecute(null, rrn, this.charsetIndex, this.txIsolation, true);
-
 	}
 
 	public long getLastTime() {
@@ -529,14 +506,12 @@ public class MySQLConnection extends BackendAIOConnection {
 	}
 
 	public void commit() {
-
 		_COMMIT.write(this);
-
 	}
 
 	public boolean batchCmdFinished() {
 		batchCmdCount--;
-		return (batchCmdCount == 0);
+		return batchCmdCount == 0;
 	}
 
 	public void execCmd(String cmd) {
@@ -547,7 +522,7 @@ public class MySQLConnection extends BackendAIOConnection {
 		// "XA END "+xaID+";"+"XA PREPARE "+xaID
 		this.batchCmdCount = batchCmds.length;
 		StringBuilder sb = new StringBuilder();
-		for (String sql : batchCmds) {
+		for (String sql: batchCmds) {
 			sb.append(sql).append(';');
 		}
 		this.sendQueryCmd(sb.toString());
@@ -582,8 +557,7 @@ public class MySQLConnection extends BackendAIOConnection {
 			respHandler = queryHandler;
 			return true;
 		} else if (queryHandler != null) {
-			LOGGER.warn("set not MySQLConnectionHandler "
-					+ queryHandler.getClass().getCanonicalName());
+			LOGGER.warn("set not MySQLConnectionHandler " + queryHandler.getClass().getCanonicalName());
 		}
 		return false;
 	}
@@ -620,8 +594,7 @@ public class MySQLConnection extends BackendAIOConnection {
 		// this.lastTime = now;
 	}
 
-	private static byte[] passwd(String pass, HandshakePacket hs)
-			throws NoSuchAlgorithmException {
+	private static byte[] passwd(String pass, HandshakePacket hs) throws NoSuchAlgorithmException {
 		if (pass == null || pass.length() == 0) {
 			return null;
 		}
@@ -673,5 +646,4 @@ public class MySQLConnection extends BackendAIOConnection {
 	public int getTxIsolation() {
 		return txIsolation;
 	}
-
 }
