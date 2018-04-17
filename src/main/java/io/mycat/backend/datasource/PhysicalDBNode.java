@@ -124,7 +124,6 @@ public class PhysicalDBNode {
 					writeSource.getConnection(schema, autoCommit, handler, attachment);
 				}
 			}
-		
 		} else {
 			throw new IllegalArgumentException("Invalid DataSource:" + dbPool.getActivedIndex());
         }
