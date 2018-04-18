@@ -39,8 +39,8 @@ public class PhysicalDBNode {
 	protected final String database;
 	protected final PhysicalDBPool dbPool;
 
-	public PhysicalDBNode(String hostName, String database, PhysicalDBPool dbPool) {
-		this.name = hostName;
+	public PhysicalDBNode(String dnName, String database, PhysicalDBPool dbPool) {
+		this.name = dnName;
 		this.database = database;
 		this.dbPool = dbPool;
 	}
@@ -67,7 +67,7 @@ public class PhysicalDBNode {
             , ResponseHandler handler, Object attachment) throws Exception {
 		PhysicalDatasource ds = this.dbPool.findDatasouce(exitsCon);
 		if (ds == null) {
-			throw new RuntimeException("can't find exits connection,maybe fininshed " + exitsCon);
+			throw new RuntimeException("can't find exits connection, maybe finished " + exitsCon);
 		} else {
 			ds.getConnection(schema, autocommit, handler, attachment);
 		}
