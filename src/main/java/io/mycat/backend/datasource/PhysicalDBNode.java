@@ -63,7 +63,7 @@ public class PhysicalDBNode {
 	 * @param exitsCon
 	 * @throws Exception
 	 */
-	public void getConnectionFromSameSource(String schema,boolean autocommit, BackendConnection exitsCon
+	public void getConnectionFromSameSource(String schema, boolean autocommit, BackendConnection exitsCon
             , ResponseHandler handler, Object attachment) throws Exception {
 		PhysicalDatasource ds = this.dbPool.findDatasouce(exitsCon);
 		if (ds == null) {
@@ -75,7 +75,7 @@ public class PhysicalDBNode {
 
 	private void checkRequest(String schema) {
 		if (schema != null && !schema.equals(this.database)) {
-			throw new RuntimeException("invalid param ,connection request db is :" + schema + " and datanode db is " + this.database);
+			throw new RuntimeException("invalid param, connection request db is :" + schema + " and datanode db is " + this.database);
 		}
 		if (!dbPool.isInitSuccess()) {
 			dbPool.init(dbPool.activedIndex);
