@@ -95,7 +95,7 @@ public class PhysicalDBNode {
 						dbPool.getReadBanlanceCon(schema, autoCommit, handler, attachment, this.database);
 					} else {	// 没有 /*balance*/ 注解
 						LOGGER.debug("rrs.isHasBlanceFlag()" + rrs.isHasBalanceFlag());
-						if(!dbPool.getReadCon(schema, autoCommit, handler, attachment, this.database)){
+						if(!dbPool.getReadCon(schema, autoCommit, handler, attachment, this.database)) {
 							LOGGER.warn("Do not have slave connection to use, use master connection instead.");
 							PhysicalDatasource writeSource = dbPool.getSource();
 							//记录写节点写负载值
