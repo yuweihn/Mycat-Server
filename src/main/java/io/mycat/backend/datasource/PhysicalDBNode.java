@@ -73,7 +73,7 @@ public class PhysicalDBNode {
 		}
 	}
 
-	private void checkRequest(String schema){
+	private void checkRequest(String schema) {
 		if (schema != null && !schema.equals(this.database)) {
 			throw new RuntimeException("invalid param ,connection request db is :" + schema + " and datanode db is " + this.database);
 		}
@@ -82,7 +82,8 @@ public class PhysicalDBNode {
 		}
 	}
 	
-	public void getConnection(String schema, boolean autoCommit, RouteResultsetNode rrs, ResponseHandler handler, Object attachment) throws Exception {
+	public void getConnection(String schema, boolean autoCommit, RouteResultsetNode rrs, ResponseHandler handler
+			, Object attachment) throws Exception {
 		checkRequest(schema);
 		if (dbPool.isInitSuccess()) {
 			LOGGER.debug("rrs.getRunOnSlave() " + rrs.getRunOnSlave());
