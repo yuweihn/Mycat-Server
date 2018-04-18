@@ -225,11 +225,11 @@ public abstract class PhysicalDatasource {
 					}
 				}
 			} else if (con.getLastTime() < hearBeatTime2) {
-				// not valid schema conntion should close for idle
+				// not valid schema connection should close for idle
 				// exceed 2*conHeartBeatPeriod
 				// 同样，这里也需要先移除，避免被业务连接
 				if(checkLis.remove(con)) { 
-					con.close(" heart beate idle ");
+					con.close(" heart beat idle ");
 				}
 			}
 		}
@@ -253,7 +253,7 @@ public abstract class PhysicalDatasource {
     }
 
 	public void heatBeatCheck(long timeout, long conHeartBeatPeriod) {
-//		int ildeCloseCount = hostConfig.getMinCon() * 3;
+//		int idleCloseCount = hostConfig.getMinCon() * 3;
 		int maxConsInOneCheck = 5;
 		LinkedList<BackendConnection> heartBeatCons = new LinkedList<BackendConnection>();
 
@@ -312,7 +312,7 @@ public abstract class PhysicalDatasource {
 	 * edit by dingw at 2017.06.16
 	 */
 	private void closeByIdleMany(int idleCloseCount) {
-		LOGGER.info("too many idle cons ,close some for datasource  " + name);
+		LOGGER.info("too many idle cons, close some for datasource  " + name);
 		List<BackendConnection> readyCloseCons = new ArrayList<BackendConnection>(idleCloseCount);
 		for (ConQueue queue: conMap.getAllConQueue()) {
 			readyCloseCons.addAll(queue.getIdleConsToClose(idleCloseCount));
@@ -328,7 +328,7 @@ public abstract class PhysicalDatasource {
 			idleCon.close("too many idle con");
 		}
 		
-//		LOGGER.info("too many ilde cons ,close some for datasouce  " + name);
+//		LOGGER.info("too many idle cons ,close some for datasource  " + name);
 //		
 //		Iterator<ConQueue> conQueueIt = conMap.getAllConQueue().iterator();
 //		ConQueue queue = null;
@@ -336,7 +336,7 @@ public abstract class PhysicalDatasource {
 //			queue = conQueueIt.next();
 //		}
 //		
-//		for(int i = 0; i < ildeCloseCount; i ++ ) {
+//		for(int i = 0; i < idleCloseCount; i ++ ) {
 //			
 //			if(!needCloseIdleConnection() || queue == null) {
 //				break; //如果当时空闲连接数没有超过最小配置连接数，则结束本次连接关闭
@@ -439,7 +439,7 @@ public abstract class PhysicalDatasource {
 	}
 
 	private void createNewConnection(final ResponseHandler handler, final Object attachment, final String schema) {
-		// aysn create connection
+		// async create connection
 		MycatServer.getInstance().getBusinessExecutor().execute(new Runnable() {
 			public void run() {
 				try {
@@ -475,7 +475,7 @@ public abstract class PhysicalDatasource {
 //			while(curTotalConnection + 1 <= size) {
 //				
 //				if (this.totalConnection.compareAndSet(curTotalConnection, curTotalConnection + 1)) {
-//					LOGGER.info("no ilde connection in pool,create new connection for "	+ this.name + " of schema " + schema);
+//					LOGGER.info("no idle connection in pool,create new connection for "	+ this.name + " of schema " + schema);
 //					createNewConnection(handler, attachment, schema);
 //					return;
 //				}
@@ -485,8 +485,8 @@ public abstract class PhysicalDatasource {
 //			}
 //			
 //			// 如果后端连接不足，立即失败,故直接抛出连接数超过最大连接异常
-//			LOGGER.error("the max activeConnnections size can not be max than maxconnections:" + curTotalConnection);
-//			throw new IOException("the max activeConnnections size can not be max than maxconnections:" + curTotalConnection);
+//			LOGGER.error("the max activeConnections size can not be max than maxConnections:" + curTotalConnection);
+//			throw new IOException("the max activeConnections size can not be max than maxConnections:" + curTotalConnection);
 			
 			int activeCons = this.getActiveCount();// 当前最大活动连接
 			if (activeCons + 1 > size) {// 下一个连接大于最大连接数
