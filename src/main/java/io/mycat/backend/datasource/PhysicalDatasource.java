@@ -490,8 +490,8 @@ public abstract class PhysicalDatasource {
 			
 			int activeCons = this.getActiveCount();// 当前最大活动连接
 			if (activeCons + 1 > size) {// 下一个连接大于最大连接数
-				LOGGER.error("the max activeConnnections size can not be max than maxconnections");
-				throw new IOException("the max activeConnnections size can not be max than maxconnections");
+				LOGGER.error("the max activeConnections size can not be max than maxConnections");
+				throw new IOException("the max activeConnections size can not be max than maxConnections");
 			} else { // create connection
 				LOGGER.info("no ilde connection in pool,create new connection for "	+ this.name + " of schema " + schema);
 				createNewConnection(handler, attachment, schema);
