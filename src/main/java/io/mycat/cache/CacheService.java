@@ -23,6 +23,7 @@
  */
 package io.mycat.cache;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
 
 /**
  * cache service for other component default using memory cache encache
@@ -111,11 +113,9 @@ public class CacheService {
 	private void createLayeredPool(String cacheName, String type, int size, int expireSeconds) {
 		checkExists(cacheName);
 		logger.info("create layer cache pool " + cacheName + " of type " + type
-				+ " ,default cache size " + size + " ,default expire seconds"
-				+ expireSeconds);
+				+ ", default cache size " + size + ", default expire seconds " + expireSeconds);
 		DefaultLayedCachePool layerdPool = new DefaultLayedCachePool(cacheName, this.getCacheFact(type), size, expireSeconds);
 		this.allPools.put(cacheName, layerdPool);
-
 	}
 
 	private void checkExists(String poolName) {
@@ -124,9 +124,9 @@ public class CacheService {
 		}
 	}
 
-	private void createPoolFactory(String factryType, String factryClassName) throws Exception {
-		CachePoolFactory factry = (CachePoolFactory) Class.forName(factryClassName).newInstance();
-		poolFactorys.put(factryType, factry);
+	private void createPoolFactory(String factoryType, String factoryClassName) throws Exception {
+		CachePoolFactory factory = (CachePoolFactory) Class.forName(factoryClassName).newInstance();
+		poolFactorys.put(factoryType, factory);
 	}
 
 	private void createPool(String poolName, String type, int cacheSize, int expireSeconds) {
@@ -137,11 +137,11 @@ public class CacheService {
 	}
 
 	private CachePoolFactory getCacheFact(String type) {
-		CachePoolFactory facty = this.poolFactorys.get(type);
-		if (facty == null) {
+		CachePoolFactory factory = this.poolFactorys.get(type);
+		if (factory == null) {
 			throw new RuntimeException("CachePoolFactory not defined for type:" + type);
 		}
-		return facty;
+		return factory;
 	}
 
 	/**
@@ -153,7 +153,7 @@ public class CacheService {
 	public CachePool getCachePool(String poolName) {
 		CachePool pool = allPools.get(poolName);
 		if (pool == null) {
-			throw new IllegalArgumentException("can't find cache pool:" + poolName);
+			throw new IllegalArgumentException("can't find cache pool: " + poolName);
 		} else {
 			return pool;
 		}
@@ -161,7 +161,7 @@ public class CacheService {
 
 	public void clearCache() {
 		logger.info("clear all cache pool ");
-		for (CachePool pool : allPools.values()) {
+		for (CachePool pool: allPools.values()) {
 			pool.clearCache();
 		}
 	}
