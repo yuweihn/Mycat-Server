@@ -23,10 +23,8 @@
  */
 package io.mycat.route;
 
-import com.alibaba.druid.sql.ast.SQLStatement;
 
-import io.mycat.MycatServer;
-import io.mycat.config.MycatConfig;
+import com.alibaba.druid.sql.ast.SQLStatement;
 import io.mycat.config.model.SchemaConfig;
 import io.mycat.route.parser.util.PageSQLUtil;
 import io.mycat.sqlengine.mpp.HavingCols;
@@ -34,6 +32,7 @@ import io.mycat.util.FormatUtil;
 
 import java.io.Serializable;
 import java.util.*;
+
 
 /**
  * @author mycat
@@ -66,7 +65,7 @@ public final class RouteResultset implements Serializable {
     //是否自动提交，此属性主要用于记录ServerConnection上的autocommit状态
     private boolean autocommit = true;
 
-    private boolean isLoadData=false;
+    private boolean isLoadData = false;
 
     //是否可以在从库运行,此属性主要供RouteResultsetNode获取
     private Boolean canRunInReadDB;
@@ -76,9 +75,11 @@ public final class RouteResultset implements Serializable {
     private Boolean runOnSlave = null;	// 默认null表示不施加影响
 
        //key=dataNode    value=slot
-    private Map<String,Integer>   dataNodeSlotMap=new HashMap<>();
+    private Map<String, Integer> dataNodeSlotMap = new HashMap<String, Integer>();
 
     private boolean selectForUpdate;
+    private List<String> tables;
+
 
     public boolean isSelectForUpdate() {
         return selectForUpdate;
@@ -87,9 +88,6 @@ public final class RouteResultset implements Serializable {
     public void setSelectForUpdate(boolean selectForUpdate) {
         this.selectForUpdate = selectForUpdate;
     }
-	
-	
-	 private List<String> tables;
 
     public List<String> getTables() {
         return tables;
@@ -116,23 +114,19 @@ public final class RouteResultset implements Serializable {
 	}
 	  private Procedure procedure;
 
-    public Procedure getProcedure()
-    {
+    public Procedure getProcedure() {
         return procedure;
     }
 
-    public void setProcedure(Procedure procedure)
-    {
+    public void setProcedure(Procedure procedure) {
         this.procedure = procedure;
     }
 
-	public boolean isLoadData()
-    {
+	public boolean isLoadData() {
         return isLoadData;
     }
 
-    public void setLoadData(boolean isLoadData)
-    {
+    public void setLoadData(boolean isLoadData) {
         this.isLoadData = isLoadData;
     }
 
@@ -160,25 +154,20 @@ public final class RouteResultset implements Serializable {
 
     public void resetNodes() {
         if (nodes != null) {
-            for (RouteResultsetNode node : nodes) {
+            for (RouteResultsetNode node: nodes) {
                 node.resetStatement();
             }
         }
     }
 
     public void copyLimitToNodes() {
-
-        if(nodes!=null)
-        {
-            for (RouteResultsetNode node : nodes)
-            {
-                if(node.getLimitSize()==-1&&node.getLimitStart()==0)
-                {
+        if(nodes != null) {
+            for (RouteResultsetNode node: nodes) {
+                if(node.getLimitSize() == -1 && node.getLimitStart() == 0) {
                     node.setLimitStart(limitStart);
                     node.setLimitSize(limitSize);
                 }
             }
-
         }
     }
 
@@ -240,8 +229,7 @@ public final class RouteResultset implements Serializable {
 
     public void setPrimaryKey(String primaryKey) {
         if (!primaryKey.contains(".")) {
-            throw new java.lang.IllegalArgumentException(
-                    "must be table.primarykey fomat :" + primaryKey);
+            throw new java.lang.IllegalArgumentException("must be table.primarykey fomat :" + primaryKey);
         }
         this.primaryKey = primaryKey;
     }
@@ -277,7 +265,6 @@ public final class RouteResultset implements Serializable {
         if (mergeCols != null && !mergeCols.isEmpty()) {
             createSQLMergeIfNull().setMergeCols(mergeCols);
         }
-
     }
 
     public LinkedHashMap<String, Integer> getOrderByCols() {
@@ -294,14 +281,11 @@ public final class RouteResultset implements Serializable {
     }
 
     public void setNodes(RouteResultsetNode[] nodes) {
-        if(nodes!=null)
-        {
+        if(nodes != null) {
            int nodeSize=nodes.length;
-            for (RouteResultsetNode node : nodes)
-            {
+            for (RouteResultsetNode node: nodes) {
                 node.setTotalNodeSize(nodeSize);
             }
-
         }
         this.nodes = nodes;
     }
@@ -327,45 +311,35 @@ public final class RouteResultset implements Serializable {
 
     public void setCallStatement(boolean callStatement) {
         this.callStatement = callStatement;
-        if(nodes!=null)
-        {
-            for (RouteResultsetNode node : nodes)
-            {
+        if(nodes != null) {
+            for (RouteResultsetNode node: nodes) {
                 node.setCallStatement(callStatement);
             }
-
         }
     }
 
-    public void changeNodeSqlAfterAddLimit(SchemaConfig schemaConfig, String sourceDbType, String sql, int offset, int count, boolean isNeedConvert) {
-        if (nodes != null)
-        {
-
+    public void changeNodeSqlAfterAddLimit(SchemaConfig schemaConfig, String sourceDbType, String sql, int offset
+            , int count, boolean isNeedConvert) {
+        if (nodes != null) {
             Map<String, String> dataNodeDbTypeMap = schemaConfig.getDataNodeDbTypeMap();
             Map<String, String> sqlMapCache = new HashMap<>();
-            for (RouteResultsetNode node : nodes)
-            {
+            for (RouteResultsetNode node: nodes) {
                 String dbType = dataNodeDbTypeMap.get(node.getName());
-                if (dbType.equalsIgnoreCase("mysql")) 
-                {
+                if (dbType.equalsIgnoreCase("mysql")) {
                     node.setStatement(sql);   //mysql之前已经加好limit
-                } else if (sqlMapCache.containsKey(dbType))
-                {
+                } else if (sqlMapCache.containsKey(dbType)) {
                     node.setStatement(sqlMapCache.get(dbType));
-                } else if(isNeedConvert)
-                {
+                } else if(isNeedConvert) {
                     String nativeSql = PageSQLUtil.convertLimitToNativePageSql(dbType, sql, offset, count);
                     sqlMapCache.put(dbType, nativeSql);
                     node.setStatement(nativeSql);
-                }  else {
+                } else {
                     node.setStatement(sql);
                 }
 
                 node.setLimitStart(offset);
                 node.setLimitSize(count);
             }
-
-
         }
     }
 
@@ -420,10 +394,7 @@ public final class RouteResultset implements Serializable {
 	}
 	
 	public boolean isDistTable(){
-		if(this.getSubTables()!=null && !this.getSubTables().isEmpty() ){
-			return true;
-		}
-		return false;
+		return this.getSubTables() != null && !this.getSubTables().isEmpty();
 	}
 
 	@Override
@@ -439,5 +410,4 @@ public final class RouteResultset implements Serializable {
         s.append("\n}");
         return s.toString();
     }
-
 }
