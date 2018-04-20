@@ -23,6 +23,7 @@
  */
 package io.mycat.route;
 
+
 import io.mycat.cache.CachePool;
 import io.mycat.cache.CacheService;
 import io.mycat.cache.LayerCachePool;
@@ -45,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
+
 public class RouteService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RouteService.class);
     public static final String MYCAT_HINT_TYPE = "_mycatHintType";
@@ -64,9 +66,8 @@ public class RouteService {
 		return tableId2DataNodeCache;
 	}
 
-	public RouteResultset route(SystemConfig sysconf, SchemaConfig schema,
-			int sqlType, String stmt, String charset, ServerConnection sc)
-			throws SQLNonTransientException {
+	public RouteResultset route(SystemConfig sysconf, SchemaConfig schema, int sqlType, String stmt
+			, String charset, ServerConnection sc) throws SQLNonTransientException {
 		RouteResultset rrs = null;
 		String cacheKey = null;
 
@@ -88,7 +89,7 @@ public class RouteService {
 //      boolean isMatchNewHint = stmt.startsWith(NEW_MYCAT_HINT);
 //		if (isMatchOldHint || isMatchNewHint ) {
 		int hintLength = RouteService.isHintSql(stmt);
-		if(hintLength != -1){
+		if(hintLength != -1) {
 			int endPos = stmt.indexOf("*/");
 			if (endPos > 0) {				
 				// 用!mycat:内部的语句来做路由分析
@@ -96,13 +97,13 @@ public class RouteService {
 				String hint = stmt.substring(hintLength, endPos).trim();	
 				
                 int firstSplitPos = hint.indexOf(HINT_SPLIT);                
-                if(firstSplitPos > 0){
+                if(firstSplitPos > 0) {
                     Map hintMap = parseHint(hint);
                 	String hintType = (String) hintMap.get(MYCAT_HINT_TYPE);
                     String hintSql = (String) hintMap.get(hintType);
                     if(hintSql.length() == 0) {
-                    	LOGGER.warn("comment int sql must meet :/*!mycat:type=value*/ or /*#mycat:type=value*/ or /*mycat:type=value*/: "+stmt);
-                    	throw new SQLSyntaxErrorException("comment int sql must meet :/*!mycat:type=value*/ or /*#mycat:type=value*/ or /*mycat:type=value*/: "+stmt);
+                    	LOGGER.warn("comment int sql must meet :/*!mycat:type=value*/ or /*#mycat:type=value*/ or /*mycat:type=value*/: " + stmt);
+                    	throw new SQLSyntaxErrorException("comment int sql must meet :/*!mycat:type=value*/ or /*#mycat:type=value*/ or /*mycat:type=value*/: " + stmt);
                     }
                     String realSQL = stmt.substring(endPos + "*/".length()).trim();
 
@@ -113,17 +114,14 @@ public class RouteService {
                         	 * 修复 注解SQL的 sqlType 与 实际SQL的 sqlType 不一致问题， 如： hint=SELECT，real=INSERT
                         	 * fixed by zhuam
                         	 */
-                    		int hintSqlType = ServerParse.parse( hintSql ) & 0xff;     
+                    		int hintSqlType = ServerParse.parse(hintSql) & 0xff;
                     		rrs = hintHandler.route(sysconf, schema, sqlType, realSQL, charset, sc, tableId2DataNodeCache, hintSql, hintSqlType, hintMap);
-                    		
-                    	} else {                    		
+                    	} else {
                     		rrs = hintHandler.route(sysconf, schema, sqlType, realSQL, charset, sc, tableId2DataNodeCache, hintSql, sqlType, hintMap);
                     	}
- 
                     } else {
                         LOGGER.warn("TODO , support hint sql type : " + hintType);
                     }
-                    
                 } else {//fixed by runfriends@126.com
                 	LOGGER.warn("comment in sql must meet :/*!mycat:type=value*/ or /*#mycat:type=value*/ or /*mycat:type=value*/: " + stmt);
                 	throw new SQLSyntaxErrorException("comment in sql must meet :/*!mcat:type=value*/ or /*#mycat:type=value*/ or /*mycat:type=value*/: " + stmt);
@@ -142,7 +140,7 @@ public class RouteService {
 	}
 
 	 //数据迁移的切换准备阶段，需要拒绝写操作和所有的跨多节点写操作
-	private void checkMigrateRule(String schemal, RouteResultset rrs, int sqlType ) throws SQLNonTransientException {
+	private void checkMigrateRule(String schemal, RouteResultset rrs, int sqlType) throws SQLNonTransientException {
 		if(rrs != null && rrs.getTables() != null) {
 			boolean isUpdate = isUpdateSql(sqlType);
 			if(!isUpdate) {
@@ -150,15 +148,15 @@ public class RouteService {
 			}
 			ConcurrentMap<String, List<PartitionByCRC32PreSlot.Range>> tableRules = RouteCheckRule.migrateRuleMap.get(schemal.toUpperCase()) ;
 			if(tableRules != null) {
-				for (String table : rrs.getTables()) {
+				for (String table: rrs.getTables()) {
 					List<PartitionByCRC32PreSlot.Range> rangeList = tableRules.get(table.toUpperCase()) ;
 					if(rangeList != null && !rangeList.isEmpty()) {
 						if(rrs.getNodes().length > 1 && isUpdate){
 							throw new SQLNonTransientException ("schema:" + schemal + ", table:" + table + ", sql:" + rrs.getStatement() + " is not allowed, because table is migrate switching, please wait for a moment.");
 						}
-						for (PartitionByCRC32PreSlot.Range range : rangeList) {
+						for (PartitionByCRC32PreSlot.Range range: rangeList) {
 							RouteResultsetNode[] routeResultsetNodes = rrs.getNodes();
-							for (RouteResultsetNode routeResultsetNode : routeResultsetNodes) {
+							for (RouteResultsetNode routeResultsetNode: routeResultsetNodes) {
 								int slot = routeResultsetNode.getSlot();
 								if(isUpdate && slot >= range.start && slot <= range.end) {
 									throw new SQLNonTransientException ("schema:" + schemal + ", table:" + table + ", sql:" + rrs.getStatement() + " is not allowed, because table is migrate switching, please wait for a moment.");
@@ -179,20 +177,20 @@ public class RouteService {
 	public static int isHintSql(String sql) {
 		int j = 0;
 		int len = sql.length();
-		if(sql.charAt(j++) == '/' && sql.charAt(j++) == '*'){
+		if(sql.charAt(j++) == '/' && sql.charAt(j++) == '*') {
 			char c = sql.charAt(j);
 			// 过滤掉 空格 和 * 两种字符, 支持： "/** !mycat: */" 和 "/** #mycat: */" 形式的注解
-			while(j < len && c != '!' && c != '#' && (c == ' ' || c == '*')){
+			while(j < len && c != '!' && c != '#' && (c == ' ' || c == '*')) {
 				c = sql.charAt(++j);
 			}
 			//注解支持的'!'不被mysql单库兼容，
 			//注解支持的'#'不被mybatis兼容
 			//注解支持的':'不被hibernate兼容
 			//考虑用mycat字符前缀标志Hintsql:"/** mycat: */"
-			if(sql.charAt(j) == 'm'){
+			if(sql.charAt(j) == 'm') {
 				j--;
 			}
-			if(j + 6 >= len)	{// prevent the following sql.charAt overflow
+			if(j + 6 >= len) {// prevent the following sql.charAt overflow
 				return -1;        // false
 			}
 			if(sql.charAt(++j) == 'm' && sql.charAt(++j) == 'y' && sql.charAt(++j) == 'c'
@@ -203,7 +201,7 @@ public class RouteService {
 		return -1;	// false
 	}
 	
-	private Map parseHint(String sql){
+	private Map parseHint(String sql) {
         Map map = new HashMap();
         int y = 0;
         int begin = 0;
@@ -232,7 +230,7 @@ public class RouteService {
                 value = value.substring(1, value.length() - 1);
             }
             if(map.isEmpty()) {
- 				map.put(MYCAT_HINT_TYPE,key);
+ 				map.put(MYCAT_HINT_TYPE, key);
             }
             map.put(key, value.trim());
         }
