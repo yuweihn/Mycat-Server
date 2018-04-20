@@ -45,12 +45,12 @@ public class DefaultLayedCachePool implements LayerCachePool {
 	private final String name;
 
 
-	public DefaultLayedCachePool(String name, CachePoolFactory poolFactory, int defaultCacheSize, int defaulExpiredSeconds) {
+	public DefaultLayedCachePool(String name, CachePoolFactory poolFactory, int defaultCacheSize, int defaultExpiredSeconds) {
 		super();
 		this.name = name;
 		this.poolFactory = poolFactory;
 		this.defaultCacheSize = defaultCacheSize;
-		this.defaulExpiredSeconds = defaulExpiredSeconds;
+		this.defaulExpiredSeconds = defaultExpiredSeconds;
 	}
 
 	private CachePool getCache(String cacheName) {
