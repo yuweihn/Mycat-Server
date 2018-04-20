@@ -23,6 +23,8 @@
  */
 package io.mycat.cache;
 
+
+
 /**
  * cache static information
  * 
@@ -38,6 +40,7 @@ public class CacheStatic {
 	private long hitTimes;
 	private long lastAccesTime;
 	private long lastPutTime;
+
 
 	public long getMemorySize() {
 		return memorySize;
@@ -127,7 +130,6 @@ public class CacheStatic {
 		this.lastPutTime = 0;
 		this.memorySize = 0;
 		this.putTimes = 0;
-
 	}
 
 	@Override
@@ -137,5 +139,4 @@ public class CacheStatic {
 				+ putTimes + ", hitTimes=" + hitTimes + ", lastAccesTime="
 				+ lastAccesTime + ", lastPutTime=" + lastPutTime + "]";
 	}
-
 }
