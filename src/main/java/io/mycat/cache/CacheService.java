@@ -42,7 +42,7 @@ import java.util.Properties;
 public class CacheService {
 	private static final Logger logger = LoggerFactory.getLogger(CacheService.class);
 
-	private final Map<String, CachePoolFactory> poolFactorys = new HashMap<String, CachePoolFactory>();
+	private final Map<String, CachePoolFactory> poolFactories = new HashMap<String, CachePoolFactory>();
 	private final Map<String, CachePool> allPools = new HashMap<String, CachePool>();
 
 	public CacheService() {
@@ -126,7 +126,7 @@ public class CacheService {
 
 	private void createPoolFactory(String factoryType, String factoryClassName) throws Exception {
 		CachePoolFactory factory = (CachePoolFactory) Class.forName(factoryClassName).newInstance();
-		poolFactorys.put(factoryType, factory);
+        poolFactories.put(factoryType, factory);
 	}
 
 	private void createPool(String poolName, String type, int cacheSize, int expireSeconds) {
@@ -137,7 +137,7 @@ public class CacheService {
 	}
 
 	private CachePoolFactory getCacheFact(String type) {
-		CachePoolFactory factory = this.poolFactorys.get(type);
+		CachePoolFactory factory = this.poolFactories.get(type);
 		if (factory == null) {
 			throw new RuntimeException("CachePoolFactory not defined for type:" + type);
 		}
