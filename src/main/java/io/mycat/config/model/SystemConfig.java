@@ -445,12 +445,12 @@ public final class SystemConfig {
 		if(home == null) {
 			try {
 				String path = new File("..").getCanonicalPath().replaceAll("\\\\", "/");
-				File conf = new File(path+"/conf");
+				File conf = new File(path + "/conf");
 				if(conf.exists() && conf.isDirectory()) {
 					home = path;
 				} else {
 					path = new File(".").getCanonicalPath().replaceAll("\\\\", "/");
-					conf = new File(path+"/conf");
+					conf = new File(path + "/conf");
 					if(conf.exists() && conf.isDirectory()) {
 						home = path;
 					}
