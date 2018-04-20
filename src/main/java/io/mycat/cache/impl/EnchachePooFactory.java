@@ -48,9 +48,9 @@ public class EnchachePooFactory extends CachePoolFactory {
 			cacheConf.setTimeToIdleSeconds(expiredSeconds);
 			Cache cache = new Cache(cacheConf);
 			cacheManager.addCache(cache);
-			return new EnchachePool(poolName,cache,cacheSize);
+			return new EnchachePool(poolName, cache, cacheSize);
 		} else {
-			return new EnchachePool(poolName,enCache,cacheSize);
+			return new EnchachePool(poolName, enCache, cacheSize);
 		}
 	}
 }
