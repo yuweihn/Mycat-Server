@@ -103,6 +103,10 @@ public class MycatServer {
 	private static final Repository fileRepository = new FileSystemRepository();
 	private final RouteService routerService;
 	private final CacheService cacheService;
+
+	/**
+	 * 记录每个dataHost当前活跃的writeHost
+	 */
 	private Properties dnIndexProperties;
 	
 	//AIO连接群组
