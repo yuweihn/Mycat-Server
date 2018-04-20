@@ -1,5 +1,6 @@
 package io.mycat.route.factory;
 
+
 import io.mycat.MycatServer;
 import io.mycat.config.model.SystemConfig;
 import io.mycat.route.RouteStrategy;
@@ -7,6 +8,7 @@ import io.mycat.route.impl.DruidMycatRouteStrategy;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 
 /**
  * 路由策略工厂类
@@ -16,7 +18,9 @@ import java.util.concurrent.ConcurrentMap;
 public class RouteStrategyFactory {
 	private static RouteStrategy defaultStrategy = null;
 	private static volatile boolean isInit = false;
-	private static ConcurrentMap<String,RouteStrategy> strategyMap = new ConcurrentHashMap<String,RouteStrategy>();
+	private static ConcurrentMap<String, RouteStrategy> strategyMap = new ConcurrentHashMap<String, RouteStrategy>();
+
+
 	public static void init() {
 		SystemConfig config = MycatServer.getInstance().getConfig().getSystem();
 

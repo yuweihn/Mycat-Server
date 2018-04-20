@@ -56,7 +56,7 @@ public class DruidMycatRouteStrategy extends AbstractRouteStrategy {
 	
 	@Override
 	public RouteResultset routeNormalSqlWithAST(SchemaConfig schema, String stmt, RouteResultset rrs
-			,String charset, LayerCachePool cachePool, int sqlType, ServerConnection sc) throws SQLNonTransientException {
+			, String charset, LayerCachePool cachePool, int sqlType, ServerConnection sc) throws SQLNonTransientException {
 		/**
 		 *  只有mysql时只支持mysql语法
 		 */
@@ -184,7 +184,7 @@ public class DruidMycatRouteStrategy extends AbstractRouteStrategy {
 					throw new SQLSyntaxErrorException(err);
 				} else {
 					SQLSelectQuery sqlSelectQuery = sqlselect.getQuery();
-					if(((MySqlSelectQueryBlock)sqlSelectQuery).getFrom() instanceof SQLExprTableSource) {
+					if(((MySqlSelectQueryBlock) sqlSelectQuery).getFrom() instanceof SQLExprTableSource) {
 						rrs.setCacheAble(false);
 						rrs.setFinishedRoute(true);
 						rrsResult = middlerResultRoute(schema, charset, sqlselect, sqlType, statement, sc);
@@ -371,7 +371,7 @@ public class DruidMycatRouteStrategy extends AbstractRouteStrategy {
 		
 		RouteResultsetNode[] nodes = new RouteResultsetNode[nodeSet.size()];
 		int i = 0;
-		for (RouteResultsetNode aNodeSet : nodeSet) {
+		for (RouteResultsetNode aNodeSet: nodeSet) {
 			nodes[i] = aNodeSet;
 			if(statement instanceof MySqlInsertStatement && ctx.getTables().size() == 1 && schema.getTables().containsKey(ctx.getTables().get(0))) {
 				RuleConfig rule = schema.getTables().get(ctx.getTables().get(0)).getRule();
@@ -394,8 +394,8 @@ public class DruidMycatRouteStrategy extends AbstractRouteStrategy {
 		return rrs;
 	}
 	
-	private SQLExprTableSource getDisTable(SQLTableSource tableSource, RouteResultsetNode node) throws SQLSyntaxErrorException{
-		if(node.getSubTableName() == null){
+	private SQLExprTableSource getDisTable(SQLTableSource tableSource, RouteResultsetNode node) throws SQLSyntaxErrorException {
+		if(node.getSubTableName() == null) {
 			String msg = " sub table not exists for " + node.getName() + " on " + tableSource;
 			LOGGER.error("DruidMycatRouteStrategyError " + msg);
 			throw new SQLSyntaxErrorException(msg);
@@ -413,7 +413,7 @@ public class DruidMycatRouteStrategy extends AbstractRouteStrategy {
 		if(statement instanceof SQLInsertStatement) {
 			SQLInsertStatement insertStatement = (SQLInsertStatement) statement;
 			tableSource = insertStatement.getTableSource();
-			for (RouteResultsetNode node : rrs.getNodes()) {
+			for (RouteResultsetNode node: rrs.getNodes()) {
 				SQLExprTableSource from2 = getDisTable(tableSource, node);
 				insertStatement.setTableSource(from2);
 				node.setStatement(insertStatement.toString());
@@ -422,7 +422,7 @@ public class DruidMycatRouteStrategy extends AbstractRouteStrategy {
 		if(statement instanceof SQLDeleteStatement) {
 			SQLDeleteStatement deleteStatement = (SQLDeleteStatement) statement;
 			tableSource = deleteStatement.getTableSource();
-			for (RouteResultsetNode node : rrs.getNodes()) {
+			for (RouteResultsetNode node: rrs.getNodes()) {
 				SQLExprTableSource from2 = getDisTable(tableSource, node);
 				deleteStatement.setTableSource(from2);
 				node.setStatement(deleteStatement.toString());
@@ -431,7 +431,7 @@ public class DruidMycatRouteStrategy extends AbstractRouteStrategy {
 		if(statement instanceof SQLUpdateStatement) {
 			SQLUpdateStatement updateStatement = (SQLUpdateStatement) statement;
 			tableSource = updateStatement.getTableSource();
-			for (RouteResultsetNode node : rrs.getNodes()) {
+			for (RouteResultsetNode node: rrs.getNodes()) {
 				SQLExprTableSource from2 = getDisTable(tableSource, node);
 				updateStatement.setTableSource(from2);
 				node.setStatement(updateStatement.toString());
@@ -605,8 +605,7 @@ public class DruidMycatRouteStrategy extends AbstractRouteStrategy {
 //
 //	}
 
-	public RouteResultset routeSystemInfo(SchemaConfig schema, int sqlType, String stmt
-			, RouteResultset rrs) {
+	public RouteResultset routeSystemInfo(SchemaConfig schema, int sqlType, String stmt, RouteResultset rrs) {
 		switch(sqlType) {
 			case ServerParse.SHOW:// if origSQL is like show tables
 				return analyseShowSQL(schema, rrs, stmt);
@@ -634,8 +633,7 @@ public class DruidMycatRouteStrategy extends AbstractRouteStrategy {
 	 * @return RouteResultset		(数据路由集合)
 	 * @author mycat
 	 */
-	private static RouteResultset analyseDescrSQL(SchemaConfig schema, RouteResultset rrs
-			, String stmt, int ind) {
+	private static RouteResultset analyseDescrSQL(SchemaConfig schema, RouteResultset rrs, String stmt, int ind) {
 		final String MATCHED_FEATURE = "DESCRIBE ";
 		final String MATCHED2_FEATURE = "DESC ";
 		int pos = 0;
