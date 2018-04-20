@@ -23,23 +23,22 @@
  */
 package io.mycat.cache.impl;
 
+
 import io.mycat.cache.CachePool;
 import io.mycat.cache.CachePoolFactory;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.CacheConfiguration;
 
+
 public class EnchachePooFactory extends CachePoolFactory {
 
 	@Override
-	public CachePool createCachePool(String poolName, int cacheSize,
-			int expiredSeconds) {
+	public CachePool createCachePool(String poolName, int cacheSize, int expiredSeconds) {
 		CacheManager cacheManager = CacheManager.create();
 		Cache enCache = cacheManager.getCache(poolName);
 		if (enCache == null) {
-
-			CacheConfiguration cacheConf = cacheManager.getConfiguration()
-					.getDefaultCacheConfiguration().clone();
+			CacheConfiguration cacheConf = cacheManager.getConfiguration().getDefaultCacheConfiguration().clone();
 			cacheConf.setName(poolName);
 			if (cacheConf.getMaxEntriesLocalHeap() != 0) {
 				cacheConf.setMaxEntriesLocalHeap(cacheSize);
@@ -54,5 +53,4 @@ public class EnchachePooFactory extends CachePoolFactory {
 			return new EnchachePool(poolName,enCache,cacheSize);
 		}
 	}
-
 }
