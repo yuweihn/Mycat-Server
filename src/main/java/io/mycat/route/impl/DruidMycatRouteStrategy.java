@@ -45,7 +45,7 @@ public class DruidMycatRouteStrategy extends AbstractRouteStrategy {
 	
 	private static Map<Class<?>, RouteMiddlerReaultHandler> middleResultHandler = new HashMap<>();
 	
-	static{
+	static {
 		middleResultHandler.put(SQLQueryExpr.class, new SQLQueryResultHandler());
 		middleResultHandler.put(SQLBinaryOpExpr.class, new BinaryOpResultHandler());
 		middleResultHandler.put(SQLInSubQueryExpr.class, new InSubQueryResultHandler());
