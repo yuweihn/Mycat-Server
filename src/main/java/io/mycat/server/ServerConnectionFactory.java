@@ -23,6 +23,7 @@
  */
 package io.mycat.server;
 
+
 import java.io.IOException;
 import java.nio.channels.NetworkChannel;
 
@@ -33,6 +34,7 @@ import io.mycat.net.FrontendConnection;
 import io.mycat.net.factory.FrontendConnectionFactory;
 import io.mycat.server.handler.ServerLoadDataInfileHandler;
 import io.mycat.server.handler.ServerPrepareHandler;
+
 
 /**
  * @author mycat
@@ -52,5 +54,4 @@ public class ServerConnectionFactory extends FrontendConnectionFactory {
         c.setSession2(new NonBlockingSession(c));
         return c;
     }
-
 }

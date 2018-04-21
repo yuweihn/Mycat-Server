@@ -23,8 +23,10 @@
  */
 package io.mycat.net;
 
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
+
 
 /**
  * @author mycat
@@ -45,7 +47,4 @@ public interface NIOConnection extends ClosableConnection{
      * 写出一块缓存数据
      */
     void write(ByteBuffer buffer);
-    
-     
-     
 }

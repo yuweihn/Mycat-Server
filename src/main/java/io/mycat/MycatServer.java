@@ -336,8 +336,7 @@ public class MycatServer {
 
 		switch (bufferPoolType) {
 			case 0:
-				bufferPool = new DirectByteBufferPool(bufferPoolPageSize, bufferPoolChunkSize, bufferPoolPageNumber
-						, system.getFrontSocketSoRcvbuf());
+				bufferPool = new DirectByteBufferPool(bufferPoolPageSize, bufferPoolChunkSize, bufferPoolPageNumber, system.getFrontSocketSoRcvbuf());
 				totalNetWorkBufferSize = bufferPoolPageSize * bufferPoolPageNumber;
 				break;
 			case 1:
@@ -358,8 +357,7 @@ public class MycatServer {
 				LOGGER.info("Use Netty Buffer Pool");
 				break;
 			default:
-				bufferPool = new DirectByteBufferPool(bufferPoolPageSize, bufferPoolChunkSize, bufferPoolPageNumber
-						, system.getFrontSocketSoRcvbuf());
+				bufferPool = new DirectByteBufferPool(bufferPoolPageSize, bufferPoolChunkSize, bufferPoolPageNumber, system.getFrontSocketSoRcvbuf());
 				totalNetWorkBufferSize = bufferPoolPageSize * bufferPoolPageNumber;
 		}
 		
@@ -459,7 +457,7 @@ public class MycatServer {
  		
 //		new Thread(tableStructureCheck()).start();
 
-		//XA Init recovery Log
+//		XA Init recovery Log
 		LOGGER.info("===============================================");
 		LOGGER.info("Perform XA recovery log ...");
 		performXARecoveryLog();

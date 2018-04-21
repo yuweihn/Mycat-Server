@@ -23,6 +23,8 @@
  */
 package io.mycat.net;
 
+
+
 public interface ClosableConnection {
 	String getCharset();
 	/**
@@ -32,7 +34,7 @@ public interface ClosableConnection {
 
 	boolean isClosed();
 
-	public void idleCheck();
+	void idleCheck();
 
 	long getStartupTime();
 
