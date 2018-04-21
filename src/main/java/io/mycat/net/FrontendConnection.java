@@ -23,7 +23,9 @@
  */
 package io.mycat.net;
 
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.mycat.MycatServer;
 import io.mycat.backend.mysql.CharsetUtil;
@@ -49,11 +51,11 @@ import java.nio.channels.SocketChannel;
 import java.util.List;
 import java.util.Set;
 
+
 /**
  * @author mycat
  */
 public abstract class FrontendConnection extends AbstractConnection {
-	
 	private static final Logger LOGGER = LoggerFactory.getLogger(FrontendConnection.class);
 
 	protected long id;
@@ -78,8 +80,7 @@ public abstract class FrontendConnection extends AbstractConnection {
 		InetSocketAddress localAddr = (InetSocketAddress) channel.getLocalAddress();
 		InetSocketAddress remoteAddr = null;
 		if (channel instanceof SocketChannel) {
-			remoteAddr = (InetSocketAddress) ((SocketChannel) channel).getRemoteAddress();	
-			
+			remoteAddr = (InetSocketAddress) ((SocketChannel) channel).getRemoteAddress();
 		} else if (channel instanceof AsynchronousSocketChannel) {
 			remoteAddr = (InetSocketAddress) ((AsynchronousSocketChannel) channel).getRemoteAddress();
 		}
@@ -196,20 +197,19 @@ public abstract class FrontendConnection extends AbstractConnection {
 		}
 	}
 
-	public void writeErrMessage(int errno, String msg) {
-		writeErrMessage((byte) 1, errno, msg);
+	public void writeErrMessage(int errNo, String msg) {
+		writeErrMessage((byte) 1, errNo, msg);
 	}
 
-	public void writeErrMessage(byte id, int errno, String msg) {
+	public void writeErrMessage(byte id, int errNo, String msg) {
 		ErrorPacket err = new ErrorPacket();
 		err.packetId = id;
-		err.errno = errno;
+		err.errno = errNo;
 		err.message = encodeString(msg, charset);
 		err.write(this);
 	}
 	
 	public void initDB(byte[] data) {
-		
 		MySQLMessage mm = new MySQLMessage(data);
 		mm.position(5);
 		String db = mm.readString();
@@ -244,9 +244,8 @@ public abstract class FrontendConnection extends AbstractConnection {
 				LOGGER.error("load data error", e);
 				writeErrMessage(ErrorCode.ERR_HANDLE_DATA, e.getMessage());
 			}
-
 		} else {
-			writeErrMessage(ErrorCode.ER_UNKNOWN_COM_ERROR, "load data infile sql is not  unsupported!");
+			writeErrMessage(ErrorCode.ER_UNKNOWN_COM_ERROR, "load data infile sql is not unsupported!");
 		}
 	}
 
@@ -261,7 +260,6 @@ public abstract class FrontendConnection extends AbstractConnection {
 		} else {
 			writeErrMessage(ErrorCode.ER_UNKNOWN_COM_ERROR, "load data infile  data is not  unsupported!");
 		}
-
 	}
 
 	public void loadDataInfileEnd(byte packID) {
@@ -279,7 +277,6 @@ public abstract class FrontendConnection extends AbstractConnection {
 	
 	
 	public void query(String sql) {
-		
 		if (sql == null || sql.length() == 0) {
 			writeErrMessage(ErrorCode.ER_NOT_ALLOWED_COMMAND, "Empty SQL");
 			return;
@@ -298,40 +295,36 @@ public abstract class FrontendConnection extends AbstractConnection {
 		this.setExecuteSql(sql);
 		
 		// 防火墙策略( SQL 黑名单/ 注入攻击)
-		if ( !privileges.checkFirewallSQLPolicy( user, sql ) ) {
-			writeErrMessage(ErrorCode.ERR_WRONG_USED, 
-					"The statement is unsafe SQL, reject for user '" + user + "'");
+		if (!privileges.checkFirewallSQLPolicy(user, sql)) {
+			writeErrMessage(ErrorCode.ERR_WRONG_USED, "The statement is unsafe SQL, reject for user '" + user + "'");
 			return;
-		}		
+		}
 		
 		// DML 权限检查
 		try {
 			boolean isPassed = privileges.checkDmlPrivilege(user, schema, sql);
-			if ( !isPassed ) {
-				writeErrMessage(ErrorCode.ERR_WRONG_USED, 
-						"The statement DML privilege check is not passed, reject for user '" + user + "'");
+			if (!isPassed) {
+				writeErrMessage(ErrorCode.ERR_WRONG_USED, "The statement DML privilege check is not passed, reject for user '" + user + "'");
 				return;
 			}
-		 } catch( com.alibaba.druid.sql.parser.ParserException e1) {
-	        	writeErrMessage(ErrorCode.ERR_WRONG_USED,  e1.getMessage());
-	        	LOGGER.error("parse exception", e1 );
-				return;
-	     }
+		} catch(com.alibaba.druid.sql.parser.ParserException e1) {
+			writeErrMessage(ErrorCode.ERR_WRONG_USED,  e1.getMessage());
+			LOGGER.error("parse exception", e1 );
+			return;
+		}
 		
 		// 执行查询
-		if (queryHandler != null) {			
+		if (queryHandler != null) {
 			queryHandler.setReadOnly(privileges.isReadOnly(user));
 			queryHandler.query(sql);
-			
 		} else {
 			writeErrMessage(ErrorCode.ER_UNKNOWN_COM_ERROR, "Query unsupported!");
-		}		
+		}
 	}
 	
 	public void query(byte[] data) {
-		
 		// 取得语句
-		String sql = null;		
+		String sql = null;
 		try {
 			MySQLMessage mm = new MySQLMessage(data);
 			mm.position(5);
@@ -339,9 +332,9 @@ public abstract class FrontendConnection extends AbstractConnection {
 		} catch (UnsupportedEncodingException e) {
 			writeErrMessage(ErrorCode.ER_UNKNOWN_CHARACTER_SET, "Unknown charset '" + charset + "'");
 			return;
-		}		
-		
-		this.query( sql );
+		}
+
+		this.query(sql);
 	}
 
 	public void stmtPrepare(byte[] data) {
@@ -353,8 +346,7 @@ public abstract class FrontendConnection extends AbstractConnection {
 			try {
 				sql = mm.readString(charset);
 			} catch (UnsupportedEncodingException e) {
-				writeErrMessage(ErrorCode.ER_UNKNOWN_CHARACTER_SET,
-						"Unknown charset '" + charset + "'");
+				writeErrMessage(ErrorCode.ER_UNKNOWN_CHARACTER_SET, "Unknown charset '" + charset + "'");
 				return;
 			}
 			if (sql == null || sql.length() == 0) {
@@ -398,7 +390,7 @@ public abstract class FrontendConnection extends AbstractConnection {
 
 	public void stmtClose(byte[] data) {
 		if (prepareHandler != null) {
-			prepareHandler.close( data );
+			prepareHandler.close(data);
 		} else {
 			writeErrMessage(ErrorCode.ER_UNKNOWN_COM_ERROR, "Prepare unsupported!");
 		}
@@ -423,7 +415,6 @@ public abstract class FrontendConnection extends AbstractConnection {
 	@Override
 	public void register() throws IOException {
 		if (!isClosed.get()) {
-
 			// 生成认证数据
 			byte[] rand1 = RandomUtil.randomBytes(8);
 			byte[] rand2 = RandomUtil.randomBytes(12);
@@ -469,22 +460,19 @@ public abstract class FrontendConnection extends AbstractConnection {
 
 	@Override
 	public void handle(final byte[] data) {
-
-		if (isSupportCompress()) {			
+		if (isSupportCompress()) {
 			List<byte[]> packs = CompressUtil.decompressMysqlPacket(data, decompressUnfinishedDataQueue);
-			for (byte[] pack : packs) {
+			for (byte[] pack: packs) {
 				if (pack.length != 0) {
 					rawHandle(pack);
 				}
 			}
-			
 		} else {
 			rawHandle(data);
 		}
 	}
 
 	public void rawHandle(final byte[] data) {
-
 		//load data infile  客户端会发空包 长度为4
 		if (data.length == 4 && data[0] == 0 && data[1] == 0 && data[2] == 0) {
 			// load in data空包
@@ -492,7 +480,7 @@ public abstract class FrontendConnection extends AbstractConnection {
 			return;
 		}
 		//修改quit的判断,当load data infile 分隔符为\001 时可能会出现误判断的bug.
-		if (data.length>4 && data[0] == 1 && data[1] == 0 && data[2]== 0 && data[3] == 0 &&data[4] == MySQLPacket.COM_QUIT) {
+		if (data.length > 4 && data[0] == 1 && data[1] == 0 && data[2] == 0 && data[3] == 0 && data[4] == MySQLPacket.COM_QUIT) {
 			this.getProcessor().getCommands().doQuit();
 			this.close("quit cmd");
 			return;
@@ -507,13 +495,13 @@ public abstract class FrontendConnection extends AbstractConnection {
 		flag |= Capabilities.CLIENT_LONG_FLAG;
 		flag |= Capabilities.CLIENT_CONNECT_WITH_DB;
 		// flag |= Capabilities.CLIENT_NO_SCHEMA;
-		boolean usingCompress= MycatServer.getInstance().getConfig().getSystem().getUseCompression()==1 ;
+		boolean usingCompress = MycatServer.getInstance().getConfig().getSystem().getUseCompression() == 1;
 		if (usingCompress) {
 			flag |= Capabilities.CLIENT_COMPRESS;
 		}
 		
 		flag |= Capabilities.CLIENT_ODBC;
-		 flag |= Capabilities.CLIENT_LOCAL_FILES;
+		flag |= Capabilities.CLIENT_LOCAL_FILES;
 		flag |= Capabilities.CLIENT_IGNORE_SPACE;
 		flag |= Capabilities.CLIENT_PROTOCOL_41;
 		flag |= Capabilities.CLIENT_INTERACTIVE;

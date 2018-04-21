@@ -23,6 +23,7 @@
  */
 package io.mycat.manager;
 
+
 import java.io.IOException;
 import java.nio.channels.NetworkChannel;
 
@@ -30,6 +31,7 @@ import io.mycat.MycatServer;
 import io.mycat.config.MycatPrivileges;
 import io.mycat.net.FrontendConnection;
 import io.mycat.net.factory.FrontendConnectionFactory;
+
 
 /**
  * @author mycat
@@ -44,5 +46,4 @@ public class ManagerConnectionFactory extends FrontendConnectionFactory {
         c.setQueryHandler(new ManagerQueryHandler(c));
         return c;
     }
-
 }

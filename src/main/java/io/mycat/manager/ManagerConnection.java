@@ -23,11 +23,13 @@
  */
 package io.mycat.manager;
 
+
 import java.io.IOException;
 import java.nio.channels.NetworkChannel;
 
 import io.mycat.net.FrontendConnection;
 import io.mycat.util.TimeUtil;
+
 
 /**
  * @author mycat
@@ -44,8 +46,7 @@ public class ManagerConnection extends FrontendConnection {
 		if (isAuthenticated) {
 			return super.isIdleTimeout();
 		} else {
-			return TimeUtil.currentTimeMillis() > Math.max(lastWriteTime,
-					lastReadTime) + AUTH_TIMEOUT;
+			return TimeUtil.currentTimeMillis() > Math.max(lastWriteTime, lastReadTime) + AUTH_TIMEOUT;
 		}
 	}
 
@@ -53,5 +54,4 @@ public class ManagerConnection extends FrontendConnection {
 	public void handle(final byte[] data) {
 		handler.handle(data);
 	}
-
 }
