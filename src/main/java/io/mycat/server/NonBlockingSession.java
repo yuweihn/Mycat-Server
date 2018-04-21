@@ -69,7 +69,7 @@ public class NonBlockingSession implements Session {
     private volatile String xaTXID;
 
    //huangyiming 
-  	private  volatile boolean canClose = true;
+  	private volatile boolean canClose = true;
   	
   	private volatile MiddlerResultHandler middlerResultHandler;
     private boolean prepared;
@@ -181,7 +181,7 @@ public class NonBlockingSession implements Session {
             default:
                 if(type == 1) {
                     singleNodeHandler.execute();
-                } else{
+                } else {
                     multiNodeHandler.execute();
                 }
         }
@@ -219,7 +219,7 @@ public class NonBlockingSession implements Session {
 			}
             /* 2. preAcStates 为true,事务结束后,需要设置为true。preAcStates 为ac上一个状态    */
             if(source.isPreAcStates() && !source.isAutocommit()) {
-            	source.setAutocommit(true);
+                source.setAutocommit(true);
             }
             return;
         } else if (initCount == 1) {
@@ -235,7 +235,7 @@ public class NonBlockingSession implements Session {
     }
 
     private boolean isALLGlobal() {
-        for(RouteResultsetNode routeResultsetNode:target.keySet()) {
+        for(RouteResultsetNode routeResultsetNode: target.keySet()) {
             if(routeResultsetNode.getSource() == null) {
                 return false;
             } else if(!routeResultsetNode.getSource().isGlobalTable()) {
@@ -249,7 +249,7 @@ public class NonBlockingSession implements Session {
         final int initCount = target.size();
         if (initCount <= 0) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("no session bound connections found ,no need send rollback cmd ");
+                LOGGER.debug("no session bound connections found, no need send rollback cmd ");
             }
             ByteBuffer buffer = source.allocate();
             buffer = source.writeToBuffer(OkPacket.OK, buffer);
@@ -279,7 +279,7 @@ public class NonBlockingSession implements Session {
 		// 检查路由结果是否为空
 		RouteResultsetNode[] nodes = rrs.getNodes();
 		if (nodes == null || nodes.length == 0 || nodes[0].getName() == null || nodes[0].getName().equals("")) {
-			source.writeErrMessage(ErrorCode.ER_NO_DB_ERROR, "No dataNode found ,please check tables defined in schema:" + source.getSchema());
+			source.writeErrMessage(ErrorCode.ER_NO_DB_ERROR, "No dataNode found ,please check tables defined in schema: " + source.getSchema());
 			return;
 		}
 		LockTablesHandler handler = new LockTablesHandler(this, rrs);
@@ -365,9 +365,8 @@ public class NonBlockingSession implements Session {
             if (!c.isClosedOrQuit()) {
                 if (c.isAutocommit()) {
                     c.release();
-                } else
-                //if (needRollback)
-                {
+                } else {
+                //if (needRollback) {
                     c.setResponseHandler(new RollbackReleaseHandler());
                     c.rollback();
                 }
@@ -387,14 +386,14 @@ public class NonBlockingSession implements Session {
     }
 
     public void releaseConnection(BackendConnection con) {
-        Iterator<Entry<RouteResultsetNode, BackendConnection>> itor = target .entrySet().iterator();
-        while (itor.hasNext()) {
-            BackendConnection theCon = itor.next().getValue();
+        Iterator<Entry<RouteResultsetNode, BackendConnection>> itr = target .entrySet().iterator();
+        while (itr.hasNext()) {
+            BackendConnection theCon = itr.next().getValue();
             if (theCon == con) {
-                itor.remove();
+                itr.remove();
                 con.release();
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("realse connection " + con);
+                    LOGGER.debug("release connection " + con);
                 }
                 break;
             }
@@ -500,9 +499,9 @@ public class NonBlockingSession implements Session {
     }
 
     private void clearHandlesResources() {
-        SingleNodeHandler singleHander = singleNodeHandler;
-        if (singleHander != null) {
-            singleHander.clearResources();
+        SingleNodeHandler singleHandler = singleNodeHandler;
+        if (singleHandler != null) {
+            singleHandler.clearResources();
             singleNodeHandler = null;
         }
         MultiNodeQueryHandler multiHandler = multiNodeHandler;

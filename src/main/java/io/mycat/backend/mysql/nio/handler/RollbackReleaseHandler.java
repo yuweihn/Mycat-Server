@@ -27,7 +27,6 @@ package io.mycat.backend.mysql.nio.handler;
 import io.mycat.backend.BackendConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.util.List;
 
 
@@ -57,7 +56,7 @@ public class RollbackReleaseHandler implements ResponseHandler {
 
 	@Override
 	public void okResponse(byte[] ok, BackendConnection conn) {
-		logger.debug("autocomit is false, but no commit or rollback, so mycat rollbacked backend conn " + conn);
+		logger.debug("autocomit is false, but no commit or rollback, so mycat rollback backend conn " + conn);
 		conn.release();
 	}
 

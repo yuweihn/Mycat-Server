@@ -23,14 +23,15 @@
  */
 package io.mycat.server;
 
+
 import io.mycat.net.FrontendConnection;
 import io.mycat.route.RouteResultset;
+
 
 /**
  * @author mycat
  */
 public interface Session {
-
     /**
      * 取得源端连接
      */
@@ -68,6 +69,4 @@ public interface Session {
      * 终止会话，必须在关闭源端连接后执行该方法。
      */
     void terminate();
-    
-
 }
