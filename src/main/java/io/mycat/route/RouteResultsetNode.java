@@ -63,7 +63,12 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 	private int slot = -2;
 	private Map hintMap;
 
-	
+
+	/**
+	 * @param name------------------data node
+	 * @param sqlType---------------sql type, {@link ServerParse}
+	 * @param srcStatement----------sql
+	 */
 	public RouteResultsetNode(String name, int sqlType, String srcStatement) {
 		this.name = name;
 		this.limitStart = 0;
