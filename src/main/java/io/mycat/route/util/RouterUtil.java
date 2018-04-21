@@ -125,7 +125,7 @@ public class RouterUtil {
 		int count = 0;
 		boolean skipChar = false;
 		for (int i = 0; i < end; i++) {
-			if(sql.charAt(i)=='\'' && !skipChar) {
+			if(sql.charAt(i) == '\'' && !skipChar) {
 				count++;
 				skipChar = false;
 			} else if(sql.charAt(i) == '\\') {
