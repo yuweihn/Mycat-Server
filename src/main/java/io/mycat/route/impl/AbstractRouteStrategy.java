@@ -105,12 +105,10 @@ public abstract class AbstractRouteStrategy implements RouteStrategy {
 	/**
 	 * 路由信息指令, 如 SHOW、SELECT@@、DESCRIBE
 	 */
-	public abstract RouteResultset routeSystemInfo(SchemaConfig schema, int sqlType, String stmt
-			, RouteResultset rrs) throws SQLSyntaxErrorException;
+	public abstract RouteResultset routeSystemInfo(SchemaConfig schema, int sqlType, String stmt , RouteResultset rrs) throws SQLSyntaxErrorException;
 
 	/**
 	 * 解析 Show 之类的语句
 	 */
-	public abstract RouteResultset analyseShowSQL(SchemaConfig schema, RouteResultset rrs
-			, String stmt) throws SQLNonTransientException;
+	public abstract RouteResultset analyseShowSQL(SchemaConfig schema, RouteResultset rrs , String stmt) throws SQLNonTransientException;
 }
