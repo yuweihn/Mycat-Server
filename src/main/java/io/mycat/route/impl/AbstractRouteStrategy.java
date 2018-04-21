@@ -78,7 +78,7 @@ public abstract class AbstractRouteStrategy implements RouteStrategy {
 		} else {
 			RouteResultset returnedSet = routeSystemInfo(schema, sqlType, stmt, rrs);
 			if (returnedSet == null) {
-				rrs = routeNormalSqlWithAST(schema, stmt, rrs, charset, cachePool,sqlType,sc);
+				rrs = routeNormalSqlWithAST(schema, stmt, rrs, charset, cachePool, sqlType, sc);
 			}
 		}
 
@@ -89,8 +89,7 @@ public abstract class AbstractRouteStrategy implements RouteStrategy {
 	 * 路由之前必要的处理
 	 * 主要是全局序列号插入，还有子表插入
 	 */
-	private boolean beforeRouteProcess(SchemaConfig schema, int sqlType, String origSQL
-			, ServerConnection sc) throws SQLNonTransientException {
+	private boolean beforeRouteProcess(SchemaConfig schema, int sqlType, String origSQL, ServerConnection sc) throws SQLNonTransientException {
 		return RouterUtil.processWithMycatSeq(schema, sqlType, origSQL, sc)
 				|| (sqlType == ServerParse.INSERT && RouterUtil.processERChildTable(schema, origSQL, sc))
 				|| (sqlType == ServerParse.INSERT && RouterUtil.processInsert(schema, sqlType, origSQL, sc));
