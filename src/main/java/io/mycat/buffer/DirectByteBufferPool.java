@@ -1,5 +1,6 @@
 package io.mycat.buffer;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.nio.ch.DirectBuffer;
@@ -7,6 +8,7 @@ import sun.nio.ch.DirectBuffer;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+
 
 /**
  * DirectByteBuffer池，可以分配任意指定大小的DirectByteBuffer，用完需要归还
@@ -22,7 +24,7 @@ public class DirectByteBufferPool implements BufferPool{
    // private int prevAllocatedPage = 0;
     //private AtomicInteger prevAllocatedPage;
     private AtomicLong prevAllocatedPage;
-    private final  int pageSize;
+    private final int pageSize;
     private final short pageCount;
     private final int conReadBuferChunk ;
       
@@ -31,7 +33,7 @@ public class DirectByteBufferPool implements BufferPool{
      */
     private final ConcurrentHashMap<Long, Long> memoryUsage;
 
-    public DirectByteBufferPool(int pageSize, short chunkSize, short pageCount,int conReadBuferChunk) {
+    public DirectByteBufferPool(int pageSize, short chunkSize, short pageCount, int conReadBuferChunk) {
         allPages = new ByteBufferPage[pageCount];
         this.chunkSize = chunkSize;
         this.pageSize = pageSize;
@@ -53,11 +55,11 @@ public class DirectByteBufferPool implements BufferPool{
      * @param buffer
      * @return
      */
-    public  ByteBuffer expandBuffer(ByteBuffer buffer){
+    public ByteBuffer expandBuffer(ByteBuffer buffer) {
         int oldCapacity = buffer.capacity();
         int newCapacity = oldCapacity << 1;
         ByteBuffer newBuffer = allocate(newCapacity);
-        if(newBuffer != null){
+        if(newBuffer != null) {
             int newPosition = buffer.position();
             buffer.flip();
             newBuffer.put(buffer);
@@ -141,7 +143,7 @@ public class DirectByteBufferPool implements BufferPool{
     }
 	
 	 @Override
-    public ConcurrentHashMap<Long,Long> getNetDirectMemoryUsage() {
+    public ConcurrentHashMap<Long, Long> getNetDirectMemoryUsage() {
         return memoryUsage;
     }
 
@@ -154,19 +156,17 @@ public class DirectByteBufferPool implements BufferPool{
     }
 
     public long capacity() {
-	return (long) pageSize * pageCount;
+	    return (long) pageSize * pageCount;
     }
 
-    public long size(){
-        return  (long) pageSize * chunkSize * pageCount;
+    public long size() {
+        return (long) pageSize * chunkSize * pageCount;
     }
 
     //TODO
-    public  int getSharedOptsCount(){
+    public int getSharedOptsCount() {
         return 0;
     }
-
-    
 
     public ByteBufferPage[] getAllPages() {
 		return allPages;
@@ -175,5 +175,4 @@ public class DirectByteBufferPool implements BufferPool{
 	public int getConReadBuferChunk() {
         return conReadBuferChunk;
     }
-
 }
