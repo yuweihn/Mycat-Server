@@ -278,14 +278,14 @@ public abstract class AbstractConnection implements NIOConnection {
 		this.socketWR.asynRead();
 	}
 
-	public void doNextWriteCheck() throws IOException {
+	public void doNextWriteCheck() {
 		this.socketWR.doNextWriteCheck();
 	}
 
 	/**
 	 * 读取可能的Socket字节流
 	 */
-	public void onReadData(int got) throws IOException {
+	public void onReadData(int got) {
 		if (isClosed.get()) {
 			return;
 		}
@@ -309,7 +309,7 @@ public abstract class AbstractConnection implements NIOConnection {
 				if (offset != 0) {
 					this.readBuffer = compactReadBuffer(readBuffer, offset);
 				} else if (readBuffer != null && !readBuffer.hasRemaining()) {
-					throw new RuntimeException( "invalid readbuffer capacity ,too little buffer size " + readBuffer.capacity());
+					throw new RuntimeException( "invalid read buffer capacity, too little buffer size " + readBuffer.capacity());
 				}
 				break;
 			}
@@ -336,7 +336,7 @@ public abstract class AbstractConnection implements NIOConnection {
 					// then change to direct buffer for performance
 					if (readBuffer != null && !readBuffer.isDirect() && lastLargeMessageTime < lastReadTime - 30 * 1000L) {  // used temp heap
 						if (LOGGER.isDebugEnabled()) {
-							LOGGER.debug("change to direct con read buffer ,cur temp buf size :" + readBuffer.capacity());
+							LOGGER.debug("change to direct con read buffer, cur temp buf size :" + readBuffer.capacity());
 						}
 						recycle(readBuffer);
 						readBuffer = processor.getBufferPool().allocate(processor.getBufferPool().getConReadBuferChunk());
@@ -357,8 +357,8 @@ public abstract class AbstractConnection implements NIOConnection {
 					continue;
 				}
 			} else {				
-				// not read whole message package ,so check if buffer enough and
-				// compact readbuffer
+				// not read whole message package, so check if buffer enough and
+				// compact read buffer
 				if (!readBuffer.hasRemaining()) {
 					readBuffer = ensureFreeSpaceOfReadBuffer(readBuffer, offset, length);
 				}
@@ -387,10 +387,10 @@ public abstract class AbstractConnection implements NIOConnection {
 			return newBuffer;
 		} else {
 			if (offset != 0) {
-				// compact bytebuffer only
+				// compact byte buffer only
 				return compactReadBuffer(buffer, offset);
 			} else {
-				throw new RuntimeException(" not enough space");
+				throw new RuntimeException("not enough space");
 			}
 		}
 	}
@@ -430,7 +430,7 @@ public abstract class AbstractConnection implements NIOConnection {
 			writeQueue.offer(buffer);
 		}
 
-		// if ansyn write finishe event got lock before me ,then writing
+		// if async write finish event got lock before me ,then writing
 		// flag is set false but not start a write request
 		// so we check again
 		try {
@@ -495,9 +495,9 @@ public abstract class AbstractConnection implements NIOConnection {
 			if (Strings.isNullOrEmpty(reason)) {
 				return;
 			}
-			LOGGER.info("close connection,reason:" + reason + " ," + this);
-			if (reason.contains("connection,reason:java.net.ConnectException")) {
-				throw new RuntimeException(" errr");
+			LOGGER.info("close connection, reason:" + reason + " ," + this);
+			if (reason.contains("connection, reason: java.net.ConnectException")) {
+				throw new RuntimeException("error");
 			}
 		} else {
 		    // make sure cleanup again
@@ -589,7 +589,7 @@ public abstract class AbstractConnection implements NIOConnection {
 			
 			boolean closed = isSocketClosed && (!channel.isOpen());
 			if (closed == false) {
-				LOGGER.warn("close socket of connnection failed " + this);
+				LOGGER.warn("close socket of connection failed " + this);
 			}
 		}
 	}
