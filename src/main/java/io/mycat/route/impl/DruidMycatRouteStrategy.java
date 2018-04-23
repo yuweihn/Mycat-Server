@@ -64,7 +64,7 @@ public class DruidMycatRouteStrategy extends AbstractRouteStrategy {
 		if (schema.isNeedSupportMultiDBType()) {
 			parser = new MycatStatementParser(stmt);
 		} else {
-			parser = new MySqlStatementParser(stmt); 
+			parser = new MySqlStatementParser(stmt);
 		}
 
 		MycatSchemaStatVisitor visitor = null;
