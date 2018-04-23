@@ -1,7 +1,9 @@
 package io.mycat.util;
 
+
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
+
 
 public class NameableThreadFactory implements ThreadFactory {
 	private final ThreadGroup group;
@@ -11,8 +13,7 @@ public class NameableThreadFactory implements ThreadFactory {
 
 	public NameableThreadFactory(String name, boolean isDaemon) {
 		SecurityManager s = System.getSecurityManager();
-		this.group = (s != null) ? s.getThreadGroup() : Thread.currentThread()
-				.getThreadGroup();
+		this.group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
 		this.namePrefix = name;
 		this.threadId = new AtomicInteger(0);
 		this.isDaemon = isDaemon;
