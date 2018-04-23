@@ -31,7 +31,7 @@ import java.nio.ByteBuffer;
 /**
  * @author mycat
  */
-public interface NIOConnection extends ClosableConnection{
+public interface NIOConnection extends ClosableConnection {
 
     /**
      * connected 
