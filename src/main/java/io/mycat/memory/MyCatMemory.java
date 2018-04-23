@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 public class MyCatMemory {
 	private static Logger LOGGER = Logger.getLogger(MyCatMemory.class);
 
-	public final  static double DIRECT_SAFETY_FRACTION  = 0.7;
+	public final  static double DIRECT_SAFETY_FRACTION = 0.7;
 	private final long systemReserveBufferSize;
 
 	private final long memoryPageSize;
@@ -46,7 +46,7 @@ public class MyCatMemory {
 	private final SystemConfig system;
 
 
-	public MyCatMemory(SystemConfig system,long totalNetWorkBufferSize) {
+	public MyCatMemory(SystemConfig system, long totalNetWorkBufferSize) {
 		this.system = system;
 
 		LOGGER.info("useOffHeapForMerge = " + system.getUseOffHeapForMerge());
@@ -68,7 +68,7 @@ public class MyCatMemory {
 		/**
 		 * 目前merge，order by ，limit 没有使用On Heap内存
 		 */
-		long maxOnHeapMemory = (Platform.getMaxHeapMemory() - systemReserveBufferSize);
+		long maxOnHeapMemory = Platform.getMaxHeapMemory() - systemReserveBufferSize;
 
 		assert maxOnHeapMemory > 0;
 
