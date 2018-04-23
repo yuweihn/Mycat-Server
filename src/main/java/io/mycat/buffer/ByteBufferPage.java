@@ -1,15 +1,16 @@
 package io.mycat.buffer;
 
+
 import java.nio.ByteBuffer;
 import java.util.BitSet;
 import java.util.concurrent.atomic.AtomicBoolean;
+
 
 /*
  * 用来保存一个一个ByteBuffer为底层存储的内存页
  */
 @SuppressWarnings("restriction")
 public class ByteBufferPage {
-
     private final ByteBuffer buf;
     private final int chunkSize;
     private final int chunkCount;
@@ -82,14 +83,12 @@ public class ByteBufferPage {
     }
 
     public boolean recycleBuffer(ByteBuffer parent, int startChunk, int chunkCount) {
-
         if (parent == this.buf) {
-
             while (!this.allocLockStatus.compareAndSet(false, true)) {
                 Thread.yield();
             }
             try {
-                markChunksUnused(startChunk,chunkCount);
+                markChunksUnused(startChunk, chunkCount);
             } finally {
                 allocLockStatus.set(false);
             }
