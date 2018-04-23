@@ -23,11 +23,11 @@
  */
 package io.mycat.net;
 
+
+
 /**
  * @author mycat
  */
 public interface NIOHandler {
-
     void handle(byte[] data);
-
 }
