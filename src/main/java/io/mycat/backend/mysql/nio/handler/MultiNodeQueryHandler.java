@@ -85,8 +85,8 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 	/**
 	 * Limit N，M
 	 */
-	private   int limitStart;
-	private   int limitSize;
+	private int limitStart;
+	private int limitSize;
 
 	private int index = 0;
 
@@ -175,7 +175,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 		MycatConfig conf = MycatServer.getInstance().getConfig();
 		startTime = System.currentTimeMillis();
 		LOGGER.debug("rrs.getRunOnSlave()-" + rrs.getRunOnSlave());
-		for (final RouteResultsetNode node : rrs.getNodes()) {
+		for (final RouteResultsetNode node: rrs.getNodes()) {
 			BackendConnection conn = session.getTarget(node);
 			if (session.tryExistsCon(conn, node)) {
 				LOGGER.debug("node.getRunOnSlave()-" + node.getRunOnSlave());
@@ -304,9 +304,8 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 			execCount++;
 			if (execCount == rrs.getNodes().length) {
 				source.setExecuteSql(null);  //完善show @@connection.sql 监控命令.已经执行完的sql 不再显示
-				QueryResult queryResult = new QueryResult(session.getSource().getUser(), rrs.getSqlType()
-						, rrs.getStatement(), selectRows, netInBytes, netOutBytes, startTime
-						, System.currentTimeMillis(),0);
+				QueryResult queryResult = new QueryResult(session.getSource().getUser(), rrs.getSqlType(), rrs.getStatement()
+						, selectRows, netInBytes, netOutBytes, startTime, System.currentTimeMillis(),0);
 				QueryResultDispatcher.dispatchQuery(queryResult);
 			}
 		}
@@ -393,13 +392,11 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 			//TODO: add by zhuam
 			//查询结果派发
 			QueryResult queryResult = new QueryResult(session.getSource().getUser(), rrs.getSqlType(), rrs.getStatement()
-					, selectRows, netInBytes, netOutBytes, startTime
-					, System.currentTimeMillis(),resultSize);
+					, selectRows, netInBytes, netOutBytes, startTime, System.currentTimeMillis(), resultSize);
 			QueryResultDispatcher.dispatchQuery(queryResult);
-			
- 			
+
 			//	add huangyiming  如果是中间过程,必须等数据合并好了再进行下一步语句的拼装 
- 			if(middlerResultHandler != null){
+ 			if(middlerResultHandler != null) {
  				while (!this.isMiddleResultDone.compareAndSet(false, true)) {
  	                Thread.yield();
 				}
@@ -608,7 +605,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 			if (needMerg) {
 				Map<String, Integer> mergeColsMap = dataMergeSvr.getRrs().getMergeCols();
 				if (mergeColsMap != null) {
-					for (Map.Entry<String, Integer> entry : mergeColsMap.entrySet()) {
+					for (Map.Entry<String, Integer> entry: mergeColsMap.entrySet()) {
 						String key = entry.getKey();
 						int mergeType = entry.getValue();
 						if (MergeCol.MERGE_AVG == mergeType && mergeColsMap.containsKey(key + "SUM")) {
@@ -679,12 +676,13 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 					fieldPackets.add(fieldPkg);
 					fieldCount = fields.size();
 					if (primaryKey != null && primaryKeyIndex == -1) {
-					// find primary key index
-					String fieldName = new String(fieldPkg.name);
-					if (primaryKey.equalsIgnoreCase(fieldName)) {
-						primaryKeyIndex = i;
+						// find primary key index
+						String fieldName = new String(fieldPkg.name);
+						if (primaryKey.equalsIgnoreCase(fieldName)) {
+							primaryKeyIndex = i;
+						}
 					}
-				}   }
+				}
 				if (!shouldSkip) {
 					field[3] = ++packetId;
 					buffer = source.writeToBuffer(field, buffer);
@@ -696,7 +694,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 			if(null == middlerResultHandler ){
 				//session.getSource().write(row);
 				source.write(buffer);
-		     }
+		 	}
 			
  			if (dataMergeSvr != null) {
 				dataMergeSvr.onRowMetaData(columToIndx, fieldCount);
@@ -745,7 +743,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 
 				MiddlerResultHandler middlerResultHandler = session.getMiddlerResultHandler();
 				if(null != middlerResultHandler ){
-					if(middlerResultHandler instanceof MiddlerQueryResultHandler){
+					if(middlerResultHandler instanceof MiddlerQueryResultHandler) {
 						byte[] rv = ResultSetUtil.getColumnVal(row, fields, 0);
 						String rowValue = rv == null ? "" : new String(rv);
 						middlerResultHandler.add(rowValue);
@@ -777,7 +775,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
  						session.getSource().write(row);
 					} else {
 						if(middlerResultHandler instanceof MiddlerQueryResultHandler) {
-							String rowValue =  ResultSetUtil.getColumnValAsString(row, fields, 0);
+							String rowValue = ResultSetUtil.getColumnValAsString(row, fields, 0);
 							middlerResultHandler.add(rowValue);
 						}
 					}
