@@ -23,6 +23,11 @@
  */
 package io.mycat.net;
 
+
+import io.mycat.util.SelectorUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
@@ -31,8 +36,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import io.mycat.util.SelectorUtil;
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 /**
  * 网络事件反应器
@@ -95,14 +98,11 @@ public final class NIOReactor {
 					long end = System.nanoTime();
 					register(tSelector);
 					keys = tSelector.selectedKeys();
-					if (keys.size() == 0 && (end - start) < SelectorUtil.MIN_SELECT_TIME_IN_NANO_SECONDS )
-					{
+					if (keys.size() == 0 && (end - start) < SelectorUtil.MIN_SELECT_TIME_IN_NANO_SECONDS) {
 						invalidSelectCount++;
-					}
-					else
-					{
+					} else {
 						invalidSelectCount = 0;
-						for (SelectionKey key : keys) {
+						for (SelectionKey key: keys) {
 							AbstractConnection con = null;
 							try {
 								Object att = key.attachment();
@@ -145,11 +145,9 @@ public final class NIOReactor {
 							}
 						}
 					}
-					if (invalidSelectCount > SelectorUtil.REBUILD_COUNT_THRESHOLD)
-					{
+					if (invalidSelectCount > SelectorUtil.REBUILD_COUNT_THRESHOLD) {
 						final Selector rebuildSelector = SelectorUtil.rebuildSelector(this.selector);
-						if (rebuildSelector != null)
-						{
+						if (rebuildSelector != null) {
 							this.selector = rebuildSelector;
 						}
 						invalidSelectCount = 0;
@@ -165,7 +163,6 @@ public final class NIOReactor {
 					if (keys != null) {
 						keys.clear();
 					}
-
 				}
 			}
 		}
@@ -184,7 +181,5 @@ public final class NIOReactor {
 				}
 			}
 		}
-
 	}
-
 }

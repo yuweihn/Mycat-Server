@@ -1,6 +1,8 @@
 package io.mycat.net;
 
+
 import java.io.IOException;
+
 
 public class NIOReactorPool {
 	private final NIOReactor[] reactors;
@@ -23,7 +25,7 @@ public class NIOReactorPool {
 
         int i = ++nextReactor;
         if (i >= reactors.length) {
-            i=nextReactor = 0;
+            i = nextReactor = 0;
         }
         return reactors[i];
 	}
