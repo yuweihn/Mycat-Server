@@ -23,6 +23,7 @@
  */
 package io.mycat.net;
 
+
 import io.mycat.MycatServer;
 import io.mycat.net.factory.FrontendConnectionFactory;
 import io.mycat.util.SelectorUtil;
@@ -39,10 +40,11 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Set;
 
+
 /**
  * @author mycat
  */
-public final class NIOAcceptor extends Thread implements SocketAcceptor{
+public final class NIOAcceptor extends Thread implements SocketAcceptor {
 	private static final Logger LOGGER = LoggerFactory.getLogger(NIOAcceptor.class);
 	private static final AcceptIdGenerator ID_GENERATOR = new AcceptIdGenerator();
 
@@ -53,9 +55,8 @@ public final class NIOAcceptor extends Thread implements SocketAcceptor{
 	private long acceptCount;
 	private final NIOReactorPool reactorPool;
 
-	public NIOAcceptor(String name, String bindIp,int port, 
-			FrontendConnectionFactory factory, NIOReactorPool reactorPool)
-			throws IOException {
+	public NIOAcceptor(String name, String bindIp, int port, FrontendConnectionFactory factory
+			, NIOReactorPool reactorPool) throws IOException {
 		super.setName(name);
 		this.port = port;
 		this.selector = Selector.open();
@@ -90,14 +91,11 @@ public final class NIOAcceptor extends Thread implements SocketAcceptor{
 			    tSelector.select(1000L);
 				long end = System.nanoTime();
 				Set<SelectionKey> keys = tSelector.selectedKeys();
-				if (keys.size() == 0 && (end - start) < SelectorUtil.MIN_SELECT_TIME_IN_NANO_SECONDS )
-				{
+				if (keys.size() == 0 && (end - start) < SelectorUtil.MIN_SELECT_TIME_IN_NANO_SECONDS) {
 					invalidSelectCount++;
-				}
-				else
-                {
+				} else {
 					try {
-						for (SelectionKey key : keys) {
+						for (SelectionKey key: keys) {
 							if (key.isValid() && key.isAcceptable()) {
 								accept();
 							} else {
@@ -109,11 +107,9 @@ public final class NIOAcceptor extends Thread implements SocketAcceptor{
 						invalidSelectCount = 0;
 					}
 				}
-				if (invalidSelectCount > SelectorUtil.REBUILD_COUNT_THRESHOLD)
-				{
+				if (invalidSelectCount > SelectorUtil.REBUILD_COUNT_THRESHOLD) {
 					final Selector rebuildSelector = SelectorUtil.rebuildSelector(this.selector);
-					if (rebuildSelector != null)
-					{
+					if (rebuildSelector != null) {
 						this.selector = rebuildSelector;
 					}
 					invalidSelectCount = 0;
@@ -168,7 +164,6 @@ public final class NIOAcceptor extends Thread implements SocketAcceptor{
 	 * @author mycat
 	 */
 	private static class AcceptIdGenerator {
-
 		private static final long MAX_VALUE = 0xffffffffL;
 
 		private long acceptId = 0L;
@@ -183,5 +178,4 @@ public final class NIOAcceptor extends Thread implements SocketAcceptor{
 			}
 		}
 	}
-
 }
