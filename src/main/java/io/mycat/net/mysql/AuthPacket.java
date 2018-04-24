@@ -23,6 +23,7 @@
  */
 package io.mycat.net.mysql;
 
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -32,6 +33,7 @@ import io.mycat.backend.mysql.MySQLMessage;
 import io.mycat.backend.mysql.StreamUtil;
 import io.mycat.config.Capabilities;
 import io.mycat.net.BackendAIOConnection;
+
 
 /**
  * From client to server during initial handshake.
@@ -120,26 +122,26 @@ public class AuthPacket extends MySQLPacket {
         buffer.put((byte) charsetIndex);
         buffer = c.writeToBuffer(FILLER, buffer);
         if (user == null) {
-            buffer = c.checkWriteBuffer(buffer, 1,true);
+            buffer = c.checkWriteBuffer(buffer, 1, true);
             buffer.put((byte) 0);
         } else {
             byte[] userData = user.getBytes();
-            buffer = c.checkWriteBuffer(buffer, userData.length + 1,true);
+            buffer = c.checkWriteBuffer(buffer, userData.length + 1, true);
             BufferUtil.writeWithNull(buffer, userData);
         }
         if (password == null) {
-            buffer = c.checkWriteBuffer(buffer, 1,true);
+            buffer = c.checkWriteBuffer(buffer, 1, true);
             buffer.put((byte) 0);
         } else {
-            buffer = c.checkWriteBuffer(buffer, BufferUtil.getLength(password),true);
+            buffer = c.checkWriteBuffer(buffer, BufferUtil.getLength(password), true);
             BufferUtil.writeWithLength(buffer, password);
         }
         if (database == null) {
-            buffer = c.checkWriteBuffer(buffer, 1,true);
+            buffer = c.checkWriteBuffer(buffer, 1, true);
             buffer.put((byte) 0);
         } else {
             byte[] databaseData = database.getBytes();
-            buffer = c.checkWriteBuffer(buffer, databaseData.length + 1,true);
+            buffer = c.checkWriteBuffer(buffer, databaseData.length + 1, true);
             BufferUtil.writeWithNull(buffer, databaseData);
         }
         c.write(buffer);
@@ -158,5 +160,4 @@ public class AuthPacket extends MySQLPacket {
     protected String getPacketInfo() {
         return "MySQL Authentication Packet";
     }
-
 }

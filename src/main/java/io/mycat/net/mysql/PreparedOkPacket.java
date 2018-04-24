@@ -23,10 +23,12 @@
  */
 package io.mycat.net.mysql;
 
+
 import java.nio.ByteBuffer;
 
 import io.mycat.backend.mysql.BufferUtil;
 import io.mycat.net.FrontendConnection;
+
 
 /**
  * <pre>
@@ -57,7 +59,6 @@ import io.mycat.net.FrontendConnection;
  * @author mycat
  */
 public class PreparedOkPacket extends MySQLPacket {
-
     public byte flag;
     public long statementId;
     public int columnsNumber;
@@ -71,9 +72,9 @@ public class PreparedOkPacket extends MySQLPacket {
     }
 
     @Override
-    public ByteBuffer write(ByteBuffer buffer, FrontendConnection c,boolean writeSocketIfFull) {
+    public ByteBuffer write(ByteBuffer buffer, FrontendConnection c, boolean writeSocketIfFull) {
         int size = calcPacketSize();
-        buffer = c.checkWriteBuffer(buffer, c.getPacketHeaderSize() + size,writeSocketIfFull);
+        buffer = c.checkWriteBuffer(buffer, c.getPacketHeaderSize() + size, writeSocketIfFull);
         BufferUtil.writeUB3(buffer, size);
         buffer.put(packetId);
         buffer.put(flag);
@@ -94,5 +95,4 @@ public class PreparedOkPacket extends MySQLPacket {
     protected String getPacketInfo() {
         return "MySQL PreparedOk Packet";
     }
-
 }

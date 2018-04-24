@@ -1,6 +1,8 @@
 package io.mycat.net.mysql;
 
+
 import io.mycat.backend.mysql.MySQLMessage;
+
 
 /**
  * <pre>
@@ -25,7 +27,6 @@ import io.mycat.backend.mysql.MySQLMessage;
  *
  */
 public class ResetPacket extends MySQLPacket {
-
 	private static final byte PACKET_FALG = (byte) 26;
 	private long pstmtId;
 	
@@ -51,5 +52,4 @@ public class ResetPacket extends MySQLPacket {
 	public long getPstmtId() {
 		return pstmtId;
 	}
-
 }

@@ -23,12 +23,14 @@
  */
 package io.mycat.net.mysql;
 
+
 import java.nio.ByteBuffer;
 
 import io.mycat.backend.mysql.BufferUtil;
 import io.mycat.backend.mysql.MySQLMessage;
 import io.mycat.buffer.BufferArray;
 import io.mycat.net.FrontendConnection;
+
 
 /**
  * From Server To Client, part of Result Set Packets. One for each column in the
@@ -95,11 +97,9 @@ public class FieldPacket extends MySQLPacket {
 	}
 
 	@Override
-	public ByteBuffer write(ByteBuffer buffer, FrontendConnection c,
-			boolean writeSocketIfFull) {
+	public ByteBuffer write(ByteBuffer buffer, FrontendConnection c, boolean writeSocketIfFull) {
 		int size = calcPacketSize();
-		buffer = c.checkWriteBuffer(buffer, c.getPacketHeaderSize() + size,
-				writeSocketIfFull);
+		buffer = c.checkWriteBuffer(buffer, c.getPacketHeaderSize() + size, writeSocketIfFull);
 		BufferUtil.writeUB3(buffer, size);
 		buffer.put(packetId);
 		writeBody(buffer);
@@ -167,12 +167,11 @@ public class FieldPacket extends MySQLPacket {
 		}
 	}
 
-	public  void write(BufferArray bufferArray) {
+	public void write(BufferArray bufferArray) {
 		int size = calcPacketSize();
 		ByteBuffer buffer = bufferArray.checkWriteBuffer(packetHeaderSize + size);
 		BufferUtil.writeUB3(buffer, size);
 		buffer.put(packetId);
 		writeBody(buffer);
 	}
-
 }

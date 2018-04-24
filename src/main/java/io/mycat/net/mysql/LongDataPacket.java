@@ -1,6 +1,8 @@
 package io.mycat.net.mysql;
 
+
 import io.mycat.backend.mysql.MySQLMessage;
+
 
 /**
  * 
@@ -29,7 +31,6 @@ import io.mycat.backend.mysql.MySQLMessage;
  *
  */
 public class LongDataPacket extends MySQLPacket {
-
 	private static final byte PACKET_FALG = (byte) 24;
 	private long pstmtId;
 	private long paramId;
@@ -67,6 +68,4 @@ public class LongDataPacket extends MySQLPacket {
 	public byte[] getLongData() {
 		return longData;
 	}
-
-	
 }

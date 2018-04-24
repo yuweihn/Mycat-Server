@@ -23,12 +23,13 @@
  */
 package io.mycat.net.mysql;
 
-import java.io.ByteArrayOutputStream;
+
 import java.nio.ByteBuffer;
 
 import io.mycat.backend.mysql.BufferUtil;
 import io.mycat.backend.mysql.MySQLMessage;
 import io.mycat.net.FrontendConnection;
+
 
 /**
  * From server to client in response to command, if error.
@@ -94,7 +95,7 @@ public class ErrorPacket extends MySQLPacket {
 		return data;
 	}
 	public byte[] writeToBytes() {
-		ByteBuffer buffer = ByteBuffer.allocate(calcPacketSize()+4);
+		ByteBuffer buffer = ByteBuffer.allocate(calcPacketSize() + 4);
 		int size = calcPacketSize();
 		BufferUtil.writeUB3(buffer, size);
 		buffer.put(packetId);
@@ -112,11 +113,9 @@ public class ErrorPacket extends MySQLPacket {
 		return data;
 	}
 	@Override
-	public ByteBuffer write(ByteBuffer buffer, FrontendConnection c,
-			boolean writeSocketIfFull) {
+	public ByteBuffer write(ByteBuffer buffer, FrontendConnection c, boolean writeSocketIfFull) {
 		int size = calcPacketSize();
-		buffer = c.checkWriteBuffer(buffer, c.getPacketHeaderSize() + size,
-				writeSocketIfFull);
+		buffer = c.checkWriteBuffer(buffer, c.getPacketHeaderSize() + size, writeSocketIfFull);
 		BufferUtil.writeUB3(buffer, size);
 		buffer.put(packetId);
 		buffer.put(fieldCount);
@@ -128,8 +127,6 @@ public class ErrorPacket extends MySQLPacket {
 		}
 		return buffer;
 	}
-
-
 
 	public void write(FrontendConnection c) {
 		ByteBuffer buffer = c.allocate();
@@ -150,5 +147,4 @@ public class ErrorPacket extends MySQLPacket {
 	protected String getPacketInfo() {
 		return "MySQL Error Packet";
 	}
-
 }

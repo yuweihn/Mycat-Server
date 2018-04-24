@@ -23,11 +23,13 @@
  */
 package io.mycat.net.mysql;
 
-import java.nio.ByteBuffer;
 
 import io.mycat.backend.mysql.BufferUtil;
 import io.mycat.backend.mysql.MySQLMessage;
 import io.mycat.net.BackendAIOConnection;
+
+import java.nio.ByteBuffer;
+
 
 /**
  * From client to server when the client do heartbeat between mycat cluster.
@@ -41,7 +43,6 @@ import io.mycat.net.BackendAIOConnection;
  * @author mycat
  */
 public class HeartbeatPacket extends MySQLPacket {
-
     public byte command;
     public long id;
 
@@ -72,5 +73,4 @@ public class HeartbeatPacket extends MySQLPacket {
     protected String getPacketInfo() {
         return "Mycat Heartbeat Packet";
     }
-
 }

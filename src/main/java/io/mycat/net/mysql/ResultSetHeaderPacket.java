@@ -23,12 +23,14 @@
  */
 package io.mycat.net.mysql;
 
+
 import java.nio.ByteBuffer;
 
 import io.mycat.backend.mysql.BufferUtil;
 import io.mycat.backend.mysql.MySQLMessage;
 import io.mycat.buffer.BufferArray;
 import io.mycat.net.FrontendConnection;
+
 
 /**
  * From server to client after command, if no error and result set -- that is,
@@ -54,7 +56,6 @@ import io.mycat.net.FrontendConnection;
  * @author mycat
  */
 public class ResultSetHeaderPacket extends MySQLPacket {
-
     public int fieldCount;
     public long extra;
 
@@ -69,9 +70,9 @@ public class ResultSetHeaderPacket extends MySQLPacket {
     }
 
     @Override
-    public ByteBuffer write(ByteBuffer buffer, FrontendConnection c,boolean writeSocketIfFull) {
+    public ByteBuffer write(ByteBuffer buffer, FrontendConnection c, boolean writeSocketIfFull) {
         int size = calcPacketSize();
-        buffer = c.checkWriteBuffer(buffer, c.getPacketHeaderSize() + size,writeSocketIfFull);
+        buffer = c.checkWriteBuffer(buffer, c.getPacketHeaderSize() + size, writeSocketIfFull);
         BufferUtil.writeUB3(buffer, size);
         buffer.put(packetId);
         BufferUtil.writeLength(buffer, fieldCount);
@@ -83,8 +84,7 @@ public class ResultSetHeaderPacket extends MySQLPacket {
     
     public void write(BufferArray bufferArray) {
 		int size = calcPacketSize();
-		ByteBuffer buffer = bufferArray
-				.checkWriteBuffer(packetHeaderSize + size);
+		ByteBuffer buffer = bufferArray.checkWriteBuffer(packetHeaderSize + size);
 		BufferUtil.writeUB3(buffer, size);
 		buffer.put(packetId);
 		BufferUtil.writeLength(buffer, fieldCount);
@@ -106,7 +106,4 @@ public class ResultSetHeaderPacket extends MySQLPacket {
     protected String getPacketInfo() {
         return "MySQL ResultSetHeader Packet";
     }
-
-	
-
 }

@@ -23,6 +23,7 @@
  */
 package io.mycat.net.mysql;
 
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -31,6 +32,7 @@ import io.mycat.backend.mysql.BufferUtil;
 import io.mycat.backend.mysql.MySQLMessage;
 import io.mycat.backend.mysql.StreamUtil;
 import io.mycat.net.BackendAIOConnection;
+
 
 /**
  * From client to server whenever the client wants the server to do something.
@@ -90,7 +92,6 @@ import io.mycat.net.BackendAIOConnection;
  * @author mycat
  */
 public class CommandPacket extends MySQLPacket {
-
     public byte command;
     public byte[] arg;
 
@@ -102,8 +103,6 @@ public class CommandPacket extends MySQLPacket {
         arg = mm.readBytes();
     }
 
-
-
     public void write(OutputStream out) throws IOException {
         StreamUtil.writeUB3(out, calcPacketSize());
         StreamUtil.write(out, packetId);
@@ -114,13 +113,13 @@ public class CommandPacket extends MySQLPacket {
     @Override
     public void write(BackendAIOConnection c) {
         ByteBuffer buffer = c.allocate();
-        try {    
+        try {
 	        BufferUtil.writeUB3(buffer, calcPacketSize());
 	        buffer.put(packetId);
 	        buffer.put(command);
 	        buffer = c.writeToBuffer(arg, buffer);
-	        c.write(buffer);	        
-        } catch(java.nio.BufferOverflowException e1) { 
+	        c.write(buffer);
+        } catch(java.nio.BufferOverflowException e1) {
         	//fixed issues #98 #1072
         	buffer =  c.checkWriteBuffer(buffer, c.getPacketHeaderSize() + calcPacketSize(), false);
 	        BufferUtil.writeUB3(buffer, calcPacketSize());
@@ -140,6 +139,4 @@ public class CommandPacket extends MySQLPacket {
     protected String getPacketInfo() {
         return "MySQL Command Packet";
     }
-
-	
 }

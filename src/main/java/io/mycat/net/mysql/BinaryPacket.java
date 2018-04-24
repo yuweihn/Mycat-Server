@@ -23,14 +23,16 @@
  */
 package io.mycat.net.mysql;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
 
 import io.mycat.backend.mysql.BufferUtil;
 import io.mycat.backend.mysql.StreamUtil;
 import io.mycat.net.BackendAIOConnection;
 import io.mycat.net.FrontendConnection;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+
 
 /**
  * @author mycat
@@ -55,8 +57,8 @@ public class BinaryPacket extends MySQLPacket {
     }
 
     @Override
-    public ByteBuffer write(ByteBuffer buffer, FrontendConnection c,boolean writeSocketIfFull) {
-        buffer = c.checkWriteBuffer(buffer, c.getPacketHeaderSize(),writeSocketIfFull);
+    public ByteBuffer write(ByteBuffer buffer, FrontendConnection c, boolean writeSocketIfFull) {
+        buffer = c.checkWriteBuffer(buffer, c.getPacketHeaderSize(), writeSocketIfFull);
         BufferUtil.writeUB3(buffer, calcPacketSize());
         buffer.put(packetId);
         buffer = c.writeToBuffer(data, buffer);
@@ -65,7 +67,7 @@ public class BinaryPacket extends MySQLPacket {
     @Override
     public void write(BackendAIOConnection c) {
         ByteBuffer buffer = c.allocate();
-        buffer=  c.checkWriteBuffer(buffer,c.getPacketHeaderSize()+calcPacketSize(),false);
+        buffer=  c.checkWriteBuffer(buffer, c.getPacketHeaderSize() + calcPacketSize(), false);
         BufferUtil.writeUB3(buffer, calcPacketSize());
         buffer.put(packetId);
         buffer.put(data);
@@ -81,5 +83,4 @@ public class BinaryPacket extends MySQLPacket {
     protected String getPacketInfo() {
         return "MySQL Binary Packet";
     }
-
 }

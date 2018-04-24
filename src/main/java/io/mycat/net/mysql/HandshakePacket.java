@@ -23,11 +23,13 @@
  */
 package io.mycat.net.mysql;
 
+
 import java.nio.ByteBuffer;
 
 import io.mycat.backend.mysql.BufferUtil;
 import io.mycat.backend.mysql.MySQLMessage;
 import io.mycat.net.FrontendConnection;
+
 
 /**
  * From server to client during initial handshake.
@@ -52,7 +54,7 @@ import io.mycat.net.FrontendConnection;
  * @author mycat
  */
 public class HandshakePacket extends MySQLPacket {
-    private static final byte[] FILLER_13 = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    private static final byte[] FILLER_13 = new byte[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     public byte protocolVersion;
     public byte[] serverVersion;
@@ -126,5 +128,4 @@ public class HandshakePacket extends MySQLPacket {
     protected String getPacketInfo() {
         return "MySQL Handshake Packet";
     }
-
 }

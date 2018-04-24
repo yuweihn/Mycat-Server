@@ -23,19 +23,20 @@
  */
 package io.mycat.net.mysql;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
 
 import io.mycat.backend.mysql.BufferUtil;
 import io.mycat.backend.mysql.StreamUtil;
 import io.mycat.net.BackendAIOConnection;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+
+
 /**
  * @author mycat
  */
 public class Reply323Packet extends MySQLPacket {
-
     public byte[] seed;
 
     public void write(OutputStream out) throws IOException {
@@ -70,5 +71,4 @@ public class Reply323Packet extends MySQLPacket {
     protected String getPacketInfo() {
         return "MySQL Auth323 Packet";
     }
-
 }

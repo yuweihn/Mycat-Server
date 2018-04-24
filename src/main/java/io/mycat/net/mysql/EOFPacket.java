@@ -23,12 +23,14 @@
  */
 package io.mycat.net.mysql;
 
+
 import java.nio.ByteBuffer;
 
 import io.mycat.backend.mysql.BufferUtil;
 import io.mycat.backend.mysql.MySQLMessage;
 import io.mycat.buffer.BufferArray;
 import io.mycat.net.FrontendConnection;
+
 
 /**
  * From Server To Client, at the end of a series of Field Packets, and at the
@@ -64,7 +66,7 @@ public class EOFPacket extends MySQLPacket {
     }
 
     @Override
-    public ByteBuffer write(ByteBuffer buffer, FrontendConnection c,boolean writeSocketIfFull) {
+    public ByteBuffer write(ByteBuffer buffer, FrontendConnection c, boolean writeSocketIfFull) {
         int size = calcPacketSize();
         buffer = c.checkWriteBuffer(buffer, c.getPacketHeaderSize() + size,writeSocketIfFull);
         BufferUtil.writeUB3(buffer, size);
@@ -87,13 +89,11 @@ public class EOFPacket extends MySQLPacket {
 
 	public void write(BufferArray bufferArray) {
 		int size = calcPacketSize();
-		ByteBuffer buffer = bufferArray.checkWriteBuffer(packetHeaderSize
-				+ size);
+		ByteBuffer buffer = bufferArray.checkWriteBuffer(packetHeaderSize + size);
 		BufferUtil.writeUB3(buffer, size);
 		buffer.put(packetId);
 		buffer.put(fieldCount);
 		BufferUtil.writeUB2(buffer, warningCount);
 		BufferUtil.writeUB2(buffer, status);
 	}
-
 }

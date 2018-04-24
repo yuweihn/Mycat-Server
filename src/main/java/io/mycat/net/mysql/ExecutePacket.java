@@ -23,12 +23,14 @@
  */
 package io.mycat.net.mysql;
 
+
 import java.io.UnsupportedEncodingException;
 
 import io.mycat.backend.mysql.BindValue;
 import io.mycat.backend.mysql.BindValueUtil;
 import io.mycat.backend.mysql.MySQLMessage;
 import io.mycat.backend.mysql.PreparedStatement;
+
 
 /**
  * <pre>
@@ -82,7 +84,6 @@ import io.mycat.backend.mysql.PreparedStatement;
  * @author mycat, CrazyPig
  */
 public class ExecutePacket extends MySQLPacket {
-
     public byte code;
     public long statementId;
     public byte flags;
@@ -142,7 +143,6 @@ public class ExecutePacket extends MySQLPacket {
 
     @Override
     public int calcPacketSize() {
-        
         return 0;
     }
 
@@ -150,5 +150,4 @@ public class ExecutePacket extends MySQLPacket {
     protected String getPacketInfo() {
         return "MySQL Execute Packet";
     }
-
 }

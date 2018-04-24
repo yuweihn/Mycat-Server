@@ -23,11 +23,13 @@
  */
 package io.mycat.net.mysql;
 
+
 import java.nio.ByteBuffer;
 
 import io.mycat.config.Capabilities;
 import io.mycat.backend.mysql.BufferUtil;
 import io.mycat.net.FrontendConnection;
+
 
 /**
  * From mycat server to client during initial handshake.
@@ -66,7 +68,7 @@ import io.mycat.net.FrontendConnection;
  * 
  */
 public class HandshakeV10Packet extends MySQLPacket {
-    private static final byte[] FILLER_10 = new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    private static final byte[] FILLER_10 = new byte[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     private static final byte[] DEFAULT_AUTH_PLUGIN_NAME = "mysql_native_password".getBytes();
     
     public byte protocolVersion;
@@ -80,7 +82,6 @@ public class HandshakeV10Packet extends MySQLPacket {
     public byte[] authPluginName = DEFAULT_AUTH_PLUGIN_NAME;
 
     public void write(FrontendConnection c) {
-
     	ByteBuffer buffer = c.allocate();
         BufferUtil.writeUB3(buffer, calcPacketSize());
         buffer.put(packetId);
@@ -136,7 +137,7 @@ public class HandshakeV10Packet extends MySQLPacket {
         	if(restOfScrambleBuff.length <= 13) {
         		size += 13;
         	} else {
-        		size += restOfScrambleBuff.length;
+                size += restOfScrambleBuff.length;
         	}
         }
         if((serverCapabilities & Capabilities.CLIENT_PLUGIN_AUTH) != 0) {
@@ -149,5 +150,4 @@ public class HandshakeV10Packet extends MySQLPacket {
     protected String getPacketInfo() {
         return "MySQL HandshakeV10 Packet";
     }
-
 }

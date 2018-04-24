@@ -23,6 +23,7 @@
  */
 package io.mycat.net.mysql;
 
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ import io.mycat.backend.mysql.BufferUtil;
 import io.mycat.backend.mysql.MySQLMessage;
 import io.mycat.buffer.BufferArray;
 import io.mycat.net.FrontendConnection;
+
 
 /**
  * From server to client. One packet for each row in the result set.
@@ -73,7 +75,7 @@ public class RowDataPacket extends MySQLPacket {
 	}
 	public void addFieldCount(int add) {
 		//这里应该修改field
-		fieldCount=fieldCount+add;
+		fieldCount = fieldCount+add;
 	}
 	
 	public void read(byte[] data) {
@@ -87,23 +89,20 @@ public class RowDataPacket extends MySQLPacket {
 	}
 
 	@Override
-	public ByteBuffer write(ByteBuffer bb, FrontendConnection c,
-			boolean writeSocketIfFull) {
+	public ByteBuffer write(ByteBuffer bb, FrontendConnection c, boolean writeSocketIfFull) {
 		bb = c.checkWriteBuffer(bb, c.getPacketHeaderSize(), writeSocketIfFull);
 		BufferUtil.writeUB3(bb, calcPacketSize());
 		bb.put(packetId);
 		for (int i = 0; i < fieldCount; i++) {
 			byte[] fv = fieldValues.get(i);
-			if (fv == null ) {
+			if (fv == null) {
 				bb = c.checkWriteBuffer(bb, 1, writeSocketIfFull);
 				bb.put(RowDataPacket.NULL_MARK);
-			}else if (fv.length == 0) {
+			} else if (fv.length == 0) {
                 bb = c.checkWriteBuffer(bb, 1, writeSocketIfFull);
                 bb.put(RowDataPacket.EMPTY_MARK);
-            }
-            else {
-				bb = c.checkWriteBuffer(bb, BufferUtil.getLength(fv),
-						writeSocketIfFull);
+            } else {
+				bb = c.checkWriteBuffer(bb, BufferUtil.getLength(fv), writeSocketIfFull);
 				BufferUtil.writeLength(bb, fv.length);
 				bb = c.writeToBuffer(fv, bb);
 			}
@@ -140,12 +139,10 @@ public class RowDataPacket extends MySQLPacket {
 				buffer = bufferArray.checkWriteBuffer(1);
 				buffer.put(RowDataPacket.EMPTY_MARK);
 			} else {
-				buffer = bufferArray.checkWriteBuffer(BufferUtil
-						.getLength(fv.length));
+				buffer = bufferArray.checkWriteBuffer(BufferUtil.getLength(fv.length));
 				BufferUtil.writeLength(buffer, fv.length);
 				bufferArray.write(fv);
 			}
 		}
 	}
-
 }

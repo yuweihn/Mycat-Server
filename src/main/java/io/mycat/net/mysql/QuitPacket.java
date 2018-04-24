@@ -23,11 +23,13 @@
  */
 package io.mycat.net.mysql;
 
+
+
 /**
  * @author mycat
  */
 public class QuitPacket extends MySQLPacket {
-    public static final byte[] QUIT = new byte[] { 1, 0, 0, 0, 1 };
+    public static final byte[] QUIT = new byte[] {1, 0, 0, 0, 1};
 
     @Override
     public int calcPacketSize() {
@@ -38,5 +40,4 @@ public class QuitPacket extends MySQLPacket {
     protected String getPacketInfo() {
         return "MySQL Quit Packet";
     }
-
 }

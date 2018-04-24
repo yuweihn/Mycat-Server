@@ -23,10 +23,12 @@
  */
 package io.mycat.net.mysql;
 
-import java.nio.ByteBuffer;
 
 import io.mycat.net.BackendAIOConnection;
 import io.mycat.net.FrontendConnection;
+
+import java.nio.ByteBuffer;
+
 
 /**
  * @author mycat
@@ -192,7 +194,7 @@ public abstract class MySQLPacket {
     /**
      * 把数据包写到buffer中，如果buffer满了就把buffer通过前端连接写出 (writeSocketIfFull=true)。
      */
-    public ByteBuffer write(ByteBuffer buffer, FrontendConnection c,boolean writeSocketIfFull) {
+    public ByteBuffer write(ByteBuffer buffer, FrontendConnection c, boolean writeSocketIfFull) {
         throw new UnsupportedOperationException();
     }
 
@@ -215,8 +217,7 @@ public abstract class MySQLPacket {
 
     @Override
     public String toString() {
-        return new StringBuilder().append(getPacketInfo()).append("{length=").append(packetLength).append(",id=")
-                .append(packetId).append('}').toString();
+        return new StringBuilder().append(getPacketInfo()).append("{length=").append(packetLength)
+                .append(",id=").append(packetId).append('}').toString();
     }
-
 }
