@@ -116,7 +116,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 			 */
 			if(isOffHeapuseOffHeapForMerge == 1){
 				dataMergeSvr = new DataNodeMergeManager(this, rrs, isMiddleResultDone);
-			}else {
+			} else {
 				dataMergeSvr = new DataMergeService(this, rrs);
 			}
 		} else {
@@ -239,8 +239,8 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 			OkPacket ok = new OkPacket();
 			ok.read(data);
             //存储过程
-            boolean isCanClose2Client = (!rrs.isCallStatement()) ||(rrs.isCallStatement() && !rrs.getProcedure().isResultSimpleValue());;
-			if(!isCallProcedure) {
+            boolean isCanClose2Client = (!rrs.isCallStatement()) ||(rrs.isCallStatement() && !rrs.getProcedure().isResultSimpleValue());
+            if(!isCallProcedure) {
 				if (clearIfSessionClosed(session)) {
 					return;
 				} else if (canClose(conn, false)) {
