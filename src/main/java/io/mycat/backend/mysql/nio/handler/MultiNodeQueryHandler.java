@@ -62,7 +62,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 	// private final CommitNodeHandler icHandler;
 	private final AbstractDataNodeMerge dataMergeSvr;
 	private final boolean autocommit;
-	private String priamaryKeyTable = null;
+	private String primaryKeyTable = null;
 	private int primaryKeyIndex = -1;
 	private int fieldCount = 0;
 	private final ReentrantLock lock;
@@ -79,7 +79,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 	
 	private boolean prepared;
 	private List<FieldPacket> fieldPackets = new ArrayList<FieldPacket>();
-	private int isOffHeapuseOffHeapForMerge = 1;
+	private int isOffHeapUseOffHeapForMerge = 1;
 	//huangyiming add  中间处理结果是否处理完毕
 	private final AtomicBoolean isMiddleResultDone;
 	/**
@@ -109,12 +109,12 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 		}
 		
 		this.rrs = rrs;
-		isOffHeapuseOffHeapForMerge = MycatServer.getInstance().getConfig().getSystem().getUseOffHeapForMerge();
+		isOffHeapUseOffHeapForMerge = MycatServer.getInstance().getConfig().getSystem().getUseOffHeapForMerge();
 		if (ServerParse.SELECT == sqlType && rrs.needMerge()) {
 			/**
 			 * 使用Off Heap
 			 */
-			if(isOffHeapuseOffHeapForMerge == 1){
+			if(isOffHeapUseOffHeapForMerge == 1) {
 				dataMergeSvr = new DataNodeMergeManager(this, rrs, isMiddleResultDone);
 			} else {
 				dataMergeSvr = new DataMergeService(this, rrs);
@@ -352,7 +352,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 			}
 			if (dataMergeSvr != null) {
 				//huangyiming add 数据合并前如果有中间过程则先执行数据合并再执行下一步
-				if(session.getMiddlerResultHandler() != null){
+				if(session.getMiddlerResultHandler() != null) {
 					isMiddleResultDone.set(true);
             	}
             	 
@@ -378,7 +378,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 			}
 		}
 		execCount++;
-		if(middlerResultHandler != null){
+		if(middlerResultHandler != null) {
 			if (execCount != rrs.getNodes().length) {
 				return;
 			}
@@ -632,7 +632,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 			String primaryKey = null;
 			if (rrs.hasPrimaryKeyToCache()) {
 				String[] items = rrs.getPrimaryKeyItems();
-				priamaryKeyTable = items[0];
+				primaryKeyTable = items[0];
 				primaryKey = items[1];
 			}
 
@@ -742,7 +742,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 				dataMergeSvr.onNewRecord(dataNode, row);
 
 				MiddlerResultHandler middlerResultHandler = session.getMiddlerResultHandler();
-				if(null != middlerResultHandler ){
+				if(null != middlerResultHandler ) {
 					if(middlerResultHandler instanceof MiddlerQueryResultHandler) {
 						byte[] rv = ResultSetUtil.getColumnVal(row, fields, 0);
 						String rowValue = rv == null ? "" : new String(rv);
@@ -758,7 +758,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 					rowDataPkg.read(row);
 					String primaryKey = new String(rowDataPkg.fieldValues.get(primaryKeyIndex));
 					LayerCachePool pool = MycatServer.getInstance().getRouterservice().getTableId2DataNodeCache();
-					pool.putIfAbsent(priamaryKeyTable, primaryKey, dataNode);
+					pool.putIfAbsent(primaryKeyTable, primaryKey, dataNode);
 				}
 				if(prepared) {
 					if(rowDataPkg == null) {
