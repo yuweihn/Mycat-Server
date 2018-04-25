@@ -24,6 +24,7 @@ package io.mycat.sqlengine.mpp;
  *
  */
 
+
 import io.mycat.MycatServer;
 import io.mycat.backend.mysql.BufferUtil;
 import io.mycat.backend.mysql.nio.handler.MultiNodeQueryHandler;
@@ -37,11 +38,10 @@ import io.mycat.util.StringUtil;
 
 import org.apache.log4j.Logger;
 
-
-
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
 
 /**
  * Data merge service handle data Min,Max,AVG group 、order by 、limit
@@ -54,16 +54,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  */
 public class DataMergeService extends AbstractDataNodeMerge {
-
 	private RowDataSorter sorter;
 	private RowDataPacketGrouper grouper;
 	private Map<String, LinkedList<RowDataPacket>> result = new HashMap<String, LinkedList<RowDataPacket>>();
 	private static Logger LOGGER = Logger.getLogger(DataMergeService.class);
 	private ConcurrentHashMap<String, Boolean> canDiscard = new ConcurrentHashMap<String, Boolean>();
-	public DataMergeService(MultiNodeQueryHandler handler, RouteResultset rrs) {
-		super(handler,rrs);
 
-		for (RouteResultsetNode node : rrs.getNodes()) {
+
+	public DataMergeService(MultiNodeQueryHandler handler, RouteResultset rrs) {
+		super(handler, rrs);
+		for (RouteResultsetNode node: rrs.getNodes()) {
 			result.put(node.getName(), new LinkedList<RowDataPacket>());
 		}
 	}
@@ -74,24 +74,20 @@ public class DataMergeService extends AbstractDataNodeMerge {
 	 * @param fieldCount
      */
 	public void onRowMetaData(Map<String, ColMeta> columToIndx, int fieldCount) {
-
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("field metadata keys:" + columToIndx.keySet());
 			LOGGER.debug("field metadata values:" + columToIndx.values());
 		}
 
-
 		int[] groupColumnIndexs = null;
 		this.fieldCount = fieldCount;
 
 		if (rrs.getGroupByCols() != null) {
-		
 			groupColumnIndexs = toColumnIndex(rrs.getGroupByCols(), columToIndx);
 		}
 
 		if (rrs.getHavingCols() != null) {
-			ColMeta colMeta = columToIndx.get(rrs.getHavingCols().getLeft()
-					.toUpperCase());
+			ColMeta colMeta = columToIndx.get(rrs.getHavingCols().getLeft().toUpperCase());
 			if (colMeta != null) {
 				rrs.getHavingCols().setColMeta(colMeta);
 			}
@@ -101,61 +97,45 @@ public class DataMergeService extends AbstractDataNodeMerge {
 			List<MergeCol> mergCols = new LinkedList<MergeCol>();
 			Map<String, Integer> mergeColsMap = rrs.getMergeCols();
 
-
-
 			if (mergeColsMap != null) {
-				for (Map.Entry<String, Integer> mergEntry : mergeColsMap
-						.entrySet()) {
+				for (Map.Entry<String, Integer> mergEntry: mergeColsMap.entrySet()) {
 					String colName = mergEntry.getKey().toUpperCase();
 					int type = mergEntry.getValue();
 					if (MergeCol.MERGE_AVG == type) {
-					
 						ColMeta sumColMeta = columToIndx.get(colName + "SUM");
-						ColMeta countColMeta = columToIndx.get(colName
-								+ "COUNT");
+						ColMeta countColMeta = columToIndx.get(colName + "COUNT");
 						if (sumColMeta != null && countColMeta != null) {
-							ColMeta colMeta = new ColMeta(sumColMeta.colIndex,
-									countColMeta.colIndex,
-									sumColMeta.getColType());
+							ColMeta colMeta = new ColMeta(sumColMeta.colIndex, countColMeta.colIndex, sumColMeta.getColType());
 							colMeta.decimals = sumColMeta.decimals; // 保存精度
-							mergCols.add(new MergeCol(colMeta, mergEntry
-									.getValue()));
+							mergCols.add(new MergeCol(colMeta, mergEntry.getValue()));
 						}
 					} else {
-						
 						ColMeta colMeta = columToIndx.get(colName);
 						mergCols.add(new MergeCol(colMeta, mergEntry.getValue()));
 					}
 				}
 			}
 			// add no alias merg column
-			for (Map.Entry<String, ColMeta> fieldEntry : columToIndx.entrySet()) {
+			for (Map.Entry<String, ColMeta> fieldEntry: columToIndx.entrySet()) {
 				String colName = fieldEntry.getKey();
 				int result = MergeCol.tryParseAggCol(colName);
-				if (result != MergeCol.MERGE_UNSUPPORT
-						&& result != MergeCol.MERGE_NOMERGE) {
+				if (result != MergeCol.MERGE_UNSUPPORT && result != MergeCol.MERGE_NOMERGE) {
 					mergCols.add(new MergeCol(fieldEntry.getValue(), result));
 				}
 			}
 
-		
-			grouper = new RowDataPacketGrouper(groupColumnIndexs,
-					mergCols.toArray(new MergeCol[mergCols.size()]),
-					rrs.getHavingCols());
+			grouper = new RowDataPacketGrouper(groupColumnIndexs, mergCols.toArray(new MergeCol[mergCols.size()]), rrs.getHavingCols());
 		}
 
 		if (rrs.getOrderByCols() != null) {
 			LinkedHashMap<String, Integer> orders = rrs.getOrderByCols();
 			OrderCol[] orderCols = new OrderCol[orders.size()];
 			int i = 0;
-			for (Map.Entry<String, Integer> entry : orders.entrySet()) {
-				String key = StringUtil.removeBackquote(entry.getKey()
-						.toUpperCase());
+			for (Map.Entry<String, Integer> entry: orders.entrySet()) {
+				String key = StringUtil.removeBackquote(entry.getKey().toUpperCase());
 				ColMeta colMeta = columToIndx.get(key);
 				if (colMeta == null) {
-					throw new IllegalArgumentException(
-							"all columns in order by clause should be in the selected column list!"
-									+ entry.getKey());
+					throw new IllegalArgumentException("all columns in order by clause should be in the selected column list!" + entry.getKey());
 				}
 				orderCols[i++] = new OrderCol(colMeta, entry.getValue());
 			}
@@ -165,13 +145,9 @@ public class DataMergeService extends AbstractDataNodeMerge {
 			sorter = tmp;
 		}
 
-		if (MycatServer.getInstance().
-				getConfig().getSystem().
-				getUseStreamOutput() == 1
-				&& grouper == null
-				&& sorter == null) {
+		if (MycatServer.getInstance().getConfig().getSystem().getUseStreamOutput() == 1 && grouper == null && sorter == null) {
 			setStreamOutputResult(true);
-		}else {
+		} else {
 			setStreamOutputResult(false);
 		}
 	}
@@ -192,32 +168,29 @@ public class DataMergeService extends AbstractDataNodeMerge {
 		//both sorter and group are synchronized!!
 		// @author Uncle-pan
 		// @since 2016-03-23
-		if(!running.compareAndSet(false, true)){
+		if(!running.compareAndSet(false, true)) {
 			return;
 		}
 		// eof handler has been placed to "if (pack == END_FLAG_PACK){}" in for-statement
 		// @author Uncle-pan
 		// @since 2016-03-23
 		boolean nulpack = false;
-		try{
+		try {
 			// loop-on-packs
-			for (; ; ) {
+			for (;;) {
 				final PackWraper pack = packs.poll();
 				// async: handling row pack queue, this business thread should exit when no pack
 				// @author Uncle-pan
 				// @since 2016-03-23
-				if(pack == null){
+				if(pack == null) {
 					nulpack = true;
 					break;
 				}
 				// eof: handling eof pack and exit
 				if (pack == END_FLAG_PACK) {
-
-
-
 					final int warningCount = 0;
-					final EOFPacket eofp   = new EOFPacket();
-					final ByteBuffer eof   = ByteBuffer.allocate(9);
+					final EOFPacket eofp = new EOFPacket();
+					final ByteBuffer eof = ByteBuffer.allocate(9);
 					BufferUtil.writeUB3(eof, eofp.calcPacketSize());
 					eof.put(eofp.packetId);
 					eof.put(eofp.fieldCount);
@@ -238,26 +211,25 @@ public class DataMergeService extends AbstractDataNodeMerge {
 					grouper.addRow(row);
 				} else if (sorter != null) {
 					if (!sorter.addRow(row)) {
-						canDiscard.put(pack.dataNode,true);
+						canDiscard.put(pack.dataNode, true);
 					}
 				} else {
 					result.get(pack.dataNode).add(row);
 				}
 			}// rof
-		}catch(final Exception e){
+		} catch(final Exception e) {
 			multiQueryHandler.handleDataProcessException(e);
-		}finally{
+		} finally {
 			running.set(false);
 		}
 		// try to check packs, it's possible that adding a pack after polling a null pack
 		//and before this time pointer!!
 		// @author Uncle-pan
 		// @since 2016-03-23
-		if(nulpack && !packs.isEmpty()){
+		if (nulpack && !packs.isEmpty()) {
 			this.run();
 		}
 	}
-	
 
 
 	/**
@@ -265,7 +237,6 @@ public class DataMergeService extends AbstractDataNodeMerge {
 	 * @return (最多i*(offset+size)行数据)
 	 */
 	public List<RowDataPacket> getResults(byte[] eof) {
-	
 		List<RowDataPacket> tmpResult = null;
 
 		if (this.grouper != null) {
@@ -273,9 +244,7 @@ public class DataMergeService extends AbstractDataNodeMerge {
 			grouper = null;
 		}
 
-		
 		if (sorter != null) {
-			
 			if (tmpResult != null) {
 				Iterator<RowDataPacket> itor = tmpResult.iterator();
 				while (itor.hasNext()) {
@@ -287,12 +256,10 @@ public class DataMergeService extends AbstractDataNodeMerge {
 			sorter = null;
 		}
 
-
-		
 		//no grouper and sorter
-		if(tmpResult == null){
+		if(tmpResult == null) {
 			tmpResult = new LinkedList<RowDataPacket>();
-			for (RouteResultsetNode node : rrs.getNodes()) {
+			for (RouteResultsetNode node: rrs.getNodes()) {
 				tmpResult.addAll(result.get(node.getName()));
 			}
 		}
@@ -303,4 +270,3 @@ public class DataMergeService extends AbstractDataNodeMerge {
 		return tmpResult;
 	}
 }
-
