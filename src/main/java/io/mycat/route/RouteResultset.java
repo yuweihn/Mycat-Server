@@ -282,7 +282,7 @@ public final class RouteResultset implements Serializable {
 
     public void setNodes(RouteResultsetNode[] nodes) {
         if(nodes != null) {
-           int nodeSize=nodes.length;
+           int nodeSize = nodes.length;
             for (RouteResultsetNode node: nodes) {
                 node.setTotalNodeSize(nodeSize);
             }
