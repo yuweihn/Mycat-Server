@@ -365,10 +365,10 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 				try {
 					lock.lock();
 					eof[3] = ++packetId;
-					if(LOGGER.isDebugEnabled()) {
+					if (LOGGER.isDebugEnabled()) {
 						LOGGER.debug("last packet id:" + packetId);
 					}
-					if(middlerResultHandler == null){
+					if (middlerResultHandler == null) {
 						//middlerResultHandler.secondEexcute();
 						source.write(eof);
 					} 
@@ -378,7 +378,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 			}
 		}
 		execCount++;
-		if(middlerResultHandler != null) {
+		if (middlerResultHandler != null) {
 			if (execCount != rrs.getNodes().length) {
 				return;
 			}
@@ -396,7 +396,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 			QueryResultDispatcher.dispatchQuery(queryResult);
 
 			//	add huangyiming  如果是中间过程,必须等数据合并好了再进行下一步语句的拼装 
- 			if(middlerResultHandler != null) {
+ 			if (middlerResultHandler != null) {
  				while (!this.isMiddleResultDone.compareAndSet(false, true)) {
  	                Thread.yield();
 				}
