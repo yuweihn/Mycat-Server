@@ -1,5 +1,6 @@
 package io.mycat.sqlengine.mpp;
 
+
 import io.mycat.MycatServer;
 import io.mycat.backend.mysql.nio.handler.MultiNodeQueryHandler;
 import io.mycat.net.mysql.RowDataPacket;
@@ -14,12 +15,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+
 /**
  * Created by zagnix on 2016/7/6.
  */
-public abstract class AbstractDataNodeMerge implements Runnable{
-
-
+public abstract class AbstractDataNodeMerge implements Runnable {
     private static Logger LOGGER = Logger.getLogger(AbstractDataNodeMerge.class);
     /**
      *row 有多少col
@@ -43,7 +43,6 @@ public abstract class AbstractDataNodeMerge implements Runnable{
     /**
      * 是否执行流式结果集输出
      */
-
     protected boolean isStreamOutputResult = false;
 
     /**
@@ -56,7 +55,7 @@ public abstract class AbstractDataNodeMerge implements Runnable{
      */
     protected final AtomicBoolean running = new AtomicBoolean(false);
 
-    public AbstractDataNodeMerge(MultiNodeQueryHandler handler,RouteResultset rrs){
+    public AbstractDataNodeMerge(MultiNodeQueryHandler handler, RouteResultset rrs){
         this.rrs = rrs;
         this.multiQueryHandler = handler;
     }
@@ -120,9 +119,7 @@ public abstract class AbstractDataNodeMerge implements Runnable{
         for (int i = 0; i < columns.length; i++) {
             curColMeta = toIndexMap.get(columns[i].toUpperCase());
             if (curColMeta == null) {
-                throw new IllegalArgumentException(
-                        "all columns in group by clause should be in the selected column list.!"
-                                + columns[i]);
+                throw new IllegalArgumentException("all columns in group by clause should be in the selected column list.!" + columns[i]);
             }
             result[i] = curColMeta.colIndex;
         }
@@ -148,5 +145,4 @@ public abstract class AbstractDataNodeMerge implements Runnable{
      */
     public abstract List<RowDataPacket> getResults(byte[] eof);
     public abstract void clear();
-
 }
