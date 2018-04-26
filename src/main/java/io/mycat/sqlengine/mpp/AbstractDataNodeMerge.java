@@ -54,7 +54,7 @@ public abstract class AbstractDataNodeMerge implements Runnable {
      */
     protected final AtomicBoolean running = new AtomicBoolean(false);
 
-    public AbstractDataNodeMerge(MultiNodeQueryHandler handler, RouteResultset rrs){
+    public AbstractDataNodeMerge(MultiNodeQueryHandler handler, RouteResultset rrs) {
         this.rrs = rrs;
         this.multiQueryHandler = handler;
     }
@@ -75,9 +75,9 @@ public abstract class AbstractDataNodeMerge implements Runnable {
      * @author Uncle-pan
      * @since 2016-03-23
      */
-    protected final boolean addPack(final PackWraper pack){
+    protected final boolean addPack(final PackWraper pack) {
         packs.add(pack);
-        if(running.get()){
+        if (running.get()) {
             return false;
         }
         final MycatServer server = MycatServer.getInstance();
@@ -128,7 +128,7 @@ public abstract class AbstractDataNodeMerge implements Runnable {
     @Override
     public abstract void run();
 
-    public abstract void onRowMetaData(Map<String, ColMeta> columToIndx, int fieldCount) throws IOException;
+    public abstract void onRowMetaData(Map<String, ColMeta> columnToIndex, int fieldCount) throws IOException;
 
     public void outputMergeResult() {
         addPack(END_FLAG_PACK);

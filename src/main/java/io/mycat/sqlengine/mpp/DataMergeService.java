@@ -70,24 +70,24 @@ public class DataMergeService extends AbstractDataNodeMerge {
 
 
 	/**
-	 * @param columToIndx
+	 * @param columnToIndex
 	 * @param fieldCount
      */
-	public void onRowMetaData(Map<String, ColMeta> columToIndx, int fieldCount) {
+	public void onRowMetaData(Map<String, ColMeta> columnToIndex, int fieldCount) {
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("field metadata keys:" + columToIndx.keySet());
-			LOGGER.debug("field metadata values:" + columToIndx.values());
+			LOGGER.debug("field metadata keys:" + columnToIndex.keySet());
+			LOGGER.debug("field metadata values:" + columnToIndex.values());
 		}
 
 		int[] groupColumnIndexs = null;
 		this.fieldCount = fieldCount;
 
 		if (rrs.getGroupByCols() != null) {
-			groupColumnIndexs = toColumnIndex(rrs.getGroupByCols(), columToIndx);
+			groupColumnIndexs = toColumnIndex(rrs.getGroupByCols(), columnToIndex);
 		}
 
 		if (rrs.getHavingCols() != null) {
-			ColMeta colMeta = columToIndx.get(rrs.getHavingCols().getLeft().toUpperCase());
+			ColMeta colMeta = columnToIndex.get(rrs.getHavingCols().getLeft().toUpperCase());
 			if (colMeta != null) {
 				rrs.getHavingCols().setColMeta(colMeta);
 			}
@@ -102,21 +102,21 @@ public class DataMergeService extends AbstractDataNodeMerge {
 					String colName = mergEntry.getKey().toUpperCase();
 					int type = mergEntry.getValue();
 					if (MergeCol.MERGE_AVG == type) {
-						ColMeta sumColMeta = columToIndx.get(colName + "SUM");
-						ColMeta countColMeta = columToIndx.get(colName + "COUNT");
+						ColMeta sumColMeta = columnToIndex.get(colName + "SUM");
+						ColMeta countColMeta = columnToIndex.get(colName + "COUNT");
 						if (sumColMeta != null && countColMeta != null) {
 							ColMeta colMeta = new ColMeta(sumColMeta.colIndex, countColMeta.colIndex, sumColMeta.getColType());
 							colMeta.decimals = sumColMeta.decimals; // 保存精度
 							mergCols.add(new MergeCol(colMeta, mergEntry.getValue()));
 						}
 					} else {
-						ColMeta colMeta = columToIndx.get(colName);
+						ColMeta colMeta = columnToIndex.get(colName);
 						mergCols.add(new MergeCol(colMeta, mergEntry.getValue()));
 					}
 				}
 			}
 			// add no alias merg column
-			for (Map.Entry<String, ColMeta> fieldEntry: columToIndx.entrySet()) {
+			for (Map.Entry<String, ColMeta> fieldEntry: columnToIndex.entrySet()) {
 				String colName = fieldEntry.getKey();
 				int result = MergeCol.tryParseAggCol(colName);
 				if (result != MergeCol.MERGE_UNSUPPORT && result != MergeCol.MERGE_NOMERGE) {
@@ -133,7 +133,7 @@ public class DataMergeService extends AbstractDataNodeMerge {
 			int i = 0;
 			for (Map.Entry<String, Integer> entry: orders.entrySet()) {
 				String key = StringUtil.removeBackquote(entry.getKey().toUpperCase());
-				ColMeta colMeta = columToIndx.get(key);
+				ColMeta colMeta = columnToIndex.get(key);
 				if (colMeta == null) {
 					throw new IllegalArgumentException("all columns in order by clause should be in the selected column list!" + entry.getKey());
 				}

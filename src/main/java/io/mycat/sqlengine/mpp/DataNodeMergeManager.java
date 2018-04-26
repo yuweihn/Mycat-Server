@@ -89,10 +89,10 @@ public class DataNodeMergeManager extends AbstractDataNodeMerge {
         this.limitSize = rrs.getLimitSize();
     }
 
-    public void onRowMetaData(Map<String, ColMeta> columToIndx, int fieldCount) throws IOException {
+    public void onRowMetaData(Map<String, ColMeta> columnToIndex, int fieldCount) throws IOException {
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("field metadata keys:" + columToIndx != null ? columToIndx.keySet() : "null");
-            LOGGER.debug("field metadata values:" + columToIndx != null ? columToIndx.values() : "null");
+            LOGGER.debug("field metadata keys:" + columnToIndex != null ? columnToIndex.keySet() : "null");
+            LOGGER.debug("field metadata values:" + columnToIndex != null ? columnToIndex.values() : "null");
         }
 
         OrderCol[] orderCols = null;
@@ -107,7 +107,7 @@ public class DataNodeMergeManager extends AbstractDataNodeMerge {
         this.fieldCount = fieldCount;
 
         if (rrs.getGroupByCols() != null) {
-            groupColumnIndexs = toColumnIndex(rrs.getGroupByCols(), columToIndx);
+            groupColumnIndexs = toColumnIndex(rrs.getGroupByCols(), columnToIndex);
             if (LOGGER.isDebugEnabled()) {
                 for (int i = 0; i <rrs.getGroupByCols().length ; i++) {
                     LOGGER.debug("groupColumnIndexs:" + rrs.getGroupByCols()[i]);
@@ -116,7 +116,7 @@ public class DataNodeMergeManager extends AbstractDataNodeMerge {
         }
 
         if (rrs.getHavingCols() != null) {
-            ColMeta colMeta = columToIndx.get(rrs.getHavingCols().getLeft().toUpperCase());
+            ColMeta colMeta = columnToIndex.get(rrs.getHavingCols().getLeft().toUpperCase());
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("getHavingCols:" + rrs.getHavingCols().toString());
@@ -129,9 +129,9 @@ public class DataNodeMergeManager extends AbstractDataNodeMerge {
              *  select sum(xxx) AS xxxSUM,count(xxx) AS xxxCOUNT from t
              */
             if (colMeta == null) {
-                for (String key: columToIndx.keySet()) {
+                for (String key: columnToIndex.keySet()) {
                     if (key.toUpperCase().endsWith("SUM")) {
-                        colMeta = columToIndx.get(key);
+                        colMeta = columnToIndex.get(key);
                         break;
                     }
                 }
@@ -154,21 +154,21 @@ public class DataNodeMergeManager extends AbstractDataNodeMerge {
                     String colName = mergEntry.getKey().toUpperCase();
                     int type = mergEntry.getValue();
                     if (MergeCol.MERGE_AVG == type) {
-                        ColMeta sumColMeta = columToIndx.get(colName + "SUM");
-                        ColMeta countColMeta = columToIndx.get(colName + "COUNT");
+                        ColMeta sumColMeta = columnToIndex.get(colName + "SUM");
+                        ColMeta countColMeta = columnToIndex.get(colName + "COUNT");
                         if (sumColMeta != null && countColMeta != null) {
                             ColMeta colMeta = new ColMeta(sumColMeta.colIndex, countColMeta.colIndex, sumColMeta.getColType());
                             mergCols.add(new MergeCol(colMeta, mergEntry.getValue()));
                         }
                     } else {
-                        ColMeta colMeta = columToIndx.get(colName);
+                        ColMeta colMeta = columnToIndex.get(colName);
                         mergCols.add(new MergeCol(colMeta, mergEntry.getValue()));
                     }
                 }
             }
 
             // add no alias merg column
-            for (Map.Entry<String, ColMeta> fieldEntry: columToIndx.entrySet()) {
+            for (Map.Entry<String, ColMeta> fieldEntry: columnToIndex.entrySet()) {
                 String colName = fieldEntry.getKey();
                 int result = MergeCol.tryParseAggCol(colName);
                 if (result != MergeCol.MERGE_UNSUPPORT && result != MergeCol.MERGE_NOMERGE) {
@@ -180,7 +180,7 @@ public class DataNodeMergeManager extends AbstractDataNodeMerge {
              * Group操作
              */
             MergeCol[] mergColsArrays = mergCols.toArray(new MergeCol[mergCols.size()]);
-            unsafeRowGrouper = new UnsafeRowGrouper(columToIndx, rrs.getGroupByCols(), mergColsArrays, rrs.getHavingCols());
+            unsafeRowGrouper = new UnsafeRowGrouper(columnToIndex, rrs.getGroupByCols(), mergColsArrays, rrs.getHavingCols());
             
             if(mergColsArrays != null && mergColsArrays.length > 0) {
     			mergeColsIndex = new int[mergColsArrays.length];
@@ -197,7 +197,7 @@ public class DataNodeMergeManager extends AbstractDataNodeMerge {
             int i = 0;
             for (Map.Entry<String, Integer> entry: orders.entrySet()) {
                 String key = StringUtil.removeBackquote(entry.getKey().toUpperCase());
-                ColMeta colMeta = columToIndx.get(key);
+                ColMeta colMeta = columnToIndex.get(key);
                 if (colMeta == null) {
                     throw new IllegalArgumentException("all columns in order by clause should be in the selected column list!" + entry.getKey());
                 }
@@ -207,7 +207,7 @@ public class DataNodeMergeManager extends AbstractDataNodeMerge {
             /**
              * 构造全局排序器
              */
-            schema = new StructType(columToIndx,fieldCount);
+            schema = new StructType(columnToIndex, fieldCount);
             schema.setOrderCols(orderCols);
 
             prefixComputer = new RowPrefixComputer(schema);
@@ -238,7 +238,7 @@ public class DataNodeMergeManager extends AbstractDataNodeMerge {
              * 1.schema 
              */
 
-            schema = new StructType(columToIndx, fieldCount);
+            schema = new StructType(columnToIndex, fieldCount);
             schema.setOrderCols(orderCols);
 
             /**
@@ -385,7 +385,7 @@ public class DataNodeMergeManager extends AbstractDataNodeMerge {
                     if (colValue != null) {
                         unsafeRowWriter.write(i, colValue);
                     } else {
-            	 		if(mergeColsIndex != null && mergeColsIndex.length > 0) {
+            	 		if (mergeColsIndex != null && mergeColsIndex.length > 0) {
             	 			if(Arrays.binarySearch(mergeColsIndex, i) < 0) {
             	 				nullnum++;
         	             	}
