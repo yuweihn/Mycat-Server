@@ -374,7 +374,7 @@ public class DataNodeMergeManager extends AbstractDataNodeMerge {
                 bufferHolder.reset();
 
                 /**
-                 *构造一行row，将对应的col填充.
+                 * 构造一行row，将对应的col填充.
                  */
                 MySQLMessage mm = new MySQLMessage(pack.rowData);
                 mm.readUB3();
