@@ -357,7 +357,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
             	}
             	 
 				try {
-					dataMergeSvr.outputMergeResult(session, eof);
+					dataMergeSvr.outputMergeResult();
 				} catch (Exception e) {
 					handleDataProcessException(e);
 				}

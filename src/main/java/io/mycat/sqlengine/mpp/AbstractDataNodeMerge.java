@@ -5,7 +5,6 @@ import io.mycat.MycatServer;
 import io.mycat.backend.mysql.nio.handler.MultiNodeQueryHandler;
 import io.mycat.net.mysql.RowDataPacket;
 import io.mycat.route.RouteResultset;
-import io.mycat.server.NonBlockingSession;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -131,7 +130,7 @@ public abstract class AbstractDataNodeMerge implements Runnable {
 
     public abstract void onRowMetaData(Map<String, ColMeta> columToIndx, int fieldCount) throws IOException;
 
-    public void outputMergeResult(NonBlockingSession session, byte[] eof) {
+    public void outputMergeResult() {
         addPack(END_FLAG_PACK);
     }
 
