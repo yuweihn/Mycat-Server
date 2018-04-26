@@ -73,6 +73,12 @@ public class DataNodeMergeManager extends AbstractDataNodeMerge {
     private boolean hasEndFlag = false;
 
     private AtomicBoolean isMiddleResultDone;
+
+    private UnsafeRow unsafeRow = null;
+    private BufferHolder bufferHolder = null;
+    private UnsafeRowWriter unsafeRowWriter = null;
+
+
     public DataNodeMergeManager(MultiNodeQueryHandler handler, RouteResultset rrs, AtomicBoolean isMiddleResultDone) {
         super(handler, rrs);
         this.isMiddleResultDone = isMiddleResultDone;
@@ -300,10 +306,6 @@ public class DataNodeMergeManager extends AbstractDataNodeMerge {
         return null;
     }
 
-    private UnsafeRow unsafeRow = null;
-    private BufferHolder bufferHolder = null;
-    private UnsafeRowWriter unsafeRowWriter = null;
-    private int Index = 0;
 
     @Override
     public void run() {
