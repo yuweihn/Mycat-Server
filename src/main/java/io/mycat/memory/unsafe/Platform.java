@@ -17,12 +17,11 @@
 
 package io.mycat.memory.unsafe;
 
-import io.mycat.memory.unsafe.utils.BytesTools;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.Cleaner;
 import sun.misc.Unsafe;
-import sun.nio.ch.DirectBuffer;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -35,38 +34,29 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class Platform {
 
+public final class Platform {
     private final static Logger logger = LoggerFactory.getLogger(Platform.class);
-    private static final Pattern MAX_DIRECT_MEMORY_SIZE_ARG_PATTERN =
-            Pattern.compile("\\s*-XX:MaxDirectMemorySize\\s*=\\s*([0-9]+)\\s*([kKmMgG]?)\\s*$");
+    private static final Pattern MAX_DIRECT_MEMORY_SIZE_ARG_PATTERN = Pattern.compile("\\s*-XX:MaxDirectMemorySize\\s*=\\s*([0-9]+)\\s*([kKmMgG]?)\\s*$");
     private static final Unsafe _UNSAFE;
 
     public static final int BYTE_ARRAY_OFFSET;
-
     public static final int SHORT_ARRAY_OFFSET;
-
     public static final int INT_ARRAY_OFFSET;
-
     public static final int LONG_ARRAY_OFFSET;
-
     public static final int FLOAT_ARRAY_OFFSET;
-
     public static final int DOUBLE_ARRAY_OFFSET;
 
     private static final long MAX_DIRECT_MEMORY;
-
     private static final boolean unaligned;
+    public static final boolean littleEndian = ByteOrder.nativeOrder().equals(ByteOrder.LITTLE_ENDIAN);
 
-    public static final boolean littleEndian = ByteOrder.nativeOrder()
-            .equals(ByteOrder.LITTLE_ENDIAN);
 
     static {
         boolean _unaligned;
         // use reflection to access unaligned field
         try {
-            Class<?> bitsClass =
-                    Class.forName("java.nio.Bits", false, ClassLoader.getSystemClassLoader());
+            Class<?> bitsClass = Class.forName("java.nio.Bits", false, ClassLoader.getSystemClassLoader());
             Method unalignedMethod = bitsClass.getDeclaredMethod("unaligned");
             unalignedMethod.setAccessible(true);
             _unaligned = Boolean.TRUE.equals(unalignedMethod.invoke(null));
@@ -78,7 +68,6 @@ public final class Platform {
         }
         unaligned = _unaligned;
         MAX_DIRECT_MEMORY = maxDirectMemory();
-
     }
 
 
@@ -98,10 +87,9 @@ public final class Platform {
         Class t;
         try {
             t = Class.forName("sun.misc.VM", true, getSystemClassLoader());
-            Method runtimeClass = t.getDeclaredMethod("maxDirectMemory", new Class[0]);
-            maxDirectMemory = ((Number) runtimeClass.invoke((Object) null, new Object[0])).longValue();
+            Method runtimeClass = t.getDeclaredMethod("maxDirectMemory");
+            maxDirectMemory = ((Number) runtimeClass.invoke(null, new Object[0])).longValue();
         } catch (Throwable var8) {
-            ;
         }
 
         if (maxDirectMemory > 0L) {
@@ -110,7 +98,7 @@ public final class Platform {
             try {
                 t = Class.forName("java.lang.management.ManagementFactory", true, getSystemClassLoader());
                 Class var10 = Class.forName("java.lang.management.RuntimeMXBean", true, getSystemClassLoader());
-                Object runtime = t.getDeclaredMethod("getRuntimeMXBean", new Class[0]).invoke((Object) null, new Object[0]);
+                Object runtime = t.getDeclaredMethod("getRuntimeMXBean", new Class[0]).invoke(null);
                 List vmArgs = (List) var10.getDeclaredMethod("getInputArguments", new Class[0]).invoke(runtime, new Object[0]);
 
                 label41:
@@ -278,8 +266,7 @@ public final class Platform {
         _UNSAFE.setMemory(address, size, value);
     }
 
-    public static void copyMemory(
-            Object src, long srcOffset, Object dst, long dstOffset, long length) {
+    public static void copyMemory(Object src, long srcOffset, Object dst, long dstOffset, long length) {
         // Check if dstOffset is before or after srcOffset to determine if we should copy
         // forward or backwards. This is necessary in case src and dst overlap.
         if (dstOffset < srcOffset) {
@@ -300,7 +287,6 @@ public final class Platform {
                 _UNSAFE.copyMemory(src, srcOffset, dst, dstOffset, size);
                 length -= size;
             }
-
         }
     }
 
