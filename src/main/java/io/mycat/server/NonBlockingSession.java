@@ -146,7 +146,8 @@ public class NonBlockingSession implements Session {
                 multiNodeHandler.setPrepared(true);
             }
             try {
-                if(((type == ServerParse.DELETE || type == ServerParse.INSERT || type == ServerParse.UPDATE) && !rrs.isGlobalTable() && nodes.length > 1) || initCount > 1) {
+                if(((type == ServerParse.DELETE || type == ServerParse.INSERT || type == ServerParse.UPDATE)
+                        && !rrs.isGlobalTable() && nodes.length > 1) || initCount > 1) {
                     checkDistriTransaxAndExecute(rrs, 2, autocommit);
                 } else {
                     multiNodeHandler.execute();
