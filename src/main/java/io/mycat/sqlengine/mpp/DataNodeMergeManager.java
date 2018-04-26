@@ -314,7 +314,6 @@ public class DataNodeMergeManager extends AbstractDataNodeMerge {
         }
 
         boolean nulpack = false;
-
         try {
             for (;;) {
                 final PackWraper pack = packs.poll();
@@ -330,8 +329,8 @@ public class DataNodeMergeManager extends AbstractDataNodeMerge {
                 		packs.add(pack);
                 		continue;
                 	}
-                	
-                     /**
+
+                    /**
                      * 最后一个节点datenode发送了row eof packet说明了整个
                      * 分片数据全部接收完成，进而将结果集全部发给你Mycat 客户端
                      */
