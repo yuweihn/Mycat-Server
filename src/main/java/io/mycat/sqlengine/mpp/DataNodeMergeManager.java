@@ -346,7 +346,6 @@ public class DataNodeMergeManager extends AbstractDataNodeMerge {
                     final byte[] array = eof.array();
 
                     Iterator<UnsafeRow> iters = null;
-
                     if (unsafeRowGrouper != null) {
                         /**
                          * group by里面需要排序情况
