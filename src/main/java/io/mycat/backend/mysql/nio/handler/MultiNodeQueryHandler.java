@@ -314,7 +314,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 	@Override
 	public void rowEofResponse(final byte[] eof, BackendConnection conn) {
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("on row end reseponse " + conn);
+			LOGGER.debug("on row end response " + conn);
 		}
 		
 		this.netOutBytes += eof.length;
