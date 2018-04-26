@@ -99,11 +99,21 @@ public class UnsafeRow extends MySQLPacket {
     // for serializer
     public UnsafeRow() {}
 
-    public Object getBaseObject() { return baseObject; }
-    public long getBaseOffset() { return baseOffset; }
-    public int getSizeInBytes() { return sizeInBytes; }
+    public Object getBaseObject() {
+        return baseObject;
+    }
 
-    public int numFields() { return numFields; }
+    public long getBaseOffset() {
+        return baseOffset;
+    }
+
+    public int getSizeInBytes() {
+        return sizeInBytes;
+    }
+
+    public int numFields() {
+        return numFields;
+    }
 
     /**
      * Update this UnsafeRow to point to different backing data.
@@ -200,54 +210,45 @@ public class UnsafeRow extends MySQLPacket {
         Platform.putFloat(baseObject, getFieldOffset(ordinal), value);
     }
 
-
     public boolean isNullAt(int ordinal) {
         assertIndexIsValid(ordinal);
         return BitSetMethods.isSet(baseObject, baseOffset, ordinal);
     }
-
 
     public boolean getBoolean(int ordinal) {
         assertIndexIsValid(ordinal);
         return Platform.getBoolean(baseObject, getFieldOffset(ordinal));
     }
 
-
     public byte getByte(int ordinal) {
         assertIndexIsValid(ordinal);
         return Platform.getByte(baseObject, getFieldOffset(ordinal));
     }
-
 
     public short getShort(int ordinal) {
         assertIndexIsValid(ordinal);
         return Platform.getShort(baseObject, getFieldOffset(ordinal));
     }
 
-
     public int getInt(int ordinal) {
         assertIndexIsValid(ordinal);
         return Platform.getInt(baseObject, getFieldOffset(ordinal));
     }
-
 
     public long getLong(int ordinal) {
         assertIndexIsValid(ordinal);
         return Platform.getLong(baseObject, getFieldOffset(ordinal));
     }
 
-
     public float getFloat(int ordinal) {
         assertIndexIsValid(ordinal);
         return Platform.getFloat(baseObject, getFieldOffset(ordinal));
     }
 
-
     public double getDouble(int ordinal) {
         assertIndexIsValid(ordinal);
         return Platform.getDouble(baseObject, getFieldOffset(ordinal));
     }
-
 
     public UTF8String getUTF8String(int ordinal) {
         if (isNullAt(ordinal)) return null;
@@ -256,6 +257,7 @@ public class UnsafeRow extends MySQLPacket {
         final int size = (int) offsetAndSize;
         return UTF8String.fromAddress(baseObject, baseOffset + offset, size);
     }
+
     public byte[] getBinary(int ordinal) {
         if (isNullAt(ordinal)) {
             return null;
