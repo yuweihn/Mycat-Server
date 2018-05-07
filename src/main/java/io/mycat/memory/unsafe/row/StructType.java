@@ -12,15 +12,15 @@ import java.util.Map;
  * Created by zagnix on 2016/6/6.
  */
 public class StructType {
-    private final Map<String, ColMeta> columToIndx;
+    private final Map<String, ColMeta> columnToIndex;
     private final int fieldCount;
 
     private OrderCol[] orderCols = null;
 
 
-    public StructType(@Nonnull Map<String, ColMeta> columToIndx, int fieldCount) {
+    public StructType(@Nonnull Map<String, ColMeta> columnToIndex, int fieldCount) {
         assert fieldCount >= 0;
-        this.columToIndx = columToIndx;
+        this.columnToIndex = columnToIndex;
         this.fieldCount = fieldCount;
     }
 
@@ -28,8 +28,8 @@ public class StructType {
         return fieldCount;
     }
 
-    public Map<String, ColMeta> getColumToIndx() {
-        return columToIndx;
+    public Map<String, ColMeta> getColumnToIndex() {
+        return columnToIndex;
     }
 
     public OrderCol[] getOrderCols() {
