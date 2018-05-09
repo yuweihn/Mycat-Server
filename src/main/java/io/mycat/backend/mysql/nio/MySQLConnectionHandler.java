@@ -23,6 +23,7 @@
  */
 package io.mycat.backend.mysql.nio;
 
+
 import io.mycat.backend.mysql.ByteUtil;
 import io.mycat.backend.mysql.nio.handler.LoadDataResponseHandler;
 import io.mycat.backend.mysql.nio.handler.ResponseHandler;
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * life cycle: from connection establish to close <br/>
