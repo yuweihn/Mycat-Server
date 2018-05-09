@@ -202,7 +202,6 @@ public class MySQLConnectionHandler extends BackendAsyncHandler {
 			respHand.rowResponse(data, source);
 		} else {
 			closeNoHandler();
-
 		}
 	}
 
