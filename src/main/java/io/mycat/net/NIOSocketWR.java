@@ -1,13 +1,13 @@
 package io.mycat.net;
 
+import io.mycat.util.TimeUtil;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import io.mycat.util.TimeUtil;
 
 public class NIOSocketWR extends SocketWR {
 	private SelectionKey processKey;
@@ -96,8 +96,7 @@ public class NIOSocketWR extends SocketWR {
 			buffer.flip();
 			try {
 				while (buffer.hasRemaining()) {
-					written = channel.write(buffer);// java.io.IOException:
-									// Connection reset by peer
+					written = channel.write(buffer);// java.io.IOException: Connection reset by peer
 					if (written > 0) {
 						con.lastWriteTime = TimeUtil.currentTimeMillis();
 						con.netOutBytes += written;
