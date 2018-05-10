@@ -742,7 +742,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 				dataMergeSvr.onNewRecord(dataNode, row);
 
 				MiddlerResultHandler middlerResultHandler = session.getMiddlerResultHandler();
-				if(null != middlerResultHandler ) {
+				if(null != middlerResultHandler) {
 					if(middlerResultHandler instanceof MiddlerQueryResultHandler) {
 						byte[] rv = ResultSetUtil.getColumnVal(row, fields, 0);
 						String rowValue = rv == null ? "" : new String(rv);
@@ -760,7 +760,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 					LayerCachePool pool = MycatServer.getInstance().getRouterservice().getTableId2DataNodeCache();
 					pool.putIfAbsent(primaryKeyTable, primaryKey, dataNode);
 				}
-				if(prepared) {
+				if (prepared) {
 					if(rowDataPkg == null) {
 						rowDataPkg = new RowDataPacket(fieldCount);
 						rowDataPkg.read(row);
