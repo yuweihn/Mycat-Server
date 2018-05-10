@@ -636,7 +636,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 				primaryKey = items[1];
 			}
 
-			Map<String, ColMeta> columToIndx = new HashMap<String, ColMeta>(fieldCount);
+			Map<String, ColMeta> columnToIndex = new HashMap<String, ColMeta>(fieldCount);
 
 			for (int i = 0, len = fieldCount; i < len; ++i) {
 				boolean shouldSkip = false;
@@ -646,7 +646,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 					fieldPkg.read(field);
 					fieldPackets.add(fieldPkg);
 					String fieldName = new String(fieldPkg.name).toUpperCase();
-					if (columToIndx != null && !columToIndx.containsKey(fieldName)) {
+					if (columnToIndex != null && !columnToIndex.containsKey(fieldName)) {
 						if (shouldRemoveAvgField.contains(fieldName)) {
 							shouldSkip = true;
 							fieldPackets.remove(fieldPackets.size() - 1);
@@ -668,7 +668,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 
 						ColMeta colMeta = new ColMeta(i, fieldPkg.type);
 						colMeta.decimals = fieldPkg.decimals;
-						columToIndx.put(fieldName, colMeta);
+						columnToIndex.put(fieldName, colMeta);
 					}
 				} else {
 					FieldPacket fieldPkg = new FieldPacket();
@@ -697,7 +697,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 		 	}
 			
  			if (dataMergeSvr != null) {
-				dataMergeSvr.onRowMetaData(columToIndx, fieldCount);
+				dataMergeSvr.onRowMetaData(columnToIndex, fieldCount);
 			}
 		} catch (Exception e) {
 			handleDataProcessException(e);
