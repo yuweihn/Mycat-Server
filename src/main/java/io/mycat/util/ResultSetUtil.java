@@ -1,13 +1,14 @@
 package io.mycat.util;
 
-import java.sql.Connection;
+
+import io.mycat.net.mysql.FieldPacket;
+import io.mycat.net.mysql.RowDataPacket;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.List;
 
-import io.mycat.net.mysql.FieldPacket;
-import io.mycat.net.mysql.RowDataPacket;
 
 /**
  * 
@@ -15,10 +16,7 @@ import io.mycat.net.mysql.RowDataPacket;
  * 
  */
 public class ResultSetUtil {
-
-	public static int toFlag(ResultSetMetaData metaData, int column)
-			throws SQLException {
-
+	public static int toFlag(ResultSetMetaData metaData, int column) throws SQLException {
 		int flags = 0;
 		if (metaData.isNullable(column) == 1) {
 			flags |= 1;
@@ -35,29 +33,26 @@ public class ResultSetUtil {
 		return flags;
 	}
 
-	public static void resultSetToFieldPacket(String charset,
-											  List<FieldPacket> fieldPks, ResultSet rs,
-											  boolean isSpark) throws SQLException {
+	public static void resultSetToFieldPacket(String charset, List<FieldPacket> fieldPks, ResultSet rs
+			, boolean isSpark) throws SQLException {
 		ResultSetMetaData metaData = rs.getMetaData();
-		int colunmCount = metaData.getColumnCount();
-		if (colunmCount > 0) {
-			//String values="";
-			for (int i = 0; i < colunmCount; i++) {
+		int columnCount = metaData.getColumnCount();
+		if (columnCount > 0) {
+			//String values = "";
+			for (int i = 0; i < columnCount; i++) {
 				int j = i + 1;
 				FieldPacket fieldPacket = new FieldPacket();
-				fieldPacket.orgName = StringUtil.encode(metaData.getColumnName(j),charset);
+				fieldPacket.orgName = StringUtil.encode(metaData.getColumnName(j), charset);
 				fieldPacket.name = StringUtil.encode(metaData.getColumnLabel(j), charset);
-				if (! isSpark){
-				  fieldPacket.orgTable = StringUtil.encode(metaData.getTableName(j), charset);
-				  fieldPacket.table = StringUtil.encode(metaData.getTableName(j),	charset);
-				  fieldPacket.db = StringUtil.encode(metaData.getSchemaName(j),charset);
-				  fieldPacket.flags = toFlag(metaData, j);
+				if (!isSpark) {
+					fieldPacket.orgTable = StringUtil.encode(metaData.getTableName(j), charset);
+					fieldPacket.table = StringUtil.encode(metaData.getTableName(j),	charset);
+					fieldPacket.db = StringUtil.encode(metaData.getSchemaName(j), charset);
+					fieldPacket.flags = toFlag(metaData, j);
 				}
 				fieldPacket.length = metaData.getColumnDisplaySize(j);
-				
 				fieldPacket.decimals = (byte) metaData.getScale(j);
-				int javaType = MysqlDefs.javaTypeDetect(
-						metaData.getColumnType(j), fieldPacket.decimals);
+				int javaType = MysqlDefs.javaTypeDetect(metaData.getColumnType(j), fieldPacket.decimals);
 				fieldPacket.type = (byte) (MysqlDefs.javaTypeMysql(javaType) & 0xff);
 				if(MysqlDefs.isBianry((byte) fieldPacket.type)) {
 					// 63 represent binary character set
@@ -68,28 +63,23 @@ public class ResultSetUtil {
 			}
 			// System.out.println(values);
 		}
-
-
 	}
 
-	public static RowDataPacket parseRowData(byte[] row,
-			List<byte[]> fieldValues) {
+	public static RowDataPacket parseRowData(byte[] row, List<byte[]> fieldValues) {
 		RowDataPacket rowDataPkg = new RowDataPacket(fieldValues.size());
 		rowDataPkg.read(row);
 		return rowDataPkg;
 	}
 
-	public static String getColumnValAsString(byte[] row,
-			List<byte[]> fieldValues, int columnIndex) {
+	public static String getColumnValAsString(byte[] row, List<byte[]> fieldValues, int columnIndex) {
 		RowDataPacket rowDataPkg = new RowDataPacket(fieldValues.size());
 		rowDataPkg.read(row);
 		byte[] columnData = rowDataPkg.fieldValues.get(columnIndex);
 		//columnData 为空时,直接返回null
-		return columnData==null?null:new String(columnData);
+		return columnData == null ? null : new String(columnData);
 	}
 
-	public static byte[] getColumnVal(byte[] row, List<byte[]> fieldValues,
-			int columnIndex) {
+	public static byte[] getColumnVal(byte[] row, List<byte[]> fieldValues, int columnIndex) {
 		RowDataPacket rowDataPkg = new RowDataPacket(fieldValues.size());
 		rowDataPkg.read(row);
 		byte[] columnData = rowDataPkg.fieldValues.get(columnIndex);
@@ -106,7 +96,7 @@ public class ResultSetUtil {
 		return b;
 	}
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		// byte[] byt =
 		// fromHex("20 00 00 02 03 64 65 66 00 00 00 0A 40 40 73 71 6C 5F 6D 6F 64 65 00 0C 21 00 BA 00 00 00 FD 01 00 1F 00 00");
 		// MysqlPacketBuffer buffer = new MysqlPacketBuffer(byt);
@@ -120,6 +110,5 @@ public class ResultSetUtil {
 		// fields[i].init(buffer);
 		// }
 		// System.out.println(1 | 0200);
-
 	}
 }
