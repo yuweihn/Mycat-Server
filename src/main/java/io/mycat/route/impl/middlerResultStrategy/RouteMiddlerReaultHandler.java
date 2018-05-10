@@ -9,7 +9,6 @@ import java.util.List;
 
 
 public interface RouteMiddlerReaultHandler {
-	
 	/**
 	 * 处理中间结果
 	 * @param statement
@@ -18,5 +17,4 @@ public interface RouteMiddlerReaultHandler {
 	 * @return
 	 */
 	String dohandler(SQLStatement statement, SQLSelect sqlselect, SQLObject parent, List param);
-
 }
