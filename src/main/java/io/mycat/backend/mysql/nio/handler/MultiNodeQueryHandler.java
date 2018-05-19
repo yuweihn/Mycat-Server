@@ -383,7 +383,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 				return;
 			}
 			/*else{
-				middlerResultHandler.secondEexcute(); 
+				middlerResultHandler.secondEexcute();
 			}*/
 		}
  		if (execCount == rrs.getNodes().length) {
@@ -402,7 +402,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 				}
  				middlerResultHandler.secondEexcute(); 
 				isMiddleResultDone.set(false);
-			} 
+			}
 		}
 	}
 
