@@ -1,13 +1,12 @@
 package io.mycat.statistic.stat;
 
+
+
 /**
  * SQL 执行结果
- * 
  * @author zhuam
- *
  */
 public class QueryResult {
-
 	private String user;		//用户
 	private int sqlType;		//SQL类型
 	private String sql;			//SQL
@@ -18,9 +17,8 @@ public class QueryResult {
 	private long endTime;		//结束时间
 	private int resultSize;     //结果集大小
 	
-	public QueryResult(String user, int sqlType, String sql, long sqlRows, 
-			long netInBytes, long netOutBytes, long startTime, long endTime
-			,int resultSize) {
+	public QueryResult(String user, int sqlType, String sql, long sqlRows, long netInBytes, long netOutBytes
+			, long startTime, long endTime, int resultSize) {
 		super();
 		this.user = user;
 		this.sqlType = sqlType;
@@ -30,7 +28,7 @@ public class QueryResult {
 		this.netOutBytes = netOutBytes;
 		this.startTime = startTime;
 		this.endTime = endTime;
-		this.resultSize=resultSize;
+		this.resultSize = resultSize;
 	}
 
 	public String getUser() {
