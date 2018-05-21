@@ -163,7 +163,7 @@ public class ShareJoin implements Catlet {
 
 					if(  middlerResultHandler !=null ){
 						//sc.getSession2().setCanClose(false);
-						middlerResultHandler.secondEexcute(); 
+						middlerResultHandler.secondExecute();
 					} else{
 						ctx.writeEof();
 					}

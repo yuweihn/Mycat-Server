@@ -400,7 +400,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
  				while (!this.isMiddleResultDone.compareAndSet(false, true)) {
  	                Thread.yield();
 				}
- 				middlerResultHandler.secondEexcute();
+ 				middlerResultHandler.secondExecute();
 				isMiddleResultDone.set(false);
 			}
 		}

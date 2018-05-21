@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface MiddlerResultHandler<T> {
 	List<SQLCharExpr> getResult();
-	void add(T t );
+	void add(T t);
 	String getDataType();
-	void secondEexcute();
+	void secondExecute();
 }

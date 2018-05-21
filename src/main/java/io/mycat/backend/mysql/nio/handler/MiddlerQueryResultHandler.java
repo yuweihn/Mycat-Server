@@ -43,7 +43,7 @@ public class MiddlerQueryResultHandler<T> implements MiddlerResultHandler<T> {
 	}
 	
 	@Override
-	public void secondEexcute() {
+	public void secondExecute() {
 		secondHandler.doExecute(getResult());
 	}
 }

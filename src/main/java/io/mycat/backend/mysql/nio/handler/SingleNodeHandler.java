@@ -341,7 +341,7 @@ public class SingleNodeHandler implements ResponseHandler, Terminatable, LoadDat
 		MiddlerResultHandler middlerResultHandler = session.getMiddlerResultHandler();
 
 		if(middlerResultHandler != null) {
-			middlerResultHandler.secondEexcute(); 
+			middlerResultHandler.secondExecute();
 		} else {
 			source.write(buffer);
 		}
