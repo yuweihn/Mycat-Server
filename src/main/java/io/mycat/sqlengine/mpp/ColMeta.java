@@ -23,9 +23,11 @@
  */
 package io.mycat.sqlengine.mpp;
 
+
 import java.io.Serializable;
 
-public class ColMeta implements Serializable{
+
+public class ColMeta implements Serializable {
 	public static final int COL_TYPE_DECIMAL = 0;
 	public static final int COL_TYPE_INT = 1;
 	public static final int COL_TYPE_SHORT = 2;
@@ -53,23 +55,23 @@ public class ColMeta implements Serializable{
 	public static final int COL_TYPE_VAR_STRING = 0xfd;
 	public static final int COL_TYPE_STRING = 0xfe;
 	public static final int COL_TYPE_GEOMETRY = 0xff;
-	public  int colIndex;
+	public int colIndex;
 	public final int colType;
 	
 	public int decimals;
 
-    public  int avgSumIndex;
-    public  int avgCountIndex;
+    public int avgSumIndex;
+    public int avgCountIndex;
 
     public ColMeta(int colIndex, int colType) {
 		super();
 		this.colIndex = colIndex;
 		this.colType = colType;
 	}
-    public ColMeta(int avgSumIndex,int avgCountIndex,  int colType) {
+    public ColMeta(int avgSumIndex, int avgCountIndex, int colType) {
         super();
         this.avgSumIndex = avgSumIndex;
-        this.avgCountIndex=avgCountIndex;
+        this.avgCountIndex = avgCountIndex;
         this.colType = colType;
     }
 	public int getColIndex() {
@@ -84,5 +86,4 @@ public class ColMeta implements Serializable{
 	public String toString() {
 		return "ColMeta [colIndex=" + colIndex + ", colType=" + colType + "]";
 	}
-
 }
