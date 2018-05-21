@@ -493,9 +493,9 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 				session.getSource().write(byteBuffer);
 			}
  		} catch (Exception e) {
-			e.printStackTrace(); 
+			e.printStackTrace();
 			handleDataProcessException(e);
-		} finally { 
+		} finally {
 			lock.unlock();
 			dataMergeSvr.clear();
 		}
