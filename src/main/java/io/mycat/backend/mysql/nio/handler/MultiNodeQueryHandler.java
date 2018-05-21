@@ -400,7 +400,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
  				while (!this.isMiddleResultDone.compareAndSet(false, true)) {
  	                Thread.yield();
 				}
- 				middlerResultHandler.secondEexcute(); 
+ 				middlerResultHandler.secondEexcute();
 				isMiddleResultDone.set(false);
 			}
 		}
@@ -412,7 +412,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 	 * @param eof
 	 * @param
 	 */
-	public void outputMergeResult(final ServerConnection source, final byte[] eof, Iterator<UnsafeRow> iter, AtomicBoolean isMiddleResultDone) {
+	public void outputMergeResult(final ServerConnection source, final byte[] eof, Iterator<UnsafeRow> itr, AtomicBoolean isMiddleResultDone) {
 		try {
 			lock.lock();
 			ByteBuffer buffer = session.getSource().allocate();
@@ -435,8 +435,8 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 			}
 
 			if(prepared) {
- 				while (iter.hasNext()) {
-					UnsafeRow row = iter.next();
+ 				while (itr.hasNext()) {
+					UnsafeRow row = itr.next();
 					if(index >= start) {
 						row.packetId = ++packetId;
 						BinaryRowDataPacket binRowPacket = new BinaryRowDataPacket();
@@ -449,8 +449,8 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 					}
 				}
 			} else {
-				while (iter.hasNext()) {
-					UnsafeRow row = iter.next();
+				while (itr.hasNext()) {
+					UnsafeRow row = itr.next();
 					if(index >= start) {
 						row.packetId = ++packetId;
 						buffer = row.write(buffer, source, true);

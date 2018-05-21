@@ -1,7 +1,7 @@
 package io.mycat.statistic.stat;
 
-public interface QueryResultListener {
-	
-	public void onQueryResult(QueryResult queryResult);
 
+
+public interface QueryResultListener {
+	void onQueryResult(QueryResult queryResult);
 }
