@@ -691,7 +691,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 			eof[3] = ++packetId;
 			buffer = source.writeToBuffer(eof, buffer);
 			
-			if(null == middlerResultHandler ){
+			if (null == middlerResultHandler ) {
 				//session.getSource().write(row);
 				source.write(buffer);
 		 	}
