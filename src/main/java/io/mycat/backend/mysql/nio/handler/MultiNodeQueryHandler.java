@@ -383,7 +383,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 				return;
 			}
 			/*else{
-				middlerResultHandler.secondEexcute();
+				middlerResultHandler.secondExecute();
 			}*/
 		}
  		if (execCount == rrs.getNodes().length) {
