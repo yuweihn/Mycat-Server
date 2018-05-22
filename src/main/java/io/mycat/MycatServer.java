@@ -192,7 +192,7 @@ public class MycatServer {
 		
 		//记录启动时间
 		this.startupTime = TimeUtil.currentTimeMillis();
-		if(isUseZkSwitch()) {
+		if (isUseZkSwitch()) {
 			String path = ZKUtils.getZKBasePath() + "lock/dnindex.lock";
 			this.dnIndexLock = new InterProcessMutex(ZKUtils.getConnection(), path);
 		}
@@ -237,9 +237,9 @@ public class MycatServer {
 
 	public String genXATXID() {
 		long seq = this.xaIDInc.incrementAndGet();
-		if(seq < 0) {
+		if (seq < 0) {
 			synchronized (xaIDInc) {
-				if(xaIDInc.get() < 0) {
+				if (xaIDInc.get() < 0) {
 					xaIDInc.set(0);
 				}
 				seq = xaIDInc.incrementAndGet();
@@ -364,7 +364,7 @@ public class MycatServer {
 			/**
 		 * Off Heap For Merge/Order/Group/Limit 初始化
 		 */
-		if(system.getUseOffHeapForMerge() == 1) {
+		if (system.getUseOffHeapForMerge() == 1) {
 			myCatMemory = new MyCatMemory(system, totalNetWorkBufferSize);
 		}
 		businessExecutor = ExecutorUtil.create("BusinessExecutor", threadPoolSize);
@@ -439,22 +439,21 @@ public class MycatServer {
 		heartbeatScheduler.scheduleAtFixedRate(dataSourceOldConsClear(), 0L, DEFAULT_OLD_CONNECTION_CLEAR_PERIOD, TimeUnit.MILLISECONDS);
 		scheduler.schedule(catletClassClear(), 30000, TimeUnit.MILLISECONDS);
        
-		if(system.getCheckTableConsistency() == 1) {
+		if (system.getCheckTableConsistency() == 1) {
             scheduler.scheduleAtFixedRate(tableStructureCheck(), 0L, system.getCheckTableConsistencyPeriod(), TimeUnit.MILLISECONDS);
         }
 		
-		if(system.getUseSqlStat() == 1) {
+		if (system.getUseSqlStat() == 1) {
 			scheduler.scheduleAtFixedRate(recycleSqlStat(), 0L, DEFAULT_SQL_STAT_RECYCLE_PERIOD, TimeUnit.MILLISECONDS);
 		}
 		
-		if(system.getUseGlobleTableCheck() == 1) {	// 全局表一致性检测是否开启
+		if (system.getUseGlobleTableCheck() == 1) {	// 全局表一致性检测是否开启
 			scheduler.scheduleAtFixedRate(glableTableConsistencyCheck(), 0L, system.getGlableTableCheckPeriod(), TimeUnit.MILLISECONDS);
 		}
 		
 		//定期清理结果集排行榜，控制拒绝策略
 		scheduler.scheduleAtFixedRate(resultSetMapClear(), 0L, system.getClearBigSqLResultSetMapMs(), TimeUnit.MILLISECONDS);
-		
- 		
+
 //		new Thread(tableStructureCheck()).start();
 
 //		XA Init recovery Log
@@ -462,7 +461,7 @@ public class MycatServer {
 		LOGGER.info("Perform XA recovery log ...");
 		performXARecoveryLog();
 
-		if(isUseZkSwitch()) {
+		if (isUseZkSwitch()) {
 			//首次启动如果发现zk上dnindex为空，则将本地初始化上zk
 			initZkDnindex();
 		}
@@ -472,7 +471,7 @@ public class MycatServer {
 	}
 
 	public void initRuleData() {
-		if(!isUseZk()) {
+		if (!isUseZk()) {
 			return;
 		}
 		InterProcessMutex ruleDataLock = null;
@@ -482,7 +481,7 @@ public class MycatServer {
 			ruleDataLock = new InterProcessMutex(ZKUtils.getConnection(), path);
 			ruleDataLock.acquire(30, TimeUnit.SECONDS);
 			File[] childFiles = file.listFiles();
-			if(childFiles != null && childFiles.length > 0) {
+			if (childFiles != null && childFiles.length > 0) {
 				String basePath = ZKUtils.getZKBasePath() + "ruledata/";
 				for (File childFile: childFiles) {
 					CuratorFramework zk = ZKUtils.getConnection();
@@ -495,7 +494,7 @@ public class MycatServer {
 			throw new RuntimeException(e);
 		} finally {
 			try {
-				if(ruleDataLock != null) {
+				if (ruleDataLock != null) {
 					ruleDataLock.release();
 				}
 			} catch (Exception e) {
@@ -525,7 +524,7 @@ public class MycatServer {
 	}
 
 	public void reloadDnIndex() {
-		if(MycatServer.getInstance().getProcessors() == null) {
+		if (MycatServer.getInstance().getProcessors() == null) {
 			return;
 		}
 		// load datanode active index from properties
@@ -533,7 +532,7 @@ public class MycatServer {
 		// init datahost
 		Map<String, PhysicalDBPool> dataHosts = config.getDataHosts();
 		LOGGER.info("reInitialize dataHost ...");
-		for (PhysicalDBPool node : dataHosts.values()) {
+		for (PhysicalDBPool node: dataHosts.values()) {
 			String index = dnIndexProperties.getProperty(node.getHostName(), "0");
 			if (!"0".equals(index)) {
 				LOGGER.info("reinit datahost: " + node.getHostName() + "  to use datasource index: " + index);
@@ -571,7 +570,7 @@ public class MycatServer {
 						//根据 lastTime 确认事务的执行， 超过 sqlExecuteTimeout 阀值 close connection
 						long currentTime = TimeUtil.currentTimeMillis();
 						Iterator<BackendConnection> itr = NIOProcessor.backends_old.iterator();
-						while(itr.hasNext()) {
+						while (itr.hasNext()) {
 							BackendConnection con = itr.next();
 							long lastTime = con.getLastTime();
 							if (currentTime - lastTime > sqlTimeout) {
@@ -599,12 +598,12 @@ public class MycatServer {
 				    long bufferSize = bufferPool.size();
 				    long bufferCapacity = bufferPool.capacity();
 					long bufferUsagePercent = (bufferCapacity - bufferSize) * 100 / bufferCapacity;
-					if(bufferUsagePercent < config.getSystem().getBufferUsagePercent()) {
+					if (bufferUsagePercent < config.getSystem().getBufferUsagePercent()) {
 						Map<String, UserStat> map = UserStatAnalyzer.getInstance().getUserStatMap();
 						Set<String> userSet = config.getUsers().keySet();
 						for (String user: userSet) {
 							UserStat userStat = map.get(user);
-							if(userStat != null) {
+							if (userStat != null) {
 								SqlResultSizeRecorder recorder = userStat.getSqlResultSizeRecorder();
 								//System.out.println(recorder.getSqlResultSet().size());
 								recorder.clearSqlResultSet();
@@ -645,20 +644,20 @@ public class MycatServer {
 			fileOut = new FileOutputStream(file);
 			dnIndexProperties.store(fileOut, "update");
 
-			if(isUseZkSwitch()) {
+			if (isUseZkSwitch()) {
 				// save to  zk
 				try {
 					dnIndexLock.acquire(30, TimeUnit.SECONDS);
 					String path = ZKUtils.getZKBasePath() + "bindata/dnindex.properties";
 					CuratorFramework zk = ZKUtils.getConnection();
-					if(zk.checkExists().forPath(path) == null) {
+					if (zk.checkExists().forPath(path) == null) {
 						zk.create().creatingParentsIfNeeded().forPath(path, Files.toByteArray(file));
 					} else {
 						byte[] data = zk.getData().forPath(path);
 						ByteArrayOutputStream out = new ByteArrayOutputStream();
 						Properties properties = new Properties();
 						properties.load(new ByteArrayInputStream(data));
-						if(!String.valueOf(curIndex).equals(properties.getProperty(dataHost))) {
+						if (!String.valueOf(curIndex).equals(properties.getProperty(dataHost))) {
 							properties.setProperty(dataHost, String.valueOf(curIndex));
 							properties.store(out, "update");
 							zk.setData().forPath(path, out.toByteArray());
@@ -803,7 +802,7 @@ public class MycatServer {
 						/*
 						Map<String, PhysicalDBPool> _nodes = config.getBackupDataHosts();
 						if (_nodes != null) {
-							for (PhysicalDBPool node : _nodes.values()) {
+							for (PhysicalDBPool node: _nodes.values()) {
 								node.heartbeatCheck(heartPeriod);
 							}
 						}*/
@@ -832,7 +831,7 @@ public class MycatServer {
 	}
 
 	//定时清理保存SqlStat中的数据
-	private Runnable recycleSqlStat(){
+	private Runnable recycleSqlStat() {
 		return new Runnable() {
 			@Override
 			public void run() {
@@ -873,18 +872,18 @@ public class MycatServer {
 		//fetch the recovery log
 		CoordinatorLogEntry[] coordinatorLogEntries = getCoordinatorLogEntries();
 
-		for(int i = 0; i < coordinatorLogEntries.length; i++) {
+		for (int i = 0; i < coordinatorLogEntries.length; i++) {
 			CoordinatorLogEntry coordinatorLogEntry = coordinatorLogEntries[i];
 			boolean needRollback = false;
-			for(int j = 0; j < coordinatorLogEntry.participants.length; j++) {
+			for (int j = 0; j < coordinatorLogEntry.participants.length; j++) {
 				ParticipantLogEntry participantLogEntry = coordinatorLogEntry.participants[j];
 				if (participantLogEntry.txState == TxState.TX_PREPARED_STATE) {
 					needRollback = true;
 					break;
 				}
 			}
-			if(needRollback) {
-				for(int j = 0; j < coordinatorLogEntry.participants.length; j++) {
+			if (needRollback) {
+				for (int j = 0; j < coordinatorLogEntry.participants.length; j++) {
 					ParticipantLogEntry participantLogEntry = coordinatorLogEntry.participants[j];
 					//XA rollback
 					String xacmd = "XA ROLLBACK " + coordinatorLogEntry.id + ';';
@@ -911,7 +910,7 @@ public class MycatServer {
 		}
 
 		//init into in memory cached
-		for(int i = 0; i < coordinatorLogEntries.length; i++) {
+		for (int i = 0; i < coordinatorLogEntries.length; i++) {
 			MultiNodeCoordinator.inMemoryRepository.put(coordinatorLogEntries[i].id, coordinatorLogEntries[i]);
 		}
 		//discard the recovery log
@@ -921,10 +920,10 @@ public class MycatServer {
 	/** covert the collection to array **/
 	private CoordinatorLogEntry[] getCoordinatorLogEntries() {
 		Collection<CoordinatorLogEntry> allCoordinatorLogEntries = fileRepository.getAllCoordinatorLogEntries();
-		if(allCoordinatorLogEntries == null) {
+		if (allCoordinatorLogEntries == null) {
 			return new CoordinatorLogEntry[0];
 		}
-		if(allCoordinatorLogEntries.size() == 0) {
+		if (allCoordinatorLogEntries.size() == 0) {
 			return new CoordinatorLogEntry[0];
 		}
 		return allCoordinatorLogEntries.toArray(new CoordinatorLogEntry[allCoordinatorLogEntries.size()]);
@@ -936,7 +935,7 @@ public class MycatServer {
 
 	//huangyiming add
 	public DirectByteBufferPool getDirectByteBufferPool() {
-		return (DirectByteBufferPool)bufferPool;
+		return (DirectByteBufferPool) bufferPool;
 	}
 
 	public boolean isAIO() {
