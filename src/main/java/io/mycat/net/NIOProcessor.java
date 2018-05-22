@@ -126,7 +126,7 @@ public final class NIOProcessor {
 		return this.frontends;
 	}
 	
-	public int getForntedsLength(){
+	public int getFrontendsLength(){
 		return this.frontendsLength.get();
 	}
 

@@ -139,7 +139,7 @@ public class FrontendAuthenticator implements NIOHandler {
 	    	int forntedsLength = 0;
 	    	NIOProcessor[] processors = MycatServer.getInstance().getProcessors();
 			for (NIOProcessor p : processors) {
-				forntedsLength += p.getForntedsLength();
+				forntedsLength += p.getFrontendsLength();
 			}
 
             return forntedsLength >= benchmark;
