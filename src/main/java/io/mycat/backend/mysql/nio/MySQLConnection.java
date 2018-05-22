@@ -69,7 +69,7 @@ public class MySQLConnection extends BackendAIOConnection {
 		flag |= Capabilities.CLIENT_CONNECT_WITH_DB;
 		// flag |= Capabilities.CLIENT_NO_SCHEMA;
 		boolean usingCompress = MycatServer.getInstance().getConfig().getSystem().getUseCompression() == 1 ;
-		if(usingCompress) {
+		if (usingCompress) {
 			 flag |= Capabilities.CLIENT_COMPRESS;
 		}
 		flag |= Capabilities.CLIENT_ODBC;
@@ -333,7 +333,9 @@ public class MySQLConnection extends BackendAIOConnection {
 				this.updateConnectionInfo(conn);
 				conn.metaDataSyned = true;
 				return false;
-			} else return remains < 0;
+			} else {
+				return remains < 0;
+			}
 		}
 
 		private void updateConnectionInfo(MySQLConnection conn) {
@@ -375,7 +377,7 @@ public class MySQLConnection extends BackendAIOConnection {
 			modifiedSQLExecuted = true;
 		}
 		String xaTXID = null;
-		if(sc.getSession2().getXaTXID() != null){
+		if (sc.getSession2().getXaTXID() != null) {
 			xaTXID = sc.getSession2().getXaTXID() + ",'" + getSchema() + "'";
 		}
 		synAndDoExecute(xaTXID, rrn, sc.getCharsetIndex(), sc.getTxIsolation(), autocommit);
@@ -538,9 +540,9 @@ public class MySQLConnection extends BackendAIOConnection {
 										// we can't know it's syn status ,so
 										// close
 										// it
-			LOGGER.warn("can't sure connection syn result,so close it " + this);
+			LOGGER.warn("can't sure connection syn result, so close it " + this);
 			this.respHandler = null;
-			this.close("syn status unkown ");
+			this.close("sync status unknown ");
 			return;
 		}
 		metaDataSyned = true;
