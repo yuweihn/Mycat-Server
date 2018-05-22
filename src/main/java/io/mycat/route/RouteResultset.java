@@ -79,6 +79,7 @@ public final class RouteResultset implements Serializable {
 
     private boolean selectForUpdate;
     private List<String> tables;
+    private Procedure procedure;
 
 
     public boolean isSelectForUpdate() {
@@ -112,7 +113,6 @@ public final class RouteResultset implements Serializable {
 	public void setRunOnSlave(Boolean runOnSlave) {
 		this.runOnSlave = runOnSlave;
 	}
-	  private Procedure procedure;
 
     public Procedure getProcedure() {
         return procedure;
@@ -161,9 +161,9 @@ public final class RouteResultset implements Serializable {
     }
 
     public void copyLimitToNodes() {
-        if(nodes != null) {
+        if (nodes != null) {
             for (RouteResultsetNode node: nodes) {
-                if(node.getLimitSize() == -1 && node.getLimitStart() == 0) {
+                if (node.getLimitSize() == -1 && node.getLimitStart() == 0) {
                     node.setLimitStart(limitStart);
                     node.setLimitSize(limitSize);
                 }
@@ -269,7 +269,6 @@ public final class RouteResultset implements Serializable {
 
     public LinkedHashMap<String, Integer> getOrderByCols() {
         return (sqlMerge != null) ? sqlMerge.getOrderByCols() : null;
-
     }
 
     public String getStatement() {
@@ -281,7 +280,7 @@ public final class RouteResultset implements Serializable {
     }
 
     public void setNodes(RouteResultsetNode[] nodes) {
-        if(nodes != null) {
+        if (nodes != null) {
            int nodeSize = nodes.length;
             for (RouteResultsetNode node: nodes) {
                 node.setTotalNodeSize(nodeSize);
@@ -311,7 +310,7 @@ public final class RouteResultset implements Serializable {
 
     public void setCallStatement(boolean callStatement) {
         this.callStatement = callStatement;
-        if(nodes != null) {
+        if (nodes != null) {
             for (RouteResultsetNode node: nodes) {
                 node.setCallStatement(callStatement);
             }

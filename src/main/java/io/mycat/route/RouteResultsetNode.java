@@ -127,12 +127,12 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 	 * @return
 	 */
 	public boolean canRunINReadDB(boolean autocommit) {
-//		return canRunInReadDB && (autocommit || (!autocommit && hasBlanceFlag));
+//		return canRunInReadDB && (autocommit || (!autocommit && hasBalanceFlag));
 		return canRunInReadDB && (autocommit || hasBalanceFlag);
 	}
 	
-//	public boolean canRunnINReadDB(boolean autocommit) {
-//		return canRunInReadDB && autocommit && !hasBlanceFlag || canRunInReadDB && !autocommit && hasBlanceFlag;
+//	public boolean canRunINReadDB(boolean autocommit) {
+//		return canRunInReadDB && autocommit && !hasBalanceFlag || canRunInReadDB && !autocommit && hasBalanceFlag;
 //	}
 
 	public Procedure getProcedure() {
@@ -214,7 +214,7 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 		}
 		if (obj instanceof RouteResultsetNode) {
 			RouteResultsetNode rrn = (RouteResultsetNode) obj;
-			if(subTableName != null) {
+			if (subTableName != null) {
 				return equals(name, rrn.getName()) && equals(subTableName, rrn.getSubTableName());
 			} else {
 				return equals(name, rrn.getName());
@@ -256,22 +256,21 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 
 	@Override
 	public int compareTo(RouteResultsetNode obj) {
-		if(obj == null) {
+		if (obj == null) {
 			return 1;
 		}
-		if(this.name == null) {
+		if (this.name == null) {
 			return -1;
 		}
-		if(obj.name == null) {
+		if (obj.name == null) {
 			return 1;
 		}
 		int c = this.name.compareTo(obj.name);
-		if(!this.isDisctTable()) {
+		if (!this.isDisctTable()) {
 			return c;
+		} else if (c == 0) {
+			return this.subTableName.compareTo(obj.subTableName);
 		} else {
-			if(c == 0) {
-				return this.subTableName.compareTo(obj.subTableName);
-			}
 			return c;
 		}
 	}
