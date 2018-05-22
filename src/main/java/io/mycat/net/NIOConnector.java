@@ -23,6 +23,7 @@
  */
 package io.mycat.net;
 
+
 import io.mycat.MycatServer;
 import io.mycat.util.SelectorUtil;
 import org.slf4j.Logger;
@@ -38,6 +39,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
+
 /**
  * @author mycat
  */
@@ -51,8 +53,7 @@ public final class NIOConnector extends Thread implements SocketConnector {
 	private long connectCount;
 	private final NIOReactorPool reactorPool;
 
-	public NIOConnector(String name, NIOReactorPool reactorPool)
-			throws IOException {
+	public NIOConnector(String name, NIOReactorPool reactorPool) throws IOException {
 		super.setName(name);
 		this.name = name;
 		this.selector = Selector.open();
@@ -81,35 +82,26 @@ public final class NIOConnector extends Thread implements SocketConnector {
 				long end = System.nanoTime();
 				connect(tSelector);
 				Set<SelectionKey> keys = tSelector.selectedKeys();
-				if (keys.size() == 0 && (end - start) < SelectorUtil.MIN_SELECT_TIME_IN_NANO_SECONDS )
-				{
+				if (keys.size() == 0 && (end - start) < SelectorUtil.MIN_SELECT_TIME_IN_NANO_SECONDS) {
 					invalidSelectCount++;
-				}
-				else
-				{
+				} else {
 					try {
-						for (SelectionKey key : keys)
-						{
+						for (SelectionKey key: keys) {
 							Object att = key.attachment();
-							if (att != null && key.isValid() && key.isConnectable())
-							{
+							if (att != null && key.isValid() && key.isConnectable()) {
 								finishConnect(key, att);
-							} else
-							{
+							} else {
 								key.cancel();
 							}
 						}
-					} finally
-					{
+					} finally {
 						invalidSelectCount = 0;
 						keys.clear();
 					}
 				}
-				if (invalidSelectCount > SelectorUtil.REBUILD_COUNT_THRESHOLD)
-				{
+				if (invalidSelectCount > SelectorUtil.REBUILD_COUNT_THRESHOLD) {
 					final Selector rebuildSelector = SelectorUtil.rebuildSelector(this.selector);
-					if (rebuildSelector != null)
-					{
+					if (rebuildSelector != null) {
 						this.selector = rebuildSelector;
 					}
 					invalidSelectCount = 0;
@@ -128,7 +120,7 @@ public final class NIOConnector extends Thread implements SocketConnector {
 				channel.register(selector, SelectionKey.OP_CONNECT, c);
 				channel.connect(new InetSocketAddress(c.host, c.port));
 			} catch (Exception e) {
-				LOGGER.error("error:",e);
+				LOGGER.error("error:", e);
 				c.close(e.toString());
 			}
 		}
@@ -148,17 +140,15 @@ public final class NIOConnector extends Thread implements SocketConnector {
 			}
 		} catch (Exception e) {
 			clearSelectionKey(key);
-			LOGGER.error("error:",e);
+			LOGGER.error("error:", e);
 			c.close(e.toString());
 			c.onConnectFailed(e);
 		}
 	}
 
-	private boolean finishConnect(AbstractConnection c, SocketChannel channel)
-			throws IOException {
+	private boolean finishConnect(AbstractConnection c, SocketChannel channel) throws IOException {
 		if (channel.isConnectionPending()) {
 			channel.finishConnect();
-
 			c.setLocalPort(channel.socket().getLocalPort());
 			return true;
 		} else {
@@ -179,13 +169,10 @@ public final class NIOConnector extends Thread implements SocketConnector {
 	 * @author mycat
 	 */
 	public static class ConnectIdGenerator {
-
-		private static final long MAX_VALUE = Long.MAX_VALUE;
 		private AtomicLong connectId = new AtomicLong(0);
 
 		public long getId() {
 			return connectId.incrementAndGet();
 		}
 	}
-
 }

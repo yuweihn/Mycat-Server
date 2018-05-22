@@ -154,7 +154,7 @@ public final class NIOReactor {
 					}
 				} catch (Exception e) {
 					LOGGER.warn(name, e);
-				} catch (final Throwable e){
+				} catch (final Throwable e) {
 					// Catch exceptions such as OOM so that the reactor can keep running!
                 	// @author Uncle-pan
                 	// @since 2016-03-30

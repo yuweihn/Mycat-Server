@@ -50,8 +50,8 @@ public class FrontendCommandHandler implements NIOHandler {
     public void handle(byte[] data) {
         if(source.getLoadDataInfileHandler() != null && source.getLoadDataInfileHandler().isStartLoadData()) {
             MySQLMessage mm = new MySQLMessage(data);
-            int  packetLength = mm.readUB3();
-            if(packetLength + 4 == data.length) {
+            int packetLength = mm.readUB3();
+            if (packetLength + 4 == data.length) {
                 source.loadDataInfileData(data);
             }
             return;

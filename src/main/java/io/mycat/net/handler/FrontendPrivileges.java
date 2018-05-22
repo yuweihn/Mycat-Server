@@ -23,7 +23,9 @@
  */
 package io.mycat.net.handler;
 
+
 import java.util.Set;
+
 
 /**
  * 权限提供者
@@ -31,7 +33,6 @@ import java.util.Set;
  * @author mycat
  */
 public interface FrontendPrivileges {
-
     /**
      * 检查schema是否存在
      */
@@ -66,7 +67,6 @@ public interface FrontendPrivileges {
      */
     int getBenchmark(String user);
     
-    
     /**
      * 检查防火墙策略
      * （白名单策略）
@@ -84,11 +84,9 @@ public interface FrontendPrivileges {
      */
     boolean checkFirewallSQLPolicy(String user, String sql);
     
-    
     /**
      * 检查 SQL 语句的 DML 权限
      * @return
      */
-    boolean checkDmlPrivilege(String user, String schema, String sql);   
-
+    boolean checkDmlPrivilege(String user, String schema, String sql);
 }

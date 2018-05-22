@@ -23,7 +23,16 @@
  */
 package io.mycat.net;
 
-import java.io.IOException;
+
+import io.mycat.MycatServer;
+import io.mycat.backend.BackendConnection;
+import io.mycat.buffer.BufferPool;
+import io.mycat.statistic.CommandCount;
+import io.mycat.util.NameableExecutor;
+import io.mycat.util.TimeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,22 +40,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import io.mycat.buffer.BufferPool;
-
-import org.slf4j.Logger; 
-import org.slf4j.LoggerFactory;
-
-import io.mycat.MycatServer;
-import io.mycat.backend.BackendConnection;
-import io.mycat.statistic.CommandCount;
-import io.mycat.util.NameableExecutor;
-import io.mycat.util.TimeUtil;
 
 /**
  * @author mycat
  */
 public final class NIOProcessor {
-	
 	private static final Logger LOGGER = LoggerFactory.getLogger("NIOProcessor");
 	
 	private final String name;
@@ -65,8 +63,7 @@ public final class NIOProcessor {
 	//前端已连接数
 	private AtomicInteger frontendsLength = new AtomicInteger(0);
 
-	public NIOProcessor(String name, BufferPool bufferPool,
-			NameableExecutor executor) throws IOException {
+	public NIOProcessor(String name, BufferPool bufferPool, NameableExecutor executor) {
 		this.name = name;
 		this.bufferPool = bufferPool;
 		this.executor = executor;
@@ -85,16 +82,15 @@ public final class NIOProcessor {
 
 	public int getWriteQueueSize() {
 		int total = 0;
-		for (FrontendConnection fron : frontends.values()) {
+		for (FrontendConnection fron: frontends.values()) {
 			total += fron.getWriteQueue().size();
 		}
-		for (BackendConnection back : backends.values()) {
+		for (BackendConnection back: backends.values()) {
 			if (back instanceof BackendAIOConnection) {
 				total += ((BackendAIOConnection) back).getWriteQueue().size();
 			}
 		}
 		return total;
-
 	}
 
 	public NameableExecutor getExecutor() {
@@ -158,8 +154,7 @@ public final class NIOProcessor {
 
 	// 前端连接检查
 	private void frontendCheck() {
-		Iterator<Entry<Long, FrontendConnection>> it = frontends.entrySet()
-				.iterator();
+		Iterator<Entry<Long, FrontendConnection>> it = frontends.entrySet().iterator();
 		while (it.hasNext()) {
 			FrontendConnection c = it.next().getValue();
 
@@ -205,7 +200,7 @@ public final class NIOProcessor {
 			}
 			// SQL执行超时的连接关闭
 			if (c.isBorrowed() && c.getLastTime() < TimeUtil.currentTimeMillis() - sqlTimeout) {
-				LOGGER.warn("found backend connection SQL timeout ,close it " + c);
+				LOGGER.warn("found backend connection SQL timeout, close it " + c);
 				c.close("sql timeout");
 			}
 
@@ -230,11 +225,9 @@ public final class NIOProcessor {
 			this.frontends.remove(con.getId());
 			this.frontendsLength.decrementAndGet();
 		}
-
 	}
 	//jdbc连接用这个释放
-	public void removeConnection(BackendConnection con){
+	public void removeConnection(BackendConnection con) {
 	    this.backends.remove(con.getId());
 	}
-
 }

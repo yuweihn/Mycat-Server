@@ -23,26 +23,23 @@
  */
 package io.mycat.net;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.StandardSocketOptions;
-import java.nio.channels.AsynchronousChannelGroup;
-import java.nio.channels.AsynchronousServerSocketChannel;
-import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.CompletionHandler;
-import java.nio.channels.NetworkChannel;
-import java.util.concurrent.atomic.AtomicLong;
-
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import io.mycat.MycatServer;
 import io.mycat.net.factory.FrontendConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.StandardSocketOptions;
+import java.nio.channels.*;
+import java.util.concurrent.atomic.AtomicLong;
+
 
 /**
  * @author mycat
  */
-public final class AIOAcceptor implements SocketAcceptor,
-		CompletionHandler<AsynchronousSocketChannel, Long> {
+public final class AIOAcceptor implements SocketAcceptor, CompletionHandler<AsynchronousSocketChannel, Long> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AIOAcceptor.class);
 	private static final AcceptIdGenerator ID_GENERATOR = new AcceptIdGenerator();
 
@@ -53,9 +50,8 @@ public final class AIOAcceptor implements SocketAcceptor,
 	private long acceptCount;
 	private final String name;
 
-	public AIOAcceptor(String name, String ip, int port,
-			FrontendConnectionFactory factory, AsynchronousChannelGroup group)
-			throws IOException {
+	public AIOAcceptor(String name, String ip, int port, FrontendConnectionFactory factory
+			, AsynchronousChannelGroup group) throws IOException {
 		this.name = name;
 		this.port = port;
 		this.factory = factory;
@@ -63,7 +59,7 @@ public final class AIOAcceptor implements SocketAcceptor,
 		/** 设置TCP属性 */
 		serverChannel.setOption(StandardSocketOptions.SO_REUSEADDR, true);
 		serverChannel.setOption(StandardSocketOptions.SO_RCVBUF, 1024 * 16 * 2);
-		// backlog=100
+		// backlog = 100
 		serverChannel.bind(new InetSocketAddress(ip, port), 100);
 	}
 
@@ -101,10 +97,8 @@ public final class AIOAcceptor implements SocketAcceptor,
 		if (serverChannel.isOpen()) {
 			serverChannel.accept(ID_GENERATOR.getId(), this);
 		} else {
-			throw new IllegalStateException(
-					"MyCAT Server Channel has been closed");
+			throw new IllegalStateException("MyCAT Server Channel has been closed");
 		}
-
 	}
 
 	@Override
@@ -112,7 +106,6 @@ public final class AIOAcceptor implements SocketAcceptor,
 		accept(result, id);
 		// next pending waiting
 		pendingAccept();
-
 	}
 
 	@Override
@@ -120,7 +113,6 @@ public final class AIOAcceptor implements SocketAcceptor,
 		LOGGER.info("acception connect failed:" + exc);
 		// next pending waiting
 		pendingAccept();
-
 	}
 
 	private static void closeChannel(NetworkChannel channel) {
@@ -140,7 +132,6 @@ public final class AIOAcceptor implements SocketAcceptor,
 	 * @author mycat
 	 */
 	private static class AcceptIdGenerator {
-
 		private static final long MAX_VALUE = 0xffffffffL;
 
 		private AtomicLong acceptId = new AtomicLong();

@@ -23,18 +23,19 @@
  */
 package io.mycat.net;
 
-import java.nio.channels.CompletionHandler;
-
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import io.mycat.MycatServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.nio.channels.CompletionHandler;
 import java.util.concurrent.atomic.AtomicLong;
+
 
 /**
  * @author mycat
  */
-public final class AIOConnector implements SocketConnector,
-		CompletionHandler<Void, BackendAIOConnection> {
+public final class AIOConnector implements SocketConnector, CompletionHandler<Void, BackendAIOConnection> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AIOConnector.class);
 	private static final ConnectIdGenerator ID_GENERATOR = new ConnectIdGenerator();
 
@@ -56,14 +57,13 @@ public final class AIOConnector implements SocketConnector,
 		try {
 			if (c.finishConnect()) {
 				c.setId(ID_GENERATOR.getId());
-				NIOProcessor processor = MycatServer.getInstance()
-						.nextProcessor();
+				NIOProcessor processor = MycatServer.getInstance().nextProcessor();
 				c.setProcessor(processor);
 				c.register();
 			}
 		} catch (Exception e) {
 			c.onConnectFailed(e);
-			LOGGER.info("connect err " , e);
+			LOGGER.info("connect err ", e);
 			c.close(e.toString());
 		}
 	}
@@ -74,9 +74,6 @@ public final class AIOConnector implements SocketConnector,
 	 * @author mycat
 	 */
 	private static class ConnectIdGenerator {
-
-		private static final long MAX_VALUE = Long.MAX_VALUE;
-
 		private AtomicLong connectId = new AtomicLong(0);
 
 		private long getId() {

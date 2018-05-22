@@ -322,7 +322,7 @@ public abstract class AbstractConnection implements NIOConnection {
 				handle(data);
 				
 				// maybe handle stmt_close
-				if(isClosed()) {
+				if (isClosed()) {
 					return ;
 				}
 
@@ -351,7 +351,7 @@ public abstract class AbstractConnection implements NIOConnection {
 				} else {
 					// try next package parse
 					readBufferOffset = offset;
-					if(readBuffer != null) {
+					if (readBuffer != null) {
 						readBuffer.position(position);
 					}
 					continue;
@@ -396,7 +396,7 @@ public abstract class AbstractConnection implements NIOConnection {
 	}
 	
 	private ByteBuffer compactReadBuffer(ByteBuffer buffer, int offset) {
-		if(buffer == null) {
+		if (buffer == null) {
 			return null;
 		}
 		buffer.limit(buffer.position());

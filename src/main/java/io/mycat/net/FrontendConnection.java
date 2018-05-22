@@ -513,8 +513,8 @@ public abstract class FrontendConnection extends AbstractConnection {
         flag |= Capabilities.CLIENT_MULTI_STATEMENTS;
         flag |= Capabilities.CLIENT_MULTI_RESULTS;
         boolean useHandshakeV10 = MycatServer.getInstance().getConfig().getSystem().getUseHandshakeV10() == 1;
-        if(useHandshakeV10) {
-        	flag |= Capabilities.CLIENT_PLUGIN_AUTH;
+        if (useHandshakeV10) {
+			flag |= Capabilities.CLIENT_PLUGIN_AUTH;
         }
 		return flag;
 	}
@@ -522,7 +522,7 @@ public abstract class FrontendConnection extends AbstractConnection {
 	protected boolean isConnectionReset(Throwable t) {
 		if (t instanceof IOException) {
 			String msg = t.getMessage();
-			return (msg != null && msg.contains("Connection reset by peer"));
+			return msg != null && msg.contains("Connection reset by peer");
 		}
 		return false;
 	}

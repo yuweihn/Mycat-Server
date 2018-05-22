@@ -23,6 +23,8 @@
  */
 package io.mycat.net;
 
+
+
 public class ConnectionException extends RuntimeException {
 	/**
 	 * 
@@ -41,5 +43,4 @@ public class ConnectionException extends RuntimeException {
 	public String toString() {
 		return "ConnectionException [code=" + code + ", msg=" + msg + "]";
 	}
-
 }

@@ -23,20 +23,18 @@
  */
 package io.mycat.net;
 
+
+import io.mycat.backend.BackendConnection;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.NetworkChannel;
 
-import io.mycat.backend.BackendConnection;
 
 /**
  * @author mycat
  */
-public abstract class BackendAIOConnection extends AbstractConnection implements
-		BackendConnection {
-
-	
-	
+public abstract class BackendAIOConnection extends AbstractConnection implements BackendConnection {
 	protected boolean isFinishConnect;
 
 	public BackendAIOConnection(NetworkChannel channel) {
@@ -47,17 +45,13 @@ public abstract class BackendAIOConnection extends AbstractConnection implements
 		this.asynRead();
 	}
 
-
 	public void setHost(String host) {
 		this.host = host;
 	}
 
-
 	public void setPort(int port) {
 		this.port = port;
 	}
-
-	
 
 	
 	public void discardClose(String reason){
@@ -78,7 +72,6 @@ public abstract class BackendAIOConnection extends AbstractConnection implements
 
 	@Override
 	public String toString() {
-		return "BackendConnection [id=" + id + ", host=" + host + ", port="
-				+ port + ", localPort=" + localPort + "]";
+		return "BackendConnection [id=" + id + ", host=" + host + ", port=" + port + ", localPort=" + localPort + "]";
 	}
 }
