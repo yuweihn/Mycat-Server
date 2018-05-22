@@ -183,7 +183,6 @@ public class SingleNodeHandler implements ResponseHandler, Terminatable, LoadDat
 	public void connectionAcquired(final BackendConnection conn) {
 		session.bindConnection(node, conn);
 		_execute(conn);
-
 	}
 
 	private void _execute(BackendConnection conn) {
@@ -239,8 +238,7 @@ public class SingleNodeHandler implements ResponseHandler, Terminatable, LoadDat
 		int errPort = source.getLocalPort();
 		
 		String errmgs = " errno:" + errPkg.errno + " " + new String(errPkg.message);
-		LOGGER.warn("execute  sql err :" + errmgs + " con:" + conn 
-				+ " frontend host:" + errHost + "/" + errPort + "/" + errUser);
+		LOGGER.warn("execute  sql err :" + errmgs + " con:" + conn + " frontend host:" + errHost + "/" + errPort + "/" + errUser);
 		
 		session.releaseConnectionIfSafe(conn, LOGGER.isDebugEnabled(), false);
 		source.setTxInterrupt(errmgs);
@@ -283,12 +281,11 @@ public class SingleNodeHandler implements ResponseHandler, Terminatable, LoadDat
 			ServerConnection source = session.getSource();
 			OkPacket ok = new OkPacket();
 			ok.read(data);
-            boolean isCanClose2Client =(!rrs.isCallStatement()) ||(rrs.isCallStatement() &&!rrs.getProcedure().isResultSimpleValue());
-			if (rrs.isLoadData()) {				
+            boolean isCanClose2Client = (!rrs.isCallStatement()) || (rrs.isCallStatement() && !rrs.getProcedure().isResultSimpleValue());
+			if (rrs.isLoadData()) {
 				byte lastPackId = source.getLoadDataInfileHandler().getLastPackId();
 				ok.packetId = ++lastPackId;// OK_PACKET
 				source.getLoadDataInfileHandler().clear();
-				
 			} else if (isCanClose2Client) {
 				ok.packetId = ++packetId;// OK_PACKET
 			}
@@ -306,13 +303,12 @@ public class SingleNodeHandler implements ResponseHandler, Terminatable, LoadDat
 			}
             
 			this.affectedRows = ok.affectedRows;
-			
 			source.setExecuteSql(null);
 			// add by lian
 			// 解决sql统计中写操作永远为0
 			QueryResult queryResult = new QueryResult(session.getSource().getUser(), rrs.getSqlType(), rrs.getStatement()
 					, affectedRows, netInBytes, netOutBytes, startTime, System.currentTimeMillis(), 0);
-			QueryResultDispatcher.dispatchQuery( queryResult );
+			QueryResultDispatcher.dispatchQuery(queryResult);
 		}
 	}
 
@@ -340,7 +336,7 @@ public class SingleNodeHandler implements ResponseHandler, Terminatable, LoadDat
 		resultSize = resultSize + buffer.position();
 		MiddlerResultHandler middlerResultHandler = session.getMiddlerResultHandler();
 
-		if(middlerResultHandler != null) {
+		if (middlerResultHandler != null) {
 			middlerResultHandler.secondExecute();
 		} else {
 			source.write(buffer);
@@ -375,7 +371,7 @@ public class SingleNodeHandler implements ResponseHandler, Terminatable, LoadDat
 		this.header = header;
 		this.fields = fields;
 		MiddlerResultHandler middlerResultHandler = session.getMiddlerResultHandler();
-        if(null != middlerResultHandler) {
+        if (null != middlerResultHandler) {
 			return;
 		}
 		this.netOutBytes += header.length;
@@ -405,15 +401,14 @@ public class SingleNodeHandler implements ResponseHandler, Terminatable, LoadDat
 		buffer = source.writeToBuffer(eof, buffer);
 
 		if (isDefaultNodeShowTable) {
-			for (String name : shardingTablesSet) {
+			for (String name: shardingTablesSet) {
 				RowDataPacket row = new RowDataPacket(1);
 				row.add(StringUtil.encode(name.toLowerCase(), source.getCharset()));
 				row.packetId = ++packetId;
 				buffer = row.write(buffer, source, true);
 			}
-			
 		} else if (isDefaultNodeShowFullTable) {
-			for (String name : shardingTablesSet) {
+			for (String name: shardingTablesSet) {
 				RowDataPacket row = new RowDataPacket(1);
 				row.add(StringUtil.encode(name.toLowerCase(), source.getCharset()));
 				row.add(StringUtil.encode("BASE TABLE", source.getCharset()));
@@ -445,7 +440,7 @@ public class SingleNodeHandler implements ResponseHandler, Terminatable, LoadDat
 		
 		if (prepared) {
 			RowDataPacket rowDataPk = new RowDataPacket(fieldCount);
-			rowDataPk.read(row);			
+			rowDataPk.read(row);
 			BinaryRowDataPacket binRowDataPk = new BinaryRowDataPacket();
 			binRowDataPk.read(fieldPackets, rowDataPk);
 			binRowDataPk.packetId = rowDataPk.packetId;
@@ -458,14 +453,14 @@ public class SingleNodeHandler implements ResponseHandler, Terminatable, LoadDat
 			buffer = binRowDataPk.write(buffer, session.getSource(), true);
 		} else {
 			MiddlerResultHandler middlerResultHandler = session.getMiddlerResultHandler();
-	        if(null == middlerResultHandler ){
+	        if (null == middlerResultHandler ) {
 	        	 buffer = session.getSource().writeToBuffer(row, allocBuffer());
-			}else{
-		        if(middlerResultHandler instanceof MiddlerQueryResultHandler) {
+			} else {
+		        if (middlerResultHandler instanceof MiddlerQueryResultHandler) {
 		        	byte[] rv = ResultSetUtil.getColumnVal(row, fields, 0);
-					 String rowValue = rv == null ? "" : new String(rv);
-					 middlerResultHandler.add(rowValue);
- 				 }
+					String rowValue = rv == null ? "" : new String(rv);
+					middlerResultHandler.add(rowValue);
+				}
 			}
 		}
 	}
