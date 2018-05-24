@@ -51,7 +51,7 @@ public class Procedure implements Serializable {
         return isResultList;
     }
     public boolean isResultSimpleValue() {
-        return selectSql != null&&!isResultList;
+        return selectSql != null && !isResultList;
     }
     public boolean isResultNothing() {
         return selectSql == null && !isResultList;
