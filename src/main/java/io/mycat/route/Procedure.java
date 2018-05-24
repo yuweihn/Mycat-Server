@@ -44,7 +44,7 @@ public class Procedure implements Serializable {
     private Set<String> selectColumns = new LinkedHashSet<>();
     private Set<String> listFields = new LinkedHashSet<>();
     private boolean isResultList = false;
-    private Map<String,ProcedureParameter> paramterMap = new LinkedHashMap<>();
+    private Map<String, ProcedureParameter> paramterMap = new LinkedHashMap<>();
 
 
     public boolean isResultList() {
