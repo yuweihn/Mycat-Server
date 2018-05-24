@@ -32,7 +32,7 @@ public class TableStatAnalyzer implements QueryResultListener {
 	//解析SQL 提取表名
 	private SQLParser sqlParser = new SQLParser();
 	
-    private final static TableStatAnalyzer instance  = new TableStatAnalyzer();
+    private final static TableStatAnalyzer instance = new TableStatAnalyzer();
     
     private TableStatAnalyzer() {}
     
@@ -103,7 +103,7 @@ public class TableStatAnalyzer implements QueryResultListener {
 	public List<TableStat> getTableStats(boolean isClear) {
 		Set<TableStat> tableStatSortedSet = new TreeSet<TableStat>(tableStatMap.values());
 		List<TableStat> list = new ArrayList<TableStat>(tableStatSortedSet);
-        return list;
+		return list;
 	}
 	
 	public void ClearTable() {
@@ -143,7 +143,7 @@ public class TableStatAnalyzer implements QueryResultListener {
 			final List<String> tables = new ArrayList<String>();
 			try {
 				SQLStatement stmt = parseStmt(sql);
-				if (stmt instanceof MySqlReplaceStatement ) {
+				if (stmt instanceof MySqlReplaceStatement) {
 					String table = ((MySqlReplaceStatement) stmt).getTableName().getSimpleName();
 					tables.add(fixName(table));
 				} else if (stmt instanceof SQLInsertStatement) {
@@ -158,7 +158,7 @@ public class TableStatAnalyzer implements QueryResultListener {
 				} else if (stmt instanceof SQLSelectStatement) {
 					//TODO: modify by owenludong
 					String dbType = stmt.getDbType();
-					if(!StringUtil.isEmpty(dbType) && JdbcConstants.MYSQL.equals(dbType)) {
+					if (!StringUtil.isEmpty(dbType) && JdbcConstants.MYSQL.equals(dbType)) {
 						stmt.accept(new MySqlASTVisitorAdapter() {
 							public boolean visit(SQLExprTableSource x) {
 								tables.add(fixName(x.toString()));
@@ -168,7 +168,7 @@ public class TableStatAnalyzer implements QueryResultListener {
 					} else {
 						stmt.accept(new SQLASTVisitorAdapter() {
 							public boolean visit(SQLExprTableSource x) {
-								tables.add(fixName( x.toString()));
+								tables.add(fixName(x.toString()));
 								return super.visit(x);
 							}
 						});
