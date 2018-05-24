@@ -120,7 +120,7 @@ abstract class MultiNodeHandler implements ResponseHandler, Terminatable {
 		//null信息，结果mysql命令行等客户端查询结果是"Query OK"！！
 		// @author Uncle-pan
 		// @since 2016-03-26
-		if(canClose) {
+		if (canClose) {
 			setFail("backend connect: " + e);
 		}
 		LOGGER.warn("backend connect", e);
@@ -136,7 +136,6 @@ abstract class MultiNodeHandler implements ResponseHandler, Terminatable {
 		this.setFail(errMsg);
 		
 		LOGGER.warn("error response from " + conn + " err " + errMsg + " code:" + err.errno);
-
 		this.tryErrorFinished(this.decrementCountBy(1));
 	}
 
