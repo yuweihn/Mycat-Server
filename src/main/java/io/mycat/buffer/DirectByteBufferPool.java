@@ -16,8 +16,9 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author zagnix
  */
 @SuppressWarnings("restriction")
-public class DirectByteBufferPool implements BufferPool{
+public class DirectByteBufferPool implements BufferPool {
     private static final Logger LOGGER = LoggerFactory.getLogger(DirectByteBufferPool.class);
+
     public static final String LOCAL_BUF_THREAD_PREX = "$_";
     private ByteBufferPage[] allPages;
     private final int chunkSize;

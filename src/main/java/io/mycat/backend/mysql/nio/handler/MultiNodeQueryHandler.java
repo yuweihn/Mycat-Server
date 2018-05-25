@@ -87,9 +87,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 	 */
 	private int limitStart;
 	private int limitSize;
-
 	private int index = 0;
-
 	private int end = 0;
 	
 	//huangyiming 
@@ -767,12 +765,12 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 					binRowDataPk.read(fieldPackets, rowDataPkg);
 					binRowDataPk.write(session.getSource());
 				} else {
-					//add huangyiming 
+					//add huangyiming
 					MiddlerResultHandler middlerResultHandler = session.getMiddlerResultHandler();
 					if (null == middlerResultHandler) {
  						session.getSource().write(row);
 					} else {
-						if(middlerResultHandler instanceof MiddlerQueryResultHandler) {
+						if (middlerResultHandler instanceof MiddlerQueryResultHandler) {
 							String rowValue = ResultSetUtil.getColumnValAsString(row, fields, 0);
 							middlerResultHandler.add(rowValue);
 						}
@@ -795,6 +793,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 
 	@Override
 	public void writeQueueAvailable() {
+
 	}
 
 	@Override

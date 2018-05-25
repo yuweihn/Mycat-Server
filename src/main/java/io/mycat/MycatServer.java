@@ -92,7 +92,6 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MycatServer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MycatServer.class);
 
-
 	public static final String NAME = "MyCat";
 	private static final long LOG_WATCH_DELAY = 60000L;
 	private static final long TIME_UPDATE_PERIOD = 20L;
