@@ -355,7 +355,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 				if (session.getMiddlerResultHandler() != null) {
 					isMiddleResultDone.set(true);
             	}
-            	 
+
 				try {
 					dataMergeSvr.outputMergeResult();
 				} catch (Exception e) {
@@ -371,7 +371,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 					if (middlerResultHandler == null) {
 						//middlerResultHandler.secondEexcute();
 						source.write(eof);
-					} 
+					}
  				} finally {
 					lock.unlock();
 				}
