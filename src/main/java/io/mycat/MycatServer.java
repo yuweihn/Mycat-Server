@@ -326,7 +326,7 @@ public class MycatServer {
 		processors = new NIOProcessor[processorCount];
 		// a page size
 		int bufferPoolPageSize = system.getBufferPoolPageSize();
-		// total page number 
+		// total page number
 		short bufferPoolPageNumber = system.getBufferPoolPageNumber();
 		//minimum allocation unit
 		short bufferPoolChunkSize = system.getBufferPoolChunkSize();
@@ -361,7 +361,7 @@ public class MycatServer {
 				totalNetWorkBufferSize = bufferPoolPageSize * bufferPoolPageNumber;
 		}
 		
-			/**
+		/**
 		 * Off Heap For Merge/Order/Group/Limit 初始化
 		 */
 		if (system.getUseOffHeapForMerge() == 1) {
@@ -466,7 +466,6 @@ public class MycatServer {
 			initZkDnindex();
 		}
 		initRuleData();
-
 		startup.set(true);
 	}
 
@@ -535,7 +534,7 @@ public class MycatServer {
 		for (PhysicalDBPool node: dataHosts.values()) {
 			String index = dnIndexProperties.getProperty(node.getHostName(), "0");
 			if (!"0".equals(index)) {
-				LOGGER.info("reinit datahost: " + node.getHostName() + "  to use datasource index: " + index);
+				LOGGER.info("reinit datahost: " + node.getHostName() + " to use datasource index: " + index);
 			}
 			node.switchSource(Integer.parseInt(index), true, "reload dnindex");
 		}

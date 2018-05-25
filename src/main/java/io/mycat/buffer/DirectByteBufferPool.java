@@ -59,27 +59,27 @@ public class DirectByteBufferPool implements BufferPool{
         int oldCapacity = buffer.capacity();
         int newCapacity = oldCapacity << 1;
         ByteBuffer newBuffer = allocate(newCapacity);
-        if(newBuffer != null) {
+        if (newBuffer != null) {
             int newPosition = buffer.position();
             buffer.flip();
             newBuffer.put(buffer);
             newBuffer.position(newPosition);
             recycle(buffer);
-            return  newBuffer;
+            return newBuffer;
         }
         return null;
     }
 
     public ByteBuffer allocate(int size) {
         final int theChunkCount = size / chunkSize + (size % chunkSize == 0 ? 0 : 1);
-        int selectedPage =  (int)(prevAllocatedPage.incrementAndGet() % allPages.length);
+        int selectedPage = (int) (prevAllocatedPage.incrementAndGet() % allPages.length);
         ByteBuffer byteBuf = allocateBuffer(theChunkCount, 0, selectedPage);
         if (byteBuf == null) {
             byteBuf = allocateBuffer(theChunkCount, selectedPage, allPages.length);
         }
         final long threadId = Thread.currentThread().getId();
 
-        if(byteBuf != null) {
+        if (byteBuf != null) {
             if (memoryUsage.containsKey(threadId)) {
                 memoryUsage.put(threadId, memoryUsage.get(threadId) + byteBuf.capacity());
             } else {
@@ -87,14 +87,14 @@ public class DirectByteBufferPool implements BufferPool{
             }
         }
 
-        if(byteBuf == null) {
-            return  ByteBuffer.allocate(size);
+        if (byteBuf == null) {
+            return ByteBuffer.allocate(size);
         }
         return byteBuf;
     }
 
     public void recycle(ByteBuffer theBuf) {
-      	if(theBuf != null && (!(theBuf instanceof DirectBuffer))) {
+      	if (theBuf != null && (!(theBuf instanceof DirectBuffer))) {
             theBuf.clear();
             return;
         }
@@ -107,7 +107,7 @@ public class DirectByteBufferPool implements BufferPool{
 		DirectBuffer parentBuf = (DirectBuffer) thisNavBuf.attachment();
 		int startChunk = (int) ((thisNavBuf.address() - parentBuf.address()) / chunkSize);
 		for (int i = 0; i < allPages.length; i++) {
-			if ((recycled = allPages[i].recycleBuffer((ByteBuffer) parentBuf, startChunk, chunkCount) == true)) {
+			if (recycled = allPages[i].recycleBuffer((ByteBuffer) parentBuf, startChunk, chunkCount) == true) {
 				break;
 			}
 		}
