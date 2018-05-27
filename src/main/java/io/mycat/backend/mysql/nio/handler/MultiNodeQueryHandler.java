@@ -187,7 +187,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 				LOGGER.debug("node.getRunOnSlave()2-" + node.getRunOnSlave());
 				PhysicalDBNode dn = conf.getDataNodes().get(node.getName());
 				dn.getConnection(dn.getDatabase(), autocommit, node, this, node);
-				// 注意该方法不仅仅是获取连接，获取新连接成功之后，会通过层层回调，最后回调到本类 的connectionAcquired
+				// 注意该方法不仅仅是获取连接，获取新连接成功之后，会通过层层回调，最后回调到本类的connectionAcquired
 				// 这是通过 上面方法的 this 参数的层层传递完成的。
 				// connectionAcquired 进行执行操作:
 				// session.bindConnection(node, conn);
