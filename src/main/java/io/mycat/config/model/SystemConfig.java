@@ -106,7 +106,7 @@ public final class SystemConfig {
 	//minimum allocation unit
 	private short bufferPoolChunkSize;
 	
-	// buffer pool page number 
+	// buffer pool page number
 	private short bufferPoolPageNumber;
 	
 	//大结果集阈值，默认512kb
@@ -163,8 +163,8 @@ public final class SystemConfig {
 	private int handleDistributedTransactions = 0;
 
 	private int checkTableConsistency = 0;
-	private long checkTableConsistencyPeriod = CHECKTABLECONSISTENCYPERIOD;
-	private final static long CHECKTABLECONSISTENCYPERIOD = 1 * 60 * 1000;
+	private long checkTableConsistencyPeriod = CHECK_TABLE_CONSISTENCY_PERIOD;
+	private final static long CHECK_TABLE_CONSISTENCY_PERIOD = 1 * 60 * 1000;
 
 	private int processorBufferPoolType = 0;
 
