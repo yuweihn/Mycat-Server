@@ -230,7 +230,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 		
 		boolean executeResponse = conn.syncAndExcute();
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("received ok response ,executeResponse:" + executeResponse + " from " + conn);
+			LOGGER.debug("received ok response, executeResponse:" + executeResponse + " from " + conn);
 		}
 		if (executeResponse) {
 			ServerConnection source = session.getSource();
