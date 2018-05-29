@@ -55,7 +55,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author mycat
  */
 public class NonBlockingSession implements Session {
-    public static final Logger LOGGER = LoggerFactory.getLogger(NonBlockingSession.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NonBlockingSession.class);
 
     private final ServerConnection source;
     //huangyiming add 避免出现jdk版本冲突
@@ -77,8 +77,8 @@ public class NonBlockingSession implements Session {
     public NonBlockingSession(ServerConnection source) {
         this.source = source;
         this.target = new ConcurrentHashMap<RouteResultsetNode, BackendConnection>(2, 0.75f);
-        multiNodeCoordinator = new MultiNodeCoordinator(this);
-        commitHandler = new CommitNodeHandler(this);
+        this.multiNodeCoordinator = new MultiNodeCoordinator(this);
+        this.commitHandler = new CommitNodeHandler(this);
     }
 
     @Override
@@ -146,7 +146,7 @@ public class NonBlockingSession implements Session {
                 multiNodeHandler.setPrepared(true);
             }
             try {
-                if(((type == ServerParse.DELETE || type == ServerParse.INSERT || type == ServerParse.UPDATE)
+                if (((type == ServerParse.DELETE || type == ServerParse.INSERT || type == ServerParse.UPDATE)
                         && !rrs.isGlobalTable() && nodes.length > 1) || initCount > 1) {
                     checkDistriTransaxAndExecute(rrs, 2, autocommit);
                 } else {
@@ -164,23 +164,23 @@ public class NonBlockingSession implements Session {
     }
 
     private void checkDistriTransaxAndExecute(RouteResultset rrs, int type, boolean autocommit) throws Exception {
-        switch(MycatServer.getInstance().getConfig().getSystem().getHandleDistributedTransactions()) {
+        switch (MycatServer.getInstance().getConfig().getSystem().getHandleDistributedTransactions()) {
             case 1:
                 source.writeErrMessage(ErrorCode.ER_NOT_ALLOWED_COMMAND, "Distributed transaction is disabled!");
-                if(!autocommit) {
+                if (!autocommit) {
                     source.setTxInterrupt("Distributed transaction is disabled!");
                 }
                 break;
             case 2:
                 LOGGER.warn("Distributed transaction detected! RRS:" + rrs);
-                if(type == 1) {
+                if (type == 1) {
                     singleNodeHandler.execute();
                 } else {
                     multiNodeHandler.execute();
                 }
                 break;
             default:
-                if(type == 1) {
+                if (type == 1) {
                     singleNodeHandler.execute();
                 } else {
                     multiNodeHandler.execute();
@@ -189,8 +189,8 @@ public class NonBlockingSession implements Session {
     }
 
     private void checkDistriTransaxAndExecute() {
-        if(!isALLGlobal()) {
-            switch(MycatServer.getInstance().getConfig().getSystem().getHandleDistributedTransactions()) {
+        if (!isALLGlobal()) {
+            switch (MycatServer.getInstance().getConfig().getSystem().getHandleDistributedTransactions()) {
                 case 1:
                     source.writeErrMessage(ErrorCode.ER_NOT_ALLOWED_COMMAND, "Distributed transaction is disabled!Please rollback!");
                     source.setTxInterrupt("Distributed transaction is disabled!");
@@ -215,11 +215,11 @@ public class NonBlockingSession implements Session {
             buffer = source.writeToBuffer(OkPacket.OK, buffer);
             source.write(buffer);
             /* 1. 如果开启了 xa 事务 */
-            if(getXaTXID() != null) {
+            if (getXaTXID() != null) {
 				setXATXEnabled(false);
 			}
             /* 2. preAcStates 为true,事务结束后,需要设置为true。preAcStates 为ac上一个状态    */
-            if(source.isPreAcStates() && !source.isAutocommit()) {
+            if (source.isPreAcStates() && !source.isAutocommit()) {
                 source.setAutocommit(true);
             }
             return;
@@ -236,10 +236,10 @@ public class NonBlockingSession implements Session {
     }
 
     private boolean isALLGlobal() {
-        for(RouteResultsetNode routeResultsetNode: target.keySet()) {
-            if(routeResultsetNode.getSource() == null) {
+        for (RouteResultsetNode routeResultsetNode: target.keySet()) {
+            if (routeResultsetNode.getSource() == null) {
                 return false;
-            } else if(!routeResultsetNode.getSource().isGlobalTable()) {
+            } else if (!routeResultsetNode.getSource().isGlobalTable()) {
                 return false;
             }
         }
@@ -256,11 +256,11 @@ public class NonBlockingSession implements Session {
             buffer = source.writeToBuffer(OkPacket.OK, buffer);
             source.write(buffer);
             /* 1. 如果开启了 xa 事务 */
-            if(getXaTXID() != null) {
+            if (getXaTXID() != null) {
 				setXATXEnabled(false);
 			}
             /* 2. preAcStates 为true,事务结束后,需要设置为true。preAcStates 为ac上一个状态    */
-            if(source.isPreAcStates() && !source.isAutocommit()) {
+            if (source.isPreAcStates() && !source.isAutocommit()) {
             	source.setAutocommit(true);
             }
             return;
@@ -280,7 +280,7 @@ public class NonBlockingSession implements Session {
 		// 检查路由结果是否为空
 		RouteResultsetNode[] nodes = rrs.getNodes();
 		if (nodes == null || nodes.length == 0 || nodes[0].getName() == null || nodes[0].getName().equals("")) {
-			source.writeErrMessage(ErrorCode.ER_NO_DB_ERROR, "No dataNode found ,please check tables defined in schema: " + source.getSchema());
+			source.writeErrMessage(ErrorCode.ER_NO_DB_ERROR, "No dataNode found, please check tables defined in schema: " + source.getSchema());
 			return;
 		}
 		LockTablesHandler handler = new LockTablesHandler(this, rrs);
@@ -436,7 +436,7 @@ public class NonBlockingSession implements Session {
         } else {
             // slavedb connection and can't use anymore ,release it
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("release slave connection,can't be used in trasaction  " + conn + " for " + node);
+                LOGGER.debug("release slave connection, can't be used in transaction  " + conn + " for " + node);
             }
             releaseConnection(node, LOGGER.isDebugEnabled(), false);
         }
@@ -530,12 +530,12 @@ public class NonBlockingSession implements Session {
 
     public void setXATXEnabled(boolean xaTXEnabled) {
         if (xaTXEnabled) {
-        	LOGGER.info("XA Transaction enabled, con " + this.getSource());
-        	if(this.xaTXID == null){
+        	LOGGER.info("XA Transaction enabled, conn " + this.getSource());
+        	if (this.xaTXID == null) {
         		xaTXID = genXATXID();
         	}
         } else {
-        	LOGGER.info("XA Transaction disabled, con " + this.getSource());
+        	LOGGER.info("XA Transaction disabled, conn " + this.getSource());
         	this.xaTXID = null;
         }
     }
@@ -551,7 +551,6 @@ public class NonBlockingSession implements Session {
     public void setPrepared(boolean prepared) {
         this.prepared = prepared;
     }
-
 
 	public boolean isCanClose() {
 		return canClose;
@@ -569,3 +568,4 @@ public class NonBlockingSession implements Session {
 		this.middlerResultHandler = middlerResultHandler;
 	}
 }
+

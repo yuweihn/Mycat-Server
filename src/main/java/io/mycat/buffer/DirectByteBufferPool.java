@@ -22,20 +22,20 @@ public class DirectByteBufferPool implements BufferPool {
     public static final String LOCAL_BUF_THREAD_PREX = "$_";
     private ByteBufferPage[] allPages;
     private final int chunkSize;
-   // private int prevAllocatedPage = 0;
+    //private int prevAllocatedPage = 0;
     //private AtomicInteger prevAllocatedPage;
     private AtomicLong prevAllocatedPage;
     private final int pageSize;
     private final short pageCount;
     private final int conReadBuferChunk ;
-      
-     /**
+
+    /**
      * 记录对线程ID->该线程的所使用Direct Buffer的size
      */
     private final ConcurrentHashMap<Long, Long> memoryUsage;
 
     public DirectByteBufferPool(int pageSize, short chunkSize, short pageCount, int conReadBuferChunk) {
-        allPages = new ByteBufferPage[pageCount];
+        this.allPages = new ByteBufferPage[pageCount];
         this.chunkSize = chunkSize;
         this.pageSize = pageSize;
         this.pageCount = pageCount;
@@ -45,7 +45,7 @@ public class DirectByteBufferPool implements BufferPool {
         for (int i = 0; i < pageCount; i++) {
             allPages[i] = new ByteBufferPage(ByteBuffer.allocateDirect(pageSize), chunkSize);
         }
-        memoryUsage = new ConcurrentHashMap<>();
+        memoryUsage = new ConcurrentHashMap<Long, Long>();
     }
 
     public BufferArray allocateArray() {
@@ -95,7 +95,7 @@ public class DirectByteBufferPool implements BufferPool {
     }
 
     public void recycle(ByteBuffer theBuf) {
-      	if (theBuf != null && (!(theBuf instanceof DirectBuffer))) {
+      	if (theBuf != null && !(theBuf instanceof DirectBuffer)) {
             theBuf.clear();
             return;
         }

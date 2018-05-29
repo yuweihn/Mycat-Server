@@ -423,7 +423,7 @@ public class MycatServer {
 		for (PhysicalDBPool node: dataHosts.values()) {
 			String index = dnIndexProperties.getProperty(node.getHostName(), "0");
 			if (!"0".equals(index)) {
-				LOGGER.info("init datahost: " + node.getHostName() + "  to use datasource index:" + index);
+				LOGGER.info("init datahost: " + node.getHostName() + " to use datasource index:" + index);
 			}
 			node.init(Integer.parseInt(index));
 			node.startHeartbeat();
