@@ -1,5 +1,6 @@
 package io.mycat.config.table.structure;
 
+
 import io.mycat.MycatServer;
 import io.mycat.backend.datasource.PhysicalDBNode;
 import io.mycat.config.model.SchemaConfig;
@@ -14,8 +15,8 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
 
 /**
  * 表结构结果处理
@@ -26,16 +27,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class MySQLTableStructureDetector implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(MySQLTableStructureDetector.class);
-    private static final String[] MYSQL_SHOW_CREATE_TABLE_COLMS = new String[]{
-            "Table",
-            "Create Table"};
+    private static final String[] MYSQL_SHOW_CREATE_TABLE_COLMS = new String[] {"Table", "Create Table"};
     private static final String sqlPrefix = "show create table ";
 
     @Override
     public void run() {
-        for (SchemaConfig schema : MycatServer.getInstance().getConfig().getSchemas().values()) {
-            for (TableConfig table : schema.getTables().values()) {
-                for (String dataNode : table.getDataNodes()) {
+        for (SchemaConfig schema: MycatServer.getInstance().getConfig().getSchemas().values()) {
+            for (TableConfig table: schema.getTables().values()) {
+                for (String dataNode: table.getDataNodes()) {
                     try {
                         table.getReentrantReadWriteLock().writeLock().lock();
                         ConcurrentHashMap<String, List<String>> map = new ConcurrentHashMap<>();
@@ -80,16 +79,16 @@ public class MySQLTableStructureDetector implements Runnable {
                     List<String> dataNodeList = dataNodeTableStructureSQLMap.get(currentSql);
                     dataNodeList.add(dataNode);
                 } else {
-                    List<String> dataNodeList = new LinkedList<>();
+                    List<String> dataNodeList = new LinkedList<String>();
                     dataNodeList.add(dataNode);
-                    dataNodeTableStructureSQLMap.put(currentSql,dataNodeList);
+                    dataNodeTableStructureSQLMap.put(currentSql, dataNodeList);
                 }
                 if (dataNodeTableStructureSQLMap.size() > 1) {
                     LOGGER.warn("Table [" + table.getName() + "] structure are not consistent!");
                     LOGGER.warn("Currently detected: ");
-                    for(String sql : dataNodeTableStructureSQLMap.keySet()){
+                    for (String sql: dataNodeTableStructureSQLMap.keySet()) {
                         StringBuilder stringBuilder = new StringBuilder();
-                        for(String dn : dataNodeTableStructureSQLMap.get(sql)){
+                        for (String dn: dataNodeTableStructureSQLMap.get(sql)) {
                             stringBuilder.append("DataNode:[").append(dn).append("]");
                         }
                         stringBuilder.append(":").append(sql);
