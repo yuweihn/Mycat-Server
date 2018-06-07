@@ -43,7 +43,7 @@
     <dataNode name="jdbc_dn3" dataHost="jdbchost" database="db3" />
     -->
     <dataHost name="localhost1" maxCon="200" minCon="10" balance="0"
-              writeType="0" dbType="mysql" dbDriver="native" switchType="1" slaveThreshold="100">
+              writeType="0" dbType="mysql" dbDriver="native" switchType="1" slaveThreshold="100" maxRetryCount="4">
         <heartbeat>select user()</heartbeat>
         <!-- can have multi write hosts -->
         <writeHost host="hostM1" url="db-mysql.yuweix.com:3307" user="yuwei" password="dev">
@@ -51,7 +51,7 @@
         <!-- <writeHost host="hostM2" url="localhost:3316" user="root" password="123456"/> -->
     </dataHost>
     <dataHost name="localhost2" maxCon="200" minCon="10" balance="0"
-              writeType="0" dbType="mysql" dbDriver="native" switchType="1" slaveThreshold="100">
+              writeType="0" dbType="mysql" dbDriver="native" switchType="1" slaveThreshold="100" maxRetryCount="4">
         <heartbeat>select user()</heartbeat>
         <!-- can have multi write hosts -->
         <writeHost host="hostM1" url="db-mysql.zhonganiot.com:3307" user="yuwei" password="dev">
