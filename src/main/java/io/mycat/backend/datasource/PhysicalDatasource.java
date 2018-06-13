@@ -421,7 +421,7 @@ public abstract class PhysicalDatasource {
 	private BackendConnection takeCon(BackendConnection conn, final ResponseHandler handler
 			, final Object attachment, String schema) {
 		conn.setBorrowed(true);
-		
+
 //		if(takeConnectionContext.putIfAbsent(conn.getId(), TAKE_CONNECTION_FLAG) == null) {
 //			incrementActiveCountSafe();
 //		}

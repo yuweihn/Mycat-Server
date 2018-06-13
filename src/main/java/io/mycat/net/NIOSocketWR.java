@@ -40,6 +40,9 @@ public class NIOSocketWR extends SocketWR {
 		}
 
 		try {
+			if(!channel.isOpen()){
+				AbstractConnection.LOGGER.debug("caught err: {}", con);
+			}
 			boolean noMoreData = write0();
 			writing.set(false);
 			if (noMoreData && con.writeQueue.isEmpty()) {
@@ -56,6 +59,8 @@ public class NIOSocketWR extends SocketWR {
 				AbstractConnection.LOGGER.debug("caught err:", e);
 			}
 			con.close("err:" + e);
+		} finally {
+			writing.set(false);
 		}
 	}
 
