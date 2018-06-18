@@ -23,7 +23,6 @@
  */
 package io.mycat.backend.heartbeat;
 
-
 import io.mycat.backend.datasource.PhysicalDBNode;
 import io.mycat.backend.mysql.nio.MySQLDataSource;
 import io.mycat.server.interceptor.impl.GlobalTableUtil;
@@ -33,7 +32,6 @@ import io.mycat.sqlengine.SQLQueryResult;
 
 import java.util.Date;
 import java.util.Map;
-
 
 /**
  * @author zwy
