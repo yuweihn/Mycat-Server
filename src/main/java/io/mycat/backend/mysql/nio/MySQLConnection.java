@@ -474,7 +474,20 @@ public class MySQLConnection extends BackendAIOConnection {
 		RouteResultsetNode rrn = new RouteResultsetNode("default", ServerParse.SELECT, query);
 		synAndDoExecute(null, rrn, this.charsetIndex, this.txIsolation, true);
 	}
+	/**
+	 * by zwy ,execute a query with charsetIndex
+	 *
+	 * @param query
+	 * @throws UnsupportedEncodingException
+	 */
+	@Override
+	public void query(String query, int charsetIndex) {
+		RouteResultsetNode rrn = new RouteResultsetNode("default",
+				ServerParse.SELECT, query);
 
+		synAndDoExecute(null, rrn, charsetIndex, this.txIsolation, true);
+
+	}
 	public long getLastTime() {
 		return lastTime;
 	}

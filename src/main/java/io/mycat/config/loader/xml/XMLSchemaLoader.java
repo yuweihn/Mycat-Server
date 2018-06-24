@@ -42,6 +42,21 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import io.mycat.backend.datasource.PhysicalDBPool;
+import io.mycat.config.loader.SchemaLoader;
+import io.mycat.config.model.DBHostConfig;
+import io.mycat.config.model.DataHostConfig;
+import io.mycat.config.model.DataNodeConfig;
+import io.mycat.config.model.SchemaConfig;
+import io.mycat.config.model.TableConfig;
+import io.mycat.config.model.TableConfigMap;
+import io.mycat.config.model.rule.TableRuleConfig;
+import io.mycat.config.util.ConfigException;
+import io.mycat.config.util.ConfigUtil;
+import io.mycat.route.function.AbstractPartitionAlgorithm;
+import io.mycat.util.DecryptUtil;
+import io.mycat.util.SplitUtil;
+import io.mycat.util.StringUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -738,7 +753,13 @@ public class XMLSchemaLoader implements SchemaLoader {
 			String filters = element.getAttribute("filters");
 			String logTimeStr = element.getAttribute("logTime");
 			String slaveIDs = element.getAttribute("slaveIDs");
-			int maxRetryCount = Integer.parseInt(element.getAttribute("maxRetryCount")) ;
+			String maxRetryCountStr = element.getAttribute("maxRetryCount");
+			int maxRetryCount ;
+			if(StringUtil.isEmpty(maxRetryCountStr)){
+				maxRetryCount = 3;
+			} else {
+				maxRetryCount = Integer.valueOf(maxRetryCountStr);
+			}
 
 			long logTime = "".equals(logTimeStr) ? PhysicalDBPool.LONG_TIME : Long.parseLong(logTimeStr);
 			//读取心跳语句
