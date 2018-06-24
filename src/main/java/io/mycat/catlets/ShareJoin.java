@@ -1,6 +1,5 @@
 package io.mycat.catlets;
 
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,42 +35,31 @@ import io.mycat.sqlengine.mpp.OrderCol;
 import io.mycat.sqlengine.mpp.tmp.RowDataSorter;
 import io.mycat.util.ByteUtil;
 import io.mycat.util.ResultSetUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-
 /**  
  * 功能详细描述:分片join
  * @author sohudo[http://blog.csdn.net/wind520]
  * @create 2015年01月22日 下午6:50:23 
  * @version 0.0.1
  */
+
 public class ShareJoin implements Catlet {
-	private static final Logger log = LoggerFactory.getLogger(ShareJoin.class);
-
-
 	private EngineCtx ctx;
-	private RouteResultset rrs;
+	private RouteResultset rrs ;
 	private JoinParser joinParser;
 	
 	private Map<String, byte[]> rows = new ConcurrentHashMap<String, byte[]>();
-	private Map<String, String> ids = new ConcurrentHashMap<String, String>();
+	private Map<String,String> ids = new ConcurrentHashMap<String,String>();
 	//private ConcurrentLinkedQueue<String> ids = new ConcurrentLinkedQueue<String>();
 	
 	private List<byte[]> fields; //主表的字段
-	private ArrayList<byte[]> allFields;//所有的字段
-	private boolean isMfield = false;
-	private int mjob = 0;
-	private int maxJob = 0;
-	private int joinIndex = 0;//关联join表字段的位置
-	private int sendField = 0;
-	private boolean childRoute = false;
-	private boolean jointTableIsData = false;
+	private ArrayList<byte[]> allfields;//所有的字段
+	private boolean isMfield=false;
+	private int mjob=0;
+	private int maxjob=0;
+	private int joinindex=0;//关联join表字段的位置
+	private int sendField=0;
+	private boolean childRoute=false;
+	private boolean jointTableIsData=false;
 	// join 字段的类型，一般情况都是int, long; 增加该字段为了支持非int,long类型的(一般为varchar)joinkey的sharejoin
  	// 参见：io.mycat.server.packet.FieldPacket 属性： public int type;
  	// 参见：http://dev.mysql.com/doc/internals/en/com-query-response.html#packet-Protocol::ColumnDefinition
@@ -80,7 +68,7 @@ public class ShareJoin implements Catlet {
 	//重新路由使用
 	private SystemConfig sysConfig;
 	private SchemaConfig schema;
-	private int sqlType;
+	private int sqltype;
 	private String charset;
 	private ServerConnection sc;
 	private LayerCachePool cachePool;
@@ -91,70 +79,63 @@ public class ShareJoin implements Catlet {
 		this.rrs =rrs;
 	}	
 
-
-	public void route(SystemConfig sysConfig, SchemaConfig schema, int sqlType, String realSQL
-			, String charset, ServerConnection sc, LayerCachePool cachePool) {
+	public void route(SystemConfig sysConfig, SchemaConfig schema,int sqlType, String realSQL, String charset, ServerConnection sc,	LayerCachePool cachePool) {
 		int rs = ServerParse.parse(realSQL);
-		this.sqlType = rs & 0xff;
-		this.sysConfig = sysConfig;
-		this.schema = schema;
-		this.charset = charset;
-		this.sc = sc;
-		this.cachePool = cachePool;
+		this.sqltype = rs & 0xff;
+		this.sysConfig=sysConfig;
+		this.schema=schema;
+		this.charset=charset;
+		this.sc=sc;
+		this.cachePool=cachePool;
 		try {
-//			RouteStrategy routes=RouteStrategyFactory.getRouteStrategy();
-//			rrs =RouteStrategyFactory.getRouteStrategy().route(sysConfig, schema, sqlType2, realSQL, charset, sc, cachePool);
+		 //  RouteStrategy routes=RouteStrategyFactory.getRouteStrategy();
+		  // rrs =RouteStrategyFactory.getRouteStrategy().route(sysConfig, schema, sqlType2, realSQL,charset, sc, cachePool);
 			MySqlStatementParser parser = new MySqlStatementParser(realSQL);
 			SQLStatement statement = parser.parseStatement();
-			if (statement instanceof SQLSelectStatement) {
-				SQLSelectStatement st = (SQLSelectStatement) statement;
-				SQLSelectQuery sqlSelectQuery = st.getSelect().getQuery();
-				if (sqlSelectQuery instanceof MySqlSelectQueryBlock) {
-					MySqlSelectQueryBlock mysqlSelectQuery = (MySqlSelectQueryBlock) st.getSelect().getQuery();
-					joinParser = new JoinParser(mysqlSelectQuery, realSQL);
+			if(statement instanceof SQLSelectStatement) {
+			   SQLSelectStatement st=(SQLSelectStatement)statement;
+			   SQLSelectQuery sqlSelectQuery =st.getSelect().getQuery();
+				if(sqlSelectQuery instanceof MySqlSelectQueryBlock) {
+					MySqlSelectQueryBlock mysqlSelectQuery = (MySqlSelectQueryBlock)st.getSelect().getQuery();
+					joinParser=new JoinParser(mysqlSelectQuery,realSQL);
 					joinParser.parser();
 				}
 			}
-			/*
-			if (routes instanceof DruidMysqlRouteStrategy) {
-				SQLSelectStatement st = ((DruidMysqlRouteStrategy) routes).getSQLStatement();
-				SQLSelectQuery sqlSelectQuery = st.getSelect().getQuery();
-				if (sqlSelectQuery instanceof MySqlSelectQueryBlock) {
-					MySqlSelectQueryBlock mysqlSelectQuery = (MySqlSelectQueryBlock) st.getSelect().getQuery();
-					joinParser = new JoinParser(mysqlSelectQuery, realSQL);
+		   /*
+		   if (routes instanceof DruidMysqlRouteStrategy) {
+			   SQLSelectStatement st=((DruidMysqlRouteStrategy) routes).getSQLStatement();
+			   SQLSelectQuery sqlSelectQuery =st.getSelect().getQuery();
+				if(sqlSelectQuery instanceof MySqlSelectQueryBlock) {
+					MySqlSelectQueryBlock mysqlSelectQuery = (MySqlSelectQueryBlock)st.getSelect().getQuery();
+					joinParser=new JoinParser(mysqlSelectQuery,realSQL);
 					joinParser.parser();
 				}
-			}
-			*/
+		   }
+		   */
 		} catch (Exception e) {
-			log.error("", e);
+
 		}
 	}
-
-	public void setRoute(RouteResultset rrs) {
-		this.rrs = rrs;
-	}
-
-	private void getRoute(String sql) {
+	private void getRoute(String sql){
 		try {
-			if (joinParser != null) {
-				rrs = RouteStrategyFactory.getRouteStrategy().route(sysConfig, schema, sqlType, sql, charset, sc, cachePool);
-			}
+		  if (joinParser!=null){
+			rrs =RouteStrategyFactory.getRouteStrategy().route(sysConfig, schema, sqltype,sql,charset, sc, cachePool);
+		  }
 		} catch (Exception e) {
-			log.error("", e);
+
 		}
 	}
-	private String[] getDataNodes() {
-		String[] dataNodes = new String[rrs.getNodes().length];
-		for (int i = 0; i < rrs.getNodes().length; i++) {
-			dataNodes[i] = rrs.getNodes()[i].getName();
+	private String[] getDataNodes(){
+		String[] dataNodes =new String[rrs.getNodes().length] ;
+		for (int i=0;i<rrs.getNodes().length;i++){
+			dataNodes[i]=rrs.getNodes()[i].getName();
 		}
 		return dataNodes;
 	}
-	private String getDataNode(String[] dataNodes) {
-		String dataNode = "";
-		for (int i = 0; i < dataNodes.length; i++) {
-			dataNode += dataNodes[i] + ",";
+	private String getDataNode(String[] dataNodes){
+		String dataNode="";
+		for (int i=0;i<dataNodes.length;i++){
+			dataNode+=dataNodes[i]+",";
 		}
 		return dataNode;
 	}
@@ -163,31 +144,33 @@ public class ShareJoin implements Catlet {
 		/*
 		 *  获取左边表的sql 获取路由
 		 * */
-		String ssql = joinParser.getSql();
+		String ssql=joinParser.getSql();
 		getRoute(ssql);
 		RouteResultsetNode[] nodes = rrs.getNodes();
-		if (nodes == null || nodes.length == 0 || nodes[0].getName() == null || nodes[0].getName().equals("")) {
-			ctx.getSession().getSource().writeErrMessage(ErrorCode.ER_NO_DB_ERROR
-					, "No dataNode found, please check tables defined in schema:" + ctx.getSession().getSource().getSchema());
+		if (nodes == null || nodes.length == 0 || nodes[0].getName() == null
+				|| nodes[0].getName().equals("")) {
+			ctx.getSession().getSource().writeErrMessage(ErrorCode.ER_NO_DB_ERROR,
+					"No dataNode found ,please check tables defined in schema:"
+							+ ctx.getSession().getSource().getSchema());
 			return;
 		} 
 		this.ctx=ctx;
 		//是否可以流式输出
-		if (joinParser.hasLimit() || joinParser.hasOrder()) {
+		if(joinParser.hasLimit() || joinParser.hasOrder()){
 			ctx.setIsStreamOutputResult(false);
 		}
 
-		String[] dataNodes = getDataNodes();
-		maxJob = dataNodes.length;
+		String[] dataNodes =getDataNodes();
+		maxjob=dataNodes.length;
 
 		/*
 		 *  发送左边表的sql 到每个分片节点去查询
 		 * */
     	//huangyiming
-		ShareDBJoinHandler joinHandler = new ShareDBJoinHandler(this, joinParser.getJoinLkey(), sc.getSession2());
+		ShareDBJoinHandler joinHandler = new ShareDBJoinHandler(this,joinParser.getJoinLkey(),sc.getSession2());
 		ctx.executeNativeSQLSequnceJob(dataNodes, ssql, joinHandler);
-    	EngineCtx.LOGGER.info("Catlet exec:" + getDataNode(getDataNodes()) + " sql: " + ssql);
-        final ShareJoin shareJoin = this;
+    	EngineCtx.LOGGER.info("Catlet exec:"+getDataNode(getDataNodes())+" sql:" +ssql);
+    	final ShareJoin shareJoin = this;
 		ctx.setAllJobFinishedListener(new AllJobFinishedListener() {
 			@Override
 			public void onAllJobFinished(EngineCtx ctx) {				
@@ -196,20 +179,23 @@ public class ShareJoin implements Catlet {
 				 }
 				 
 				 MiddlerResultHandler middlerResultHandler = sc.getSession2().getMiddlerResultHandler();
-                if (middlerResultHandler != null ) {
-                    //sc.getSession2().setCanClose(false);
-                    middlerResultHandler.secondExecute();
-                } else{
-                    shareJoin.writeEof();
-                }
+
+					if(  middlerResultHandler !=null ){
+						//sc.getSession2().setCanClose(false);
+						middlerResultHandler.secondExecute();
+					} else{
+						shareJoin.writeEof();
+					}
 				EngineCtx.LOGGER.info("发送数据OK"); 
 			}
 		});
 	}
 	
-    public void putDBRow(String id,String nid, byte[] rowData,int findex){
-    	rows.put(id, rowData);	
-    	ids.put(id, nid);
+
+
+	public void putDBRow(String id,String nid, byte[] rowData,int findex){
+    	rows.put(id, rowData);	// 主键 -> 一行数据
+    	ids.put(id, nid);       // 主键 ->  joinkey value
     	joinindex=findex;
 		//ids.offer(nid);
 		int batchSize = 999;
@@ -225,9 +211,11 @@ public class ShareJoin implements Catlet {
     	 }    	
     }    
 
+    //发送最后的主表查询语句
    public void endJobInput(String dataNode, boolean failed){
-	   mjob++;
+	   mjob++; //结束任务+1
 	   if (mjob>=maxjob){
+		   //发送最后一个右边表的查询语句。
 		 createQryJob(Integer.MAX_VALUE);
 	     ctx.endJobInput();
 	   }
@@ -274,11 +262,15 @@ public class ShareJoin implements Catlet {
 		}
 		jointTableIsData=true;
 		sb.deleteCharAt(sb.length() - 1).append(')');
+		//select * from tableB where joinKey in (id1,id2);
 		String sql = String.format(joinParser.getChildSQL(), sb);
+
 		//if (!childRoute){
 		  getRoute(sql);
 		 //childRoute=true;
 		//}
+
+		 //
 		ctx.executeNativeSQLParallJob(getDataNodes(),sql, new ShareRowOutPutDataHandler(this,fields,joinindex,joinParser.getJoinRkey(), batchRows,ctx.getSession()));
 		EngineCtx.LOGGER.info("SQLParallJob:"+getDataNode(getDataNodes())+" sql:" + sql);		
 	}  
@@ -293,7 +285,44 @@ public class ShareJoin implements Catlet {
  		  setAllFields(afields, bfields);
 		 // EngineCtx.LOGGER.info("发送字段2:" + dataNode);
 		}
-		
+	   setRowDataSorterHeader(afields, bfields);
+
+	}
+	//设置排序结果收集齐
+	private void setRowDataSorterHeader(List<byte[]> afields, List<byte[]> bfields) {
+		if(!ctx.getIsStreamOutputResult() && !isInit) {
+			   synchronized (joinParser) {
+				   if(!isInit){
+		 			  LinkedHashMap<String, Integer> orderByCols =  joinParser.getOrderByCols();
+		 			  LinkedHashMap<String, Integer> childOrderByCols =  joinParser.getChildByCols();
+
+		 			  OrderCol[] orderCols = new OrderCol[orderByCols.size() + childOrderByCols.size()];
+		 			  //a 表 排序字段
+		 			  for(String fileldName : orderByCols.keySet()) {
+		 				  ColMeta colMeta =  getCommonFieldIndex(afields, fileldName); //colMeta 放置类型，字段的位置
+		 				  int val = orderByCols.get(fileldName);
+		 				  int orignIndex =  TableFilter.decodeOrignOrder(val); //字段在排序时候的位子
+		 				  int orderType =  TableFilter.decodeOrderType(val); //0:asc or  1:desc
+		 				  orderCols[orignIndex] = new OrderCol(colMeta, orderType);
+		 			  }
+
+		 			  //b 表
+		 			  for(String fileldName : childOrderByCols.keySet()) {
+		 				  ColMeta colMeta =  getCommonFieldIndex(bfields, fileldName);
+		 				  colMeta.setColIndex(colMeta.getColIndex() + afields.size() -1); // b的字段的位子 在a表字段之后 而且 少了一个joinKey 所以-1
+ 		 				  int val = childOrderByCols.get(fileldName);
+		 				  int orignIndex =  TableFilter.decodeOrignOrder(val);
+		 				  int orderType =  TableFilter.decodeOrderType(val);
+		 				  orderCols[orignIndex] = new OrderCol(colMeta, orderType);
+		 			  }
+
+		 			  RowDataSorter tmp = new RowDataSorter(orderCols);
+		 			  tmp.setLimit(joinParser.getOffset(), joinParser.getRowCount());
+		 			  sorter = tmp;
+		 			  isInit = true;
+				   }
+			   }
+ 		   }
 	}
 	private void setAllFields(List<byte[]> afields, List<byte[]> bfields){		
 		allfields=new ArrayList<byte[]>();
@@ -310,9 +339,46 @@ public class ShareJoin implements Catlet {
 		return allfields;
 	}
 	public void writeRow(RowDataPacket rowDataPkg){
-		ctx.writeRow(rowDataPkg);
+		if(ctx.getIsStreamOutputResult()){
+			ctx.writeRow(rowDataPkg);
+		} else {
+			if(isInit ){
+				//保证可见性
+				sorter.addRow(rowDataPkg);
+			} else {
+				EngineCtx.LOGGER.error("===怎么会还没初始化===");
+			}
+		}
+
 	}
 	
+	protected void writeEof() {
+		boolean t = jointTableIsData;
+		if(ctx.getIsStreamOutputResult() || (!jointTableIsData)){
+			ctx.writeEof();
+		} else {
+			//limit 输出。
+			int start = joinParser.getOffset();
+			int end = start + joinParser.getRowCount();
+			List<RowDataPacket> results = sorter.getSortedResult();
+			if (start < 0) {
+				start = 0;
+			}
+
+			if (joinParser.getRowCount() <= 0) {
+				end = results.size();
+			}
+
+			if (end > results.size()) {
+				end = results.size();
+			}
+			for (int i = start; i < end; i++) {
+				ctx.writeRow(results.get(i));
+			}
+			ctx.writeEof();
+		}
+	}
+	//获取fKey在字段 的索引位置。
 	public int getFieldIndex(List<byte[]> fields,String fkey){
 		int i=0;
 		for (byte[] field :fields) {	
@@ -326,6 +392,19 @@ public class ShareJoin implements Catlet {
 			}
 		return i;		
 	}	
+	//获取fKey在字段 的索引位置。
+	public ColMeta getCommonFieldIndex(List<byte[]> fields,String fkey){
+		int i=0;
+		for (byte[] field :fields) {
+			  FieldPacket fieldPacket = new FieldPacket();
+			  fieldPacket.read(field);
+			  if (ByteUtil.getString(fieldPacket.orgName).equals(fkey)){
+				  return new ColMeta(i, fieldPacket.type);
+			  }
+			  i++;
+			}
+		return null;
+	}
 }
 
 class ShareDBJoinHandler implements SQLJobHandler {
@@ -372,13 +451,13 @@ class ShareDBJoinHandler implements SQLJobHandler {
 	public boolean onRowData(String dataNode, byte[] rowData) {
 		int fid=this.ctx.getFieldIndex(fields,joinkey);
 		String id = ResultSetUtil.getColumnValAsString(rowData, fields, 0);//主键，默认id
-		String nid = ResultSetUtil.getColumnValAsString(rowData, fields, fid);
+		String nid = ResultSetUtil.getColumnValAsString(rowData, fields, fid); //joinKey 的value
 		// 放入结果集
 		//rows.put(id, rowData);
 		ctx.putDBRow(id,nid, rowData,fid);
 		return false;
 	}
-
+	// 收到结束包调用 或者发生错误时候调用。
 	@Override
 	public void finished(String dataNode, boolean failed, String errorMsg) {
 		if(failed){
@@ -391,10 +470,10 @@ class ShareDBJoinHandler implements SQLJobHandler {
 }
 
 class ShareRowOutPutDataHandler implements SQLJobHandler {
-	private final List<byte[]> afields;
-	private List<byte[]> bfields;
-	private final ShareJoin ctx;
-	private final Map<String, byte[]> arows;
+	private final List<byte[]> afields; // a表的字段信息
+	private List<byte[]> bfields; //B表(右边) 字段信息
+	private final ShareJoin ctx; //  sharejoin 的context
+	private final Map<String, byte[]> arows; //	 map a表的记录值  id -> 行记录
 	private int joinL;//A表(左边)关联字段的位置
 	private int joinR;//B表(右边)关联字段的位置
 	private String joinRkey;//B表(右边)关联字段
@@ -402,12 +481,12 @@ class ShareRowOutPutDataHandler implements SQLJobHandler {
 
 	public ShareRowOutPutDataHandler(ShareJoin ctx,List<byte[]> afields,int joini,String joinField,Map<String, byte[]> arows,NonBlockingSession session) {
 		super();
-		this.afields = afields;
-		this.ctx = ctx;
-		this.arows = arows;		
-		this.joinL =joini;
-		this.joinRkey= joinField;
-		this.session = session;
+		this.afields = afields; // a表的字段信息
+		this.ctx = ctx;   //  sharejoin 的context
+		this.arows = arows;	 //	 map a表的记录值  id -> 行记录
+		this.joinL =joini; //a 表 joinKey的索引位置。
+		this.joinRkey= joinField; // b 表 joinKey的字段名称。
+		this.session = session; // mycatSession
 		//EngineCtx.LOGGER.info("二次查询:" +arows.size()+ " afields："+FenDBJoinHandler.getFieldNames(afields));
     }
 
@@ -428,7 +507,8 @@ class ShareRowOutPutDataHandler implements SQLJobHandler {
 		for(Map.Entry<String,byte[]> e: batchRowsCopy.entrySet() ){
 			String key=e.getKey();
 			RowDataPacket rowDataPkg = ResultSetUtil.parseRowData(e.getValue(), afields);
-			byte[] columnValue = rowDataPkg.fieldValues.get(index);
+
+			byte[] columnValue = rowDataPkg.fieldValues.get(index); //a 表记录 joinKey的value
 			if(columnValue == null )
 				continue;
 			
@@ -453,6 +533,7 @@ class ShareRowOutPutDataHandler implements SQLJobHandler {
 //		byte[] arow = getRow(id,joinL);//arows.remove(id);
 		while (arow!=null) {
 			RowDataPacket rowDataPkg = ResultSetUtil.parseRowData(arow,afields );//ctx.getAllFields());
+			//将 b记录的值 复制到 a记录中 成为新的记录。
 			for (int i=1;i<rowDataPkgold.fieldCount;i++){
 				// 设置b.name 字段
 				byte[] bname = rowDataPkgold.fieldValues.get(i);
@@ -463,7 +544,9 @@ class ShareRowOutPutDataHandler implements SQLJobHandler {
 			// huangyiming add
 			MiddlerResultHandler middlerResultHandler = session.getMiddlerResultHandler();
 			if(null == middlerResultHandler ){
+				//
 				ctx.writeRow(rowDataPkg);
+
 			}else{
 				
 				 if(middlerResultHandler instanceof MiddlerQueryResultHandler){
