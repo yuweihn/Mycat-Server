@@ -259,10 +259,7 @@ public class TableConfig {
     }
 
     public boolean isDistTable() {
-        if (this.distTables != null && !this.distTables.isEmpty()) {
-            return true;
-        }
-        return false;
+        return this.distTables != null && !this.distTables.isEmpty();
     }
 
     public List<SQLTableElement> getTableElementList() {

@@ -227,7 +227,7 @@ public class PartitionByCRC32PreSlot extends AbstractPartitionAlgorithm
         return count;
     }
 
-    private static void hashTest() throws IOException {
+    private static void hashTest() {
         PartitionByCRC32PreSlot hash = new PartitionByCRC32PreSlot();
         hash.setRuleName("test");
         RuleConfig rule = new RuleConfig("id", "crc32slot");
@@ -288,7 +288,7 @@ public class PartitionByCRC32PreSlot extends AbstractPartitionAlgorithm
         return sb.toString();
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         hashTest();
     }
 

@@ -65,7 +65,7 @@ public class SwitchCommitListener implements PathChildrenCacheListener {
 
     @Override
     public void childEvent(CuratorFramework curatorFramework,
-                           PathChildrenCacheEvent event) throws Exception {
+                           PathChildrenCacheEvent event) {
         switch (event.getType()) {
             case CHILD_ADDED:
                 checkCommit(event);
@@ -109,7 +109,6 @@ public class SwitchCommitListener implements PathChildrenCacheListener {
                         allNewDataNodes.addAll(newDataNodes);
                         //先修改rule config
                         InterProcessMutex ruleLock = new InterProcessMutex(ZKUtils.getConnection(), ZKUtils.getZKBasePath() + "lock/rules.lock");
-                        ;
                         try {
                             ruleLock.acquire(30, TimeUnit.SECONDS);
                             //transactionFinal = modifyZkRules(transactionFinal, tableConfig.getRule().getFunctionName(), newDataNodes);

@@ -487,7 +487,6 @@ public final class MigrateHandler {
     private static boolean isJson(String str) {
         if (StringUtil.isEmpty(str)) return false;
         str = str.trim();
-        if (str.startsWith("{") && str.endsWith("}")) return true;
-        return false;
+        return str.startsWith("{") && str.endsWith("}");
     }
 }
