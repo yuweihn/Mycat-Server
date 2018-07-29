@@ -23,19 +23,12 @@
  */
 package io.mycat.config.model;
 
-
-import com.alibaba.druid.wall.WallConfig;
-import com.alibaba.druid.wall.WallProvider;
-import com.alibaba.druid.wall.spi.MySqlWallProvider;
-import io.mycat.MycatServer;
-import io.mycat.config.MycatConfig;
-import io.mycat.config.loader.xml.XMLServerLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
+import java.io.File;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,12 +36,23 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
 
+import io.mycat.util.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import com.alibaba.druid.wall.WallConfig;
+import com.alibaba.druid.wall.WallProvider;
+import com.alibaba.druid.wall.spi.MySqlWallProvider;
+
+import io.mycat.MycatServer;
+import io.mycat.config.MycatConfig;
+import io.mycat.config.loader.xml.XMLServerLoader;
 
 /**
  * 防火墙配置定义
@@ -57,24 +61,25 @@ import java.util.regex.Pattern;
  * @author zhuam
  */
 public final class FirewallConfig {
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(FirewallConfig.class);
 	
     private Map<String, List<UserConfig>> whitehost;//具体host的白名单
 	private Map<Pattern, List<UserConfig>> whitehostMask;//网段的白名单
-	public static Pattern getMaskPattern(String host) {
-		return Pattern.compile(host.replaceAll(".", "\\.").replaceAll("[*]", "[0-9]*").replaceAll("%", "[0-9]*"));
+	public static Pattern getMaskPattern(String host){
+		return Pattern.compile(host.replaceAll("\\.","\\\\.").replaceAll("[*]","[0-9]*").replaceAll("%","[0-9]*"));
 	}
     private List<String> blacklist;
     private boolean check = false;
     
     private WallConfig wallConfig = new WallConfig();
      
-    private static WallProvider provider;
+    private static WallProvider provider ;
     
-    public FirewallConfig(){}
+    public FirewallConfig() { }
     
-    public void init() {
-    	if(check) {
+    public void init(){
+    	if(check){
     		provider = new MySqlWallProvider(wallConfig);
     		provider.setBlackListEnable(true);
     	}
@@ -108,14 +113,16 @@ public final class FirewallConfig {
 	 */
 	public boolean addWhitehost(String host, List<UserConfig> Users) {
 		if (existsHost(host)){
-			return false;
-		} else {
-			if(host.contains("*") || host.contains("%")) {
-				this.whitehostMask.put(getMaskPattern(host), Users);
-			} else {
-				this.whitehost.put(host, Users);
-			}
-			return true;
+			return false;	
+		}
+		else {
+		 if(host.contains("*")||host.contains("%")){
+			 this.whitehostMask.put(getMaskPattern(host),Users);
+		 }else {
+		 	this.whitehost.put(host, Users);
+
+		 }
+		 return true;
 		}
 	}
 	
@@ -131,20 +138,20 @@ public final class FirewallConfig {
 	}
 
 	public boolean existsHost(String host) {
-		return this.whitehost != null && whitehost.get(host) != null ;
+		return this.whitehost!=null && whitehost.get(host)!=null ;
 	}
-	public boolean canConnect(String host, String user) {
-		if(whitehost == null || whitehost.size() == 0) {
+	public boolean canConnect(String host,String user) {
+		if(whitehost==null || whitehost.size()==0){
 			MycatConfig config = MycatServer.getInstance().getConfig();
 			Map<String, UserConfig> users = config.getUsers();
 			return users.containsKey(user);
-		} else {
+		}else{
 			List<UserConfig> list = whitehost.get(host);
-			if(list == null) {
+			if(list==null){
 				return false;
 			}
-			for(UserConfig userConfig: list) {
-				if(userConfig.getName().equals(user)) {
+			for(UserConfig userConfig : list){
+				if(userConfig.getName().equals(user)){
 					return true;
 				}
 			}
@@ -173,9 +180,9 @@ public final class FirewallConfig {
 		return this.wallConfig;
 	}
 	
-	public synchronized static void updateToFile(String host, List<UserConfig> userConfigs) throws Exception {
+	public synchronized static void updateToFile(String host, List<UserConfig> userConfigs) throws Exception{
 		LOGGER.debug("set white host:" + host + "user:" + userConfigs);
-		String filename = SystemConfig.getHomePath() + File.separator + "conf" + File.separator + "server.xml";
+		String filename = SystemConfig.getHomePath()+ File.separator +"conf"+ File.separator +"server.xml";
 		//String filename = "E:\\MyProject\\Mycat-Server\\src\\main\\resources\\server.xml";
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -191,42 +198,42 @@ public final class FirewallConfig {
 			firewall = xmldoc.createElement("firewall");
             Element root = xmldoc.getDocumentElement();
             root.appendChild(firewall);
-            if (whitehost == null) {
+            if(whitehost==null){
             	whitehost = xmldoc.createElement("whitehost");
             	firewall.appendChild(whitehost);
             }
         }
 
-        for(UserConfig userConfig: userConfigs) {
-			String user = userConfig.getName();
-			Element hostEle = xmldoc.createElement("host");
-			hostEle.setAttribute("host", host);
-			hostEle.setAttribute("user", user);
+        for(UserConfig userConfig : userConfigs){
+        	String user = userConfig.getName();
+        	Element hostEle = xmldoc.createElement("host");
+        	hostEle.setAttribute("host", host);
+        	hostEle.setAttribute("user", user);
 
-			whitehost.appendChild(hostEle);
+        	whitehost.appendChild(hostEle);
         }
         
              
         TransformerFactory factory2 = TransformerFactory.newInstance();
         Transformer former = factory2.newTransformer();
         String systemId = xmldoc.getDoctype().getSystemId();
-        if(systemId != null) {
-            former.setOutputProperty(javax.xml.transform.OutputKeys.DOCTYPE_SYSTEM, systemId);
+        if(systemId!=null){
+            former.setOutputProperty(javax.xml.transform.OutputKeys.DOCTYPE_SYSTEM, systemId);    
         }
         former.transform(new DOMSource(xmldoc), new StreamResult(new File(filename)));
+
 	}
-	static class IgnoreDTDEntityResolver implements EntityResolver {
-		@Override
-		public InputSource resolveEntity(java.lang.String publicId, java.lang.String systemId) {
-			if (systemId.contains("server.dtd")) {
+	static class IgnoreDTDEntityResolver implements EntityResolver{
+		public InputSource resolveEntity(java.lang.String publicId, java.lang.String systemId) throws SAXException, java.io.IOException{
+			if (systemId.contains("server.dtd")){ 
 				//InputSource is = new InputSource(new ByteArrayInputStream("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".getBytes()));
 				InputStream dtd = XMLServerLoader.class.getResourceAsStream("/server.dtd");
 				InputSource is = new InputSource(dtd);
-				return is;
+				return is; 
 		    } else {
 				return null;
 			}
-		}
+			} 
 	}
 //	public static void main(String[] args) throws Exception {
 //        List<UserConfig> userConfigs = new ArrayList<UserConfig>();
@@ -235,4 +242,6 @@ public final class FirewallConfig {
 //        userConfigs.add(user);
 //		updateToFile("127.0.0.1",userConfigs);
 //	}
+	
+	
 }
