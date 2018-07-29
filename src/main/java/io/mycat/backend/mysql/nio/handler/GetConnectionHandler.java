@@ -42,13 +42,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class GetConnectionHandler implements ResponseHandler {
 	private static final Logger logger = LoggerFactory.getLogger(GetConnectionHandler.class);
 
-	private final List<BackendConnection> successCons;
+	private final CopyOnWriteArrayList<BackendConnection> successCons;
 	private final AtomicInteger finishedCount = new AtomicInteger(0);
 	private final int total;
 
-	public GetConnectionHandler(int totalNumber) {
+	public GetConnectionHandler(CopyOnWriteArrayList<BackendConnection> connsToStore, int totalNumber) {
 		super();
-		this.successCons = new CopyOnWriteArrayList<BackendConnection>();
+		this.successCons = connsToStore;
 		this.total = totalNumber;
 	}
 
