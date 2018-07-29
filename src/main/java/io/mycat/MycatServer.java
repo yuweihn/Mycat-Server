@@ -376,13 +376,7 @@ public class MycatServer {
          * Off Heap For Merge/Order/Group/Limit 初始化
          */
         if (system.getUseOffHeapForMerge() == 1) {
-            try {
-                myCatMemory = new MyCatMemory(system, totalNetWorkBufferSize);
-            } catch (NoSuchFieldException e) {
-                LOGGER.error("NoSuchFieldException", e);
-            } catch (IllegalAccessException e) {
-                LOGGER.error("Error", e);
-            }
+            myCatMemory = new MyCatMemory(system, totalNetWorkBufferSize);
         }
         businessExecutor = ExecutorUtil.create("BusinessExecutor",
                 threadPoolSize);
