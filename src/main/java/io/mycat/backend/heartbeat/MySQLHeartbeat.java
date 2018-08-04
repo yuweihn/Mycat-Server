@@ -23,21 +23,17 @@
  */
 package io.mycat.backend.heartbeat;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.locks.ReentrantLock;
 
-import com.alibaba.fastjson.JSON;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.mycat.backend.datasource.PhysicalDBPool;
 import io.mycat.backend.datasource.PhysicalDatasource;
 import io.mycat.backend.mysql.nio.MySQLDataSource;
 import io.mycat.config.model.DataHostConfig;
-import io.mycat.util.TimeUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.concurrent.locks.ReentrantLock;
-
 
 /**
  * @author mycat
@@ -53,7 +49,6 @@ public class MySQLHeartbeat extends DBHeartbeat {
 	private final int maxRetryCount;
 
 	private MySQLDetector detector;
-
 
 	public MySQLHeartbeat(MySQLDataSource source) {
 		this.source = source;
@@ -125,13 +120,17 @@ public class MySQLHeartbeat extends DBHeartbeat {
 	 */
 	public void heartbeat() {
 		final ReentrantLock lock = this.lock;
-		lock.lock();
+		if(!lock.tryLock()){
+			return;
+		}
 		try {
 			if (isChecking.compareAndSet(false, true)) {
 				MySQLDetector detector = this.detector;
 				if (detector == null || detector.isQuit()) {
 					try {
 						detector = new MySQLDetector(this);
+						//由于没有设置导致无限循环. modifyBy zwy  todo 对应修改其他的心跳机制.
+						detector.setHeartbeatTimeout(this.getHeartbeatTimeout());
 						detector.heartbeat();
 					} catch (Exception e) {
 						LOGGER.warn(source.getConfig().toString(), e);
@@ -140,7 +139,7 @@ public class MySQLHeartbeat extends DBHeartbeat {
 					}
 					this.detector = detector;
 				} else {
-					detector.heartbeat();
+						detector.heartbeat();
 				}
 			} else {
 				MySQLDetector detector = this.detector;
@@ -160,59 +159,58 @@ public class MySQLHeartbeat extends DBHeartbeat {
 	public void setResult(int result, MySQLDetector detector, String msg) {
 		this.isChecking.set(false);
 		switch (result) {
-			case OK_STATUS:
-				setOk(detector);
-				break;
-			case ERROR_STATUS:
-				setError(detector);
-				break;
-			case TIMEOUT_STATUS:
-				setTimeout(detector);
-				break;
+		case OK_STATUS:
+			setOk(detector);
+			break;
+		case ERROR_STATUS:
+			setError(detector);
+			break;
+		case TIMEOUT_STATUS:
+			setTimeout(detector);
+			break;
 		}
 		if (this.status != OK_STATUS) {
 			switchSourceIfNeed("heartbeat error");
 		}
-//		String str = JSON.toJSONString(this);
 
-//		System.out.println(str);
 	}
 
 	private void setOk(MySQLDetector detector) {
 		switch (status) {
-            case DBHeartbeat.TIMEOUT_STATUS:
-                this.status = DBHeartbeat.INIT_STATUS;
-                this.errorCount.set(0);
-                //前一个状态为超时 当前状态为正常状态  那就马上发送一个请求 来验证状态是否恢复为Ok
-                if (isStop.get()) {
-                    detector.quit();
-                } else {
-                    heartbeat();// timeout, heart beat again
-                }
-                break;
-            case DBHeartbeat.OK_STATUS:
-                this.errorCount.set(0);
-                break;
-            default:
-                this.status = OK_STATUS;
-                this.errorCount.set(0);
+		case DBHeartbeat.TIMEOUT_STATUS:
+			this.status = DBHeartbeat.INIT_STATUS;
+			this.errorCount.set(0);			
+			//前一个状态为超时 当前状态为正常状态  那就马上发送一个请求 来验证状态是否恢复为Ok
+			if (isStop.get()) {
+				detector.quit();
+			} else {
+				heartbeat();// timeout, heart beat again
+			}
+			break;
+		case DBHeartbeat.OK_STATUS:
+			this.errorCount.set(0);
+			break;
+		default:
+			this.status = OK_STATUS;
+			this.errorCount.set(0);;
 		}
 		if (isStop.get()) {
 			detector.quit();
 		}
 	}
 	//发生错误了,是否进行下一次心跳检测的策略 . 是否进行下一次心跳检测.
-	private void nextDector(MySQLDetector detector, int nextStatue) {
+	private void nextDector(MySQLDetector detector, int nextStatue) {	
+		
 		if (isStop.get()) {
 			detector.quit();
-			this.status = nextStatue;
-		} else {
+			this.status = nextStatue;			
+		} else {  
 			// should continues check error status
-			if (errorCount.get() < maxRetryCount) {
+			if(errorCount.get() < maxRetryCount) {
 				//设置3秒钟之后重试.
 				if (detector != null && !detector.isQuit()) {
 	            	LOGGER.error("set Error " + errorCount + "  " +  this.source.getConfig() );
-					source.setHeartbeatRecoveryTime( TimeUtil.currentTimeMillis() + 3000);
+				//	source.setHeartbeatRecoveryTime( TimeUtil.currentTimeMillis() + 3000);
 	               // heartbeat(); // error count not enough, heart beat again
 	            }
 			} else {
@@ -260,7 +258,8 @@ public class MySQLHeartbeat extends DBHeartbeat {
 		int switchType = source.getHostConfig().getSwitchType();
 		if (switchType == DataHostConfig.NOT_SWITCH_DS) {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("not switch datasource ,for switchType is " + DataHostConfig.NOT_SWITCH_DS);
+				LOGGER.debug("not switch datasource ,for switchType is "
+						+ DataHostConfig.NOT_SWITCH_DS);
 				return;
 			}
 			return;
@@ -298,7 +297,8 @@ public class MySQLHeartbeat extends DBHeartbeat {
 									break;
 								} else {
 									LOGGER.warn("ignored  datasource ,slave is not  synchronized to master , slave behind master :"
-											+ theSourceHB.getSlaveBehindMaster() + " " + theSource.getConfig());
+											+ theSourceHB.getSlaveBehindMaster()
+											+ " " + theSource.getConfig());
 								}
 							} else {
 								// normal switch
@@ -306,9 +306,11 @@ public class MySQLHeartbeat extends DBHeartbeat {
 								pool.switchSourceOrVoted(nextId, true, reason);
                                 break;
 							}
+
 						}
 						nextId = pool.next(nextId);
 					}
+
 				}
 			}
 		}

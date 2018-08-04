@@ -83,6 +83,9 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 	public Boolean getRunOnSlave() {
 		return runOnSlave;
 	}
+	public String getRunOnSlaveDebugInfo() {
+		return runOnSlave == null?" default ":Boolean.toString(runOnSlave);
+	}
 	public boolean isUpdateSql() {
 		int type = sqlType;
 		return ServerParse.INSERT == type || ServerParse.UPDATE == type || ServerParse.DELETE == type || ServerParse.DDL == type;
