@@ -58,10 +58,6 @@ import java.util.Set;
 public abstract class FrontendConnection extends AbstractConnection {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FrontendConnection.class);
 
-	protected long id;
-	protected String host;
-	protected int port;
-	protected int localPort;
 	protected long idleTimeout;
 	protected byte[] seed;
 	protected String user;
