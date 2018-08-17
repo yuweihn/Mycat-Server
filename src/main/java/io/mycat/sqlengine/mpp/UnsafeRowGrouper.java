@@ -588,134 +588,147 @@ public class UnsafeRowGrouper {
 			return;
 		}
 
-		for (MergeCol merg: mergCols) {
-			if(merg.mergeType != MergeCol.MERGE_AVG && merg.colMeta != null) {
-				byte[] result = null;
-				byte[] left = null;
-				byte[] right = null;
-				int type = merg.colMeta.colType;
-				int index = merg.colMeta.colIndex;
-				switch(type) {
-					case ColMeta.COL_TYPE_INT:
-					case ColMeta.COL_TYPE_LONG:
-					case ColMeta.COL_TYPE_INT24:
-						left = BytesTools.int2Bytes(toRow.getInt(index));
-						right = BytesTools.int2Bytes(newRow.getInt(index));
-						break;
-					case ColMeta.COL_TYPE_SHORT:
-						left = BytesTools.short2Bytes(toRow.getShort(index));
-						right = BytesTools.short2Bytes(newRow.getShort(index));
-						break;
-					case ColMeta.COL_TYPE_LONGLONG:
-						left = BytesTools.long2Bytes(toRow.getLong(index));
-						right = BytesTools.long2Bytes(newRow.getLong(index));
-						break;
-					case ColMeta.COL_TYPE_FLOAT:
-						left = BytesTools.float2Bytes(toRow.getFloat(index));
-						right = BytesTools.float2Bytes(newRow.getFloat(index));
-						break;
-					case ColMeta.COL_TYPE_DOUBLE:
-						left = BytesTools.double2Bytes(toRow.getDouble(index));
-						right = BytesTools.double2Bytes(newRow.getDouble(index));
-						break;
-					case ColMeta.COL_TYPE_NEWDECIMAL:
-//						left = BytesTools.double2Bytes(toRow.getDouble(index));
-//						right = BytesTools.double2Bytes(newRow.getDouble(index));
-						int scale = merg.colMeta.decimals;
-						BigDecimal decimalLeft = toRow.getDecimal(index, scale);
-						BigDecimal decimalRight = newRow.getDecimal(index, scale);
-						left = decimalLeft == null ? null : decimalLeft.toString().getBytes();
-						right = decimalRight == null ? null : decimalRight.toString().getBytes();
-						break;
-					case ColMeta.COL_TYPE_DATE:
-					case ColMeta.COL_TYPE_TIMSTAMP:
-					case ColMeta.COL_TYPE_TIME:
-					case ColMeta.COL_TYPE_YEAR:
-					case ColMeta.COL_TYPE_DATETIME:
-					case ColMeta.COL_TYPE_NEWDATE:
-					case ColMeta.COL_TYPE_BIT:
-					case ColMeta.COL_TYPE_VAR_STRING:
-					case ColMeta.COL_TYPE_STRING:
-					case ColMeta.COL_TYPE_ENUM:
-					case ColMeta.COL_TYPE_SET:
-						left = toRow.getBinary(index);
-						right = newRow.getBinary(index);
-						break;
-					default:
-						break;
-				}
+		for (MergeCol merg : mergCols) {
+             if(merg.mergeType != MergeCol.MERGE_AVG && merg.colMeta !=null) {
+				 byte[] result = null;
+				 byte[] left = null;
+				 byte[] right = null;
+				 int type = merg.colMeta.colType;
+				 int index = merg.colMeta.colIndex;
+				 switch(type){
+					 case ColMeta.COL_TYPE_INT:
+					 case ColMeta.COL_TYPE_LONG:
+					 case ColMeta.COL_TYPE_INT24:
+						 if (!toRow.isNullAt(index)) {
+						 	left = BytesTools.int2Bytes(toRow.getInt(index));
+						 }
+						 if (!newRow.isNullAt(index)) {
+						 	right = BytesTools.int2Bytes(newRow.getInt(index));
+						 }
+						 break;
+					 case ColMeta.COL_TYPE_SHORT:
+						 left = BytesTools.short2Bytes(toRow.getShort(index));
+						 right =BytesTools.short2Bytes(newRow.getShort(index));
+						 break;
+					 case ColMeta.COL_TYPE_LONGLONG:
+						 left = BytesTools.long2Bytes(toRow.getLong(index));
+						 right = BytesTools.long2Bytes(newRow.getLong(index));
+						 break;
+					 case ColMeta.COL_TYPE_FLOAT:
+						 left = BytesTools.float2Bytes(toRow.getFloat(index));
+						 right = BytesTools.float2Bytes(newRow.getFloat(index));
+						 break;
+					 case ColMeta.COL_TYPE_DOUBLE:
+						 left = BytesTools.double2Bytes(toRow.getDouble(index));
+						 right = BytesTools.double2Bytes(newRow.getDouble(index));
+						 break;
+					 case ColMeta.COL_TYPE_NEWDECIMAL:
+//						 left = BytesTools.double2Bytes(toRow.getDouble(index));
+//						 right = BytesTools.double2Bytes(newRow.getDouble(index));
+						 int scale = merg.colMeta.decimals;
+						 BigDecimal decimalLeft = toRow.getDecimal(index, scale);
+						 BigDecimal decimalRight = newRow.getDecimal(index, scale);
+						 left = decimalLeft == null ? null : decimalLeft.toString().getBytes();
+						 right = decimalRight == null ? null : decimalRight.toString().getBytes();
+						 break;
+					 case ColMeta.COL_TYPE_DATE:
+					 case ColMeta.COL_TYPE_TIMSTAMP:
+					 case ColMeta.COL_TYPE_TIME:
+					 case ColMeta.COL_TYPE_YEAR:
+					 case ColMeta.COL_TYPE_DATETIME:
+					 case ColMeta.COL_TYPE_NEWDATE:
+					 case ColMeta.COL_TYPE_BIT:
+					 case ColMeta.COL_TYPE_VAR_STRING:
+					 case ColMeta.COL_TYPE_STRING:
+					 case ColMeta.COL_TYPE_ENUM:
+					 case ColMeta.COL_TYPE_SET:
+						 left = toRow.getBinary(index);
+						 right = newRow.getBinary(index);
+						 break;
+					 default:
+						 break;
+				 }
 
-				result = mertFields(left, right, type, merg.mergeType);
-				if (result != null) {
-					switch(type) {
-						case ColMeta.COL_TYPE_BIT:
-							toRow.setByte(index, result[0]);
-						case ColMeta.COL_TYPE_INT:
-						case ColMeta.COL_TYPE_LONG:
-						case ColMeta.COL_TYPE_INT24:
-							toRow.setInt(index, BytesTools.getInt(result));
-							break;
-						case ColMeta.COL_TYPE_SHORT:
-							toRow.setShort(index, BytesTools.getShort(result));
-							break;
-						case ColMeta.COL_TYPE_LONGLONG:
-							toRow.setLong(index, BytesTools.getLong(result));
-							break;
-						case ColMeta.COL_TYPE_FLOAT:
-							toRow.setFloat(index, BytesTools.getFloat(result));
-							break;
-						case ColMeta.COL_TYPE_DOUBLE:
-							toRow.setDouble(index, BytesTools.getDouble(result));
-							break;
-						case ColMeta.COL_TYPE_NEWDECIMAL:
-//							toRow.setDouble(index, BytesTools.getDouble(result));
-							toRow.updateDecimal(index, new BigDecimal(new String(result)));
-							break;
-						/**
-						 * TODO UnsafeFixedWidthAggregationMap 中存放
-						 * UnsafeRow时，非数值类型的列不可更改其值，
-						 * 为了统一处理聚合函数这块
-						 * 做max或者min聚合时候，目前解决方法
-						 * 先free原来 UnsafeFixedWidthAggregationMap对象。
-						 * 然后重新创建一个UnsafeFixedWidthAggregationMap对象
-						 * 然后存放最新的max或者min值作为下次比较。
-						**/
-						case ColMeta.COL_TYPE_DATE:
-						case ColMeta.COL_TYPE_TIMSTAMP:
-						case ColMeta.COL_TYPE_TIME:
-						case ColMeta.COL_TYPE_YEAR:
-						case ColMeta.COL_TYPE_DATETIME:
-						case ColMeta.COL_TYPE_NEWDATE:
-						case ColMeta.COL_TYPE_VAR_STRING:
-						case ColMeta.COL_TYPE_STRING:
-						case ColMeta.COL_TYPE_ENUM:
-						case ColMeta.COL_TYPE_SET:
-							aggregationMap.free();
-							DataNodeMemoryManager dataNodeMemoryManager = new DataNodeMemoryManager(memoryManager, Thread.currentThread().getId());
-							aggregationMap = new UnsafeFixedWidthAggregationMap(emptyAggregationBuffer, aggBufferSchema
-									, groupKeySchema, dataNodeMemoryManager, 1024
-									, conf.getSizeAsBytes("mycat.buffer.pageSize", "32k"), false);
-							UnsafeRow unsafeRow = new UnsafeRow(toRow.numFields());
-							bufferHolder = new BufferHolder(unsafeRow, 0);
-							unsafeRowWriter = new UnsafeRowWriter(bufferHolder, toRow.numFields());
-							bufferHolder.reset();
-							for (int i = 0; i < toRow.numFields(); i++) {
-								if (!toRow.isNullAt(i) && i != index) {
-									unsafeRowWriter.write(i, toRow.getBinary(i));
-								} else if (!toRow.isNullAt(i) && i == index) {
-									unsafeRowWriter.write(i, result);
-								} else if (toRow.isNullAt(i)){
-									unsafeRow.setNullAt(i);
-								}
-							}
-							unsafeRow.setTotalSize(bufferHolder.totalSize());
-							aggregationMap.put(key, unsafeRow);
-							break;
-						default:
-							break;
-					}
-				}
-			}
+                 result = mertFields(left,right,type,merg.mergeType);
+
+				 if (result != null) {
+					 switch(type){
+					 	 case ColMeta.COL_TYPE_BIT:
+					 	 	toRow.setByte(index,result[0]);
+						 case ColMeta.COL_TYPE_INT:
+						 case ColMeta.COL_TYPE_LONG:
+						 case ColMeta.COL_TYPE_INT24:
+							toRow.setInt(index,BytesTools.getInt(result));
+							 break;
+						 case ColMeta.COL_TYPE_SHORT:
+							 toRow.setShort(index,BytesTools.getShort(result));
+							 break;
+						 case ColMeta.COL_TYPE_LONGLONG:
+							 toRow.setLong(index,BytesTools.getLong(result));
+							 break;
+						 case ColMeta.COL_TYPE_FLOAT:
+							 toRow.setFloat(index,BytesTools.getFloat(result));
+							 break;
+						 case ColMeta.COL_TYPE_DOUBLE:
+                             toRow.setDouble(index,BytesTools.getDouble(result));
+							 break;
+						 case ColMeta.COL_TYPE_NEWDECIMAL:
+//                           toRow.setDouble(index,BytesTools.getDouble(result));
+							 toRow.updateDecimal(index, new BigDecimal(new String(result)));
+							 break;
+						 /**
+						  *TODO UnsafeFixedWidthAggregationMap 中存放
+						  * UnsafeRow时，非数值类型的列不可更改其值，
+						  * 为了统一处理聚合函数这块
+						  * 做max或者min聚合时候，目前解决方法
+						  * 先free原来 UnsafeFixedWidthAggregationMap对象。
+						  * 然后重新创建一个UnsafeFixedWidthAggregationMap对象
+						  * 然后存放最新的max或者min值作为下次比较。
+						  **/
+						 case ColMeta.COL_TYPE_DATE:
+						 case ColMeta.COL_TYPE_TIMSTAMP:
+						 case ColMeta.COL_TYPE_TIME:
+						 case ColMeta.COL_TYPE_YEAR:
+						 case ColMeta.COL_TYPE_DATETIME:
+						 case ColMeta.COL_TYPE_NEWDATE:
+						 case ColMeta.COL_TYPE_VAR_STRING:
+						 case ColMeta.COL_TYPE_STRING:
+						 case ColMeta.COL_TYPE_ENUM:
+						 case ColMeta.COL_TYPE_SET:
+							 aggregationMap.free();
+							 DataNodeMemoryManager dataNodeMemoryManager =
+									 new DataNodeMemoryManager(memoryManager,Thread.currentThread().getId());
+							 aggregationMap = new UnsafeFixedWidthAggregationMap(
+									 emptyAggregationBuffer,
+									 aggBufferSchema,
+									 groupKeySchema,
+									 dataNodeMemoryManager,
+									 1024,
+									 conf.getSizeAsBytes("mycat.buffer.pageSize", "32k"),
+									 false);
+							 UnsafeRow unsafeRow = new UnsafeRow(toRow.numFields());
+							 bufferHolder = new BufferHolder(unsafeRow, 0);
+							 unsafeRowWriter = new UnsafeRowWriter(bufferHolder, toRow.numFields());
+							 bufferHolder.reset();
+							 for (int i = 0; i < toRow.numFields(); i++) {
+
+								 if (i == index) {
+									 unsafeRowWriter.write(i,result);
+								 } else if (!toRow.isNullAt(i)) {
+									 unsafeRowWriter.write(i, toRow.getBinary(i));
+								 } else if (toRow.isNullAt(i)){
+									 unsafeRow.setNullAt(i);
+								 }
+							 }
+							 unsafeRow.setTotalSize(bufferHolder.totalSize());
+							 aggregationMap.put(key, unsafeRow);
+							 toRow = unsafeRow;
+							 break;
+						 default:
+							 break;
+					 }
+                 }
+             }
 		}
 	}
 
