@@ -26,8 +26,10 @@
 		<!--</table>-->
 		<!--&lt;!&ndash; <table name="oc_call" primaryKey="ID" dataNode="dn1$0-743" rule="latest-month-calldate"/> &ndash;&gt;-->
 	</schema>
-	<schema name="mycat_idebug_dev" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn5">
-		<table name="sequence" dataNode="dn5"/>
+    <schema name="mycat_idebug_dev" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn5">
+        <table name="sequence" dataNode="dn5"/>
+    </schema>
+    <schema name="mycat_gateway_dev" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn6">
     </schema>
 
     <!-- <dataNode name="dn1$0-743" dataHost="localhost1" database="db$0-743" /> -->
@@ -36,6 +38,7 @@
     <dataNode name="dn3" dataHost="localhost2" database="dev_01" />
     <dataNode name="dn4" dataHost="localhost2" database="dev_02" />
     <dataNode name="dn5" dataHost="localhost2" database="idebug_dev" />
+    <dataNode name="dn6" dataHost="localhost1" database="gateway_dev" />
     <!--
     <dataNode name="dn4" dataHost="sequoiadb1" database="SAMPLE" />
     <dataNode name="jdbc_dn1" dataHost="jdbchost" database="db1" />
