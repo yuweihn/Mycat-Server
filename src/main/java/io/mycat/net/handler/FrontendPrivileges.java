@@ -66,7 +66,7 @@ public interface FrontendPrivileges {
      * @return
      */
     int getBenchmark(String user);
-    
+
     /**
      * 检查防火墙策略
      * （白名单策略）
@@ -83,10 +83,20 @@ public interface FrontendPrivileges {
      * @return
      */
     boolean checkFirewallSQLPolicy(String user, String sql);
-    
+
     /**
      * 检查 SQL 语句的 DML 权限
      * @return
      */
     boolean checkDmlPrivilege(String user, String schema, String sql);
+
+    /**
+     * 检查针对 DataNode 的 SQL 语句的 DML 权限
+     * @param user
+     * @param dataNode
+     * @param sql
+     * @return
+     */
+    boolean checkDataNodeDmlPrivilege(String user, String dataNode, String sql);
+
 }
