@@ -95,20 +95,22 @@ public class DirectByteBufferPool implements BufferPool {
     }
 
     public void recycle(ByteBuffer theBuf) {
-      	if (theBuf != null && !(theBuf instanceof DirectBuffer)) {
-            theBuf.clear();
-            return;
-        }
+    	//堆内buffer直接就清空就好
+      	if(theBuf !=null && (!(theBuf instanceof DirectBuffer) )){
+    		theBuf.clear();
+    		return;
+         }
  		 
 		final long size = theBuf.capacity();
 
 		boolean recycled = false;
-		DirectBuffer thisNavBuf = (DirectBuffer) theBuf;
-		int chunkCount = theBuf.capacity() / chunkSize;
-		DirectBuffer parentBuf = (DirectBuffer) thisNavBuf.attachment();
-		int startChunk = (int) ((thisNavBuf.address() - parentBuf.address()) / chunkSize);
-		for (int i = 0; i < allPages.length; i++) {
-			if (recycled = allPages[i].recycleBuffer((ByteBuffer) parentBuf, startChunk, chunkCount) == true) {
+		DirectBuffer thisNavBuf = (DirectBuffer) theBuf;//
+		int chunkCount = theBuf.capacity() / chunkSize; //chunk的个数
+		DirectBuffer parentBuf = (DirectBuffer) thisNavBuf.attachment(); //page的DirectBuffer
+		int startChunk = (int) ((thisNavBuf.address() - parentBuf.address()) / chunkSize); //开始chunk的序号
+		for (int i = 0; i < allPages.length; i++) { //在所有的页面中查找当前buffer分配的
+			if ((recycled = allPages[i].recycleBuffer((ByteBuffer) parentBuf, startChunk,
+					chunkCount) == true)) {
 				break;
 			}
 		}
