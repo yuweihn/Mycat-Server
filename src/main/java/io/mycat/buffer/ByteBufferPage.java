@@ -16,7 +16,6 @@ public class ByteBufferPage {
     private final int chunkCount;  //chunk的个数
     private final BitSet chunkAllocateTrack; //某个chunk是否被分配
     private final AtomicBoolean allocLockStatus = new AtomicBoolean(false);  //锁
-    private final long startAddress;
 
     public ByteBufferPage(ByteBuffer buf, int chunkSize) {
         super();
