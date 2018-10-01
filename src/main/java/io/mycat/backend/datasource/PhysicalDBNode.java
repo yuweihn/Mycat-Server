@@ -110,7 +110,7 @@ public class PhysicalDBNode {
 							writeSource.getConnection(schema,
 									autoCommit, handler, attachment);
 							rrs.setRunOnSlave(false);
-							rrs.setCanRunInReadDB(false);
+							rrs.setCanRunnINReadDB(false);
 						}
 					}
 				}else{	// 强制走 master
@@ -121,11 +121,11 @@ public class PhysicalDBNode {
 					writeSource.setWriteCount();
 					writeSource.getConnection(schema, autoCommit,
 							handler, attachment);
-					rrs.setCanRunInReadDB(false);
+					rrs.setCanRunnINReadDB(false);
 				}
 			}else{	// 没有  /*db_type=master/slave*/ 注解，按照原来的处理方式
 				LOGGER.debug("rrs.getRunOnSlave() " + rrs.getRunOnSlaveDebugInfo());	// null
-				if (rrs.canRunINReadDB(autoCommit)) {
+				if (rrs.canRunnINReadDB(autoCommit)) {
 					dbPool.getRWBanlanceCon(schema,autoCommit, handler, attachment, this.database);
 				} else {
 					PhysicalDatasource writeSource =dbPool.getSource();
