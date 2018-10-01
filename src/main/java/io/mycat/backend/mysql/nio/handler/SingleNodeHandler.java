@@ -360,7 +360,7 @@ public class SingleNodeHandler implements ResponseHandler, Terminatable, LoadDat
 		MiddlerResultHandler middlerResultHandler = session.getMiddlerResultHandler();
 
 		if(middlerResultHandler !=null ){
-			middlerResultHandler.secondEexcute(); 
+			middlerResultHandler.secondExecute();
 		} else{
 			//modify by zwy 2018.07
 			if(!errorRepsponsed.get()&& !session.closed()&& source.canResponse()) {

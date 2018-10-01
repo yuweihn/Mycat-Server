@@ -140,7 +140,7 @@ abstract class MultiNodeHandler implements ResponseHandler, Terminatable {
 		String errMsg = new String(err.message);
 		this.setFail(errMsg);
 		
-		LOGGER.warn(this.toString() +"error response from " + conn + " err " + errmsg + " code:" + err.errno);
+		LOGGER.warn(this.toString() +"error response from " + conn + " err " + errMsg + " code:" + err.errno);
 
 		this.tryErrorFinished(this.decrementCountBy(1));
 	}
