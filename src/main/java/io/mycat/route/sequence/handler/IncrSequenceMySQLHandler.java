@@ -308,7 +308,7 @@ class FetchMySQLSequenceHandler implements ResponseHandler {
 
 class SequenceVal {
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(FetchMySQLSequnceHandler.class);
+			.getLogger(FetchMySQLSequenceHandler.class);
 //	public AtomicBoolean newValueSetted = new AtomicBoolean(false);
 	public AtomicLong curVal = new AtomicLong(0); //当前可用的id
 	public volatile long maxSegValue; //最大的可用id
@@ -356,7 +356,7 @@ class SequenceVal {
 	 *     结果还未返回，调用函数继续等待
 	 *  成功返回则正常返回
 	 * */
-	public Long[] waitFinish(FetchMySQLSequnceHandler mysqlSeqFetcher, int retryCount, boolean canSendFetch) {
+	public Long[] waitFinish(FetchMySQLSequenceHandler mysqlSeqFetcher, int retryCount, boolean canSendFetch) {
 		final int systemRetryCount = MycatServer.getInstance().getConfig().getSystem().getSequnceMySqlRetryCount();
 		//进入waitFinish小于4次，或者可以后端获取数据
 		if(retryCount <= systemRetryCount && canSendFetch) {
