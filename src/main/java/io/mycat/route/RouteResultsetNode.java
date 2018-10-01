@@ -43,7 +43,7 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 	private String statement; // 执行的语句
 	private final String srcStatement;
 	private final int sqlType;
-	private volatile boolean canRunInReadDB;
+	private volatile boolean canRunnINReadDB;
 	private final boolean hasBalanceFlag;
     private boolean callStatement = false; // 处理call关键字
 	private int limitStart;
@@ -53,7 +53,7 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 	private LoadData loadData;
 	private RouteResultset source;
 	
-	// 强制走 master，可以通过 RouteResultset的属性canRunInReadDB(false)
+	// 强制走 master，可以通过 RouteResultset的属性canRunnINReadDB(false)
 	// 传给 RouteResultsetNode 来实现，但是 强制走 slave需要增加一个属性来实现:
 	private Boolean runOnSlave = null;	// 默认null表示不施加影响, true走slave,false走master
 	
@@ -76,7 +76,7 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 		this.sqlType = sqlType;
 		this.srcStatement = srcStatement;
 		this.statement = srcStatement;
-		this.canRunInReadDB = sqlType == ServerParse.SELECT || sqlType == ServerParse.SHOW;
+		this.canRunnINReadDB = sqlType == ServerParse.SELECT || sqlType == ServerParse.SHOW;
 		this.hasBalanceFlag = statement != null && statement.startsWith("/*balance*/");
 	}
 
@@ -106,12 +106,12 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 		this.statement = statement;
 	}
 
-	public void setCanRunInReadDB(boolean canRunInReadDB) {
-		this.canRunInReadDB = canRunInReadDB;
+	public void setCanRunnINReadDB(boolean canRunnINReadDB) {
+		this.canRunnINReadDB = canRunnINReadDB;
 	}
 
-	public boolean getCanRunInReadDB() {
-		return this.canRunInReadDB;
+	public boolean getCanRunnINReadDB() {
+		return this.canRunnINReadDB;
 	}
 
 	public void resetStatement() {
@@ -125,17 +125,17 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 	 * 
 	 * 在非自动提交的情况下(有事物)，除非使用了  balance 注解的情况下，才可以走slave.
 	 * 
-	 * 当然还有一个大前提，必须是 select 或者 show 语句(canRunInReadDB=true)
+	 * 当然还有一个大前提，必须是 select 或者 show 语句(canRunnINReadDB=true)
 	 * @param autocommit
 	 * @return
 	 */
-	public boolean canRunINReadDB(boolean autocommit) {
-//		return canRunInReadDB && (autocommit || (!autocommit && hasBalanceFlag));
-		return canRunInReadDB && (autocommit || hasBalanceFlag);
+	public boolean canRunnINReadDB(boolean autocommit) {
+//		return canRunnINReadDB && (autocommit || (!autocommit && hasBalanceFlag));
+		return canRunnINReadDB && (autocommit || hasBalanceFlag);
 	}
 	
-//	public boolean canRunINReadDB(boolean autocommit) {
-//		return canRunInReadDB && autocommit && !hasBalanceFlag || canRunInReadDB && !autocommit && hasBalanceFlag;
+//	public boolean canRunnINReadDB(boolean autocommit) {
+//		return canRunnINReadDB && autocommit && !hasBalanceFlag || canRunnINReadDB && !autocommit && hasBalanceFlag;
 //	}
 
 	public Procedure getProcedure() {
@@ -250,7 +250,7 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 	}
 
 	public boolean isModifySQL() {
-		return !canRunInReadDB;
+		return !canRunnINReadDB;
 	}
 	public boolean isDisctTable() {
 		return subTableName != null && !subTableName.equals("");
