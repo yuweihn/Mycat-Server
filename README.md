@@ -11,6 +11,15 @@ Mycat’s target is to smoothly migrate the current stand-alone database and app
 
 加入MyCAT开发志愿者队伍,联系QQ:294712221
 
+更新Druid 1.1.10版本的分支独立维护在
+https://github.com/MyCATApache/Mycat-Server/tree/1.6.6-druid
+
+
+MyCAT2.0开发中
+https://github.com/MyCATApache/Mycat2
+
+
+
 * [Getting Started](https://github.com/MyCATApache/Mycat-doc/tree/master/en)
 * [尝试 MyCAT](https://github.com/MyCATApache/Mycat-doc/blob/master/MyCat_In_Action_%E4%B8%AD%E6%96%87%E7%89%88.doc)
 

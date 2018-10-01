@@ -23,6 +23,17 @@
  */
 package io.mycat.backend.datasource;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.mycat.MycatServer;
 import io.mycat.backend.BackendConnection;
@@ -425,7 +436,7 @@ public abstract class PhysicalDatasource {
 //		if(takeConnectionContext.putIfAbsent(conn.getId(), TAKE_CONNECTION_FLAG) == null) {
 //			incrementActiveCountSafe();
 //		}
-		
+
 		if (!conn.getSchema().equals(schema)) {
 			// need do schema syn in before sql send
 			conn.setSchema(schema);
@@ -438,25 +449,36 @@ public abstract class PhysicalDatasource {
 		return conn;
 	}
 
-	private void createNewConnection(final ResponseHandler handler, final Object attachment, final String schema) {
-		// async create connection
+	private void createNewConnection(final ResponseHandler handler,
+			final Object attachment, final String schema) throws IOException {		
+		// aysn create connection
+		final AtomicBoolean hasError = new AtomicBoolean(false);
+
 		MycatServer.getInstance().getBusinessExecutor().execute(new Runnable() {
 			public void run() {
 				try {
 					createNewConnection(new DelegateResponseHandler(handler) {
 						@Override
 						public void connectionError(Throwable e, BackendConnection conn) {
-							//decrementTotalConnectionsSafe(); // 如果创建连接失败，将当前连接数减1
-							handler.connectionError(e, conn);
+							if(hasError.compareAndSet(false, true)) {
+								handler.connectionError(e, conn);
+							} else {
+								LOGGER.info("connection connectionError ");
+							}
 						}
 
 						@Override
 						public void connectionAcquired(BackendConnection conn) {
+							LOGGER.info("connection id is "+conn.getId());
 							takeCon(conn, handler, attachment, schema);
 						}
 					}, schema);
 				} catch (IOException e) {
-					handler.connectionError(e, null);
+					if(hasError.compareAndSet(false, true)) {
+						handler.connectionError(e, null);
+					} else {
+						LOGGER.info("connection connectionError ");
+					}
 				}
 			}
 		});
