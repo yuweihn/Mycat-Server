@@ -126,40 +126,48 @@ public class XMLServerLoader {
      */
     private void loadFirewall(Element root) throws IllegalAccessException, InvocationTargetException {
         NodeList list = root.getElementsByTagName("host");
-        Map<String, List<UserConfig>> whiteHost = new HashMap<>();
-        Map<Pattern, List<UserConfig>> whiteHostMask = new HashMap<>();
+        Map<String, List<UserConfig>> whitehost = new HashMap<>();
+        Map<Pattern, List<UserConfig>> whitehostMask = new HashMap<>();
 
         for (int i = 0, n = list.getLength(); i < n; i++) {
             Node node = list.item(i);
             if (node instanceof Element) {
                 Element e = (Element) node;
-                String host = e.getAttribute("host").trim();
+                String hostStr = e.getAttribute("host").trim();
                 String userStr = e.getAttribute("user").trim();
-                if (this.firewall.existsHost(host)) {
-                    throw new ConfigException("host duplicated : " + host);
+                String []hosts = hostStr.split(",");
+                for (String host : hosts) {
+                    host = host.trim();
+                    if (this.firewall.existsHost(host)) {
+                        throw new ConfigException("host duplicated : " + host);
+                    }
                 }
                 String[] users = userStr.split(",");
                 List<UserConfig> userConfigs = new ArrayList<UserConfig>();
-                for(String user: users) {
+                for(String user : users){
+                    user = user.trim();
                 	UserConfig uc = this.users.get(user);
                     if (null == uc) {
-                        throw new ConfigException("[user: " + user + "] doesn't exist in [host: " + host + "]");
+                        throw new ConfigException("[user: " + user + "] doesn't exist in [host: " + hostStr + "]");
                     }
                     if (uc.getSchemas() == null || uc.getSchemas().size() == 0) {
-                        throw new ConfigException("[host: " + host + "] contains one root privileges user: " + user);
+                        throw new ConfigException("[host: " + hostStr + "] contains one root privileges user: " + user);
                     }
                     userConfigs.add(uc);
                 }
-                if(host.contains("*") || host.contains("%")) {
-                    whiteHostMask.put(FirewallConfig.getMaskPattern(host), userConfigs);
-                } else {
-                    whiteHost.put(host, userConfigs);
+                for (String host : hosts) {
+                    host = host.trim();
+                    if (host.contains("*") || host.contains("%")) {
+                        whitehostMask.put(FirewallConfig.getMaskPattern(host), userConfigs);
+                    } else {
+                        whitehost.put(host, userConfigs);
+                    }
                 }
             }
         }
 
-        firewall.setWhitehost(whiteHost);
-        firewall.setWhitehostMask(whiteHostMask);
+        firewall.setWhitehost(whitehost);
+        firewall.setWhitehostMask(whitehostMask);
 
         WallConfig wallConfig = new WallConfig();
         NodeList blacklist = root.getElementsByTagName("blacklist");

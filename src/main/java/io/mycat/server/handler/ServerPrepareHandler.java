@@ -70,12 +70,14 @@ public class ServerPrepareHandler implements FrontendPrepareHandler {
     private volatile long pstmtId;
     private Map<String, PreparedStatement> pstmtForSql;
     private Map<Long, PreparedStatement> pstmtForId;
+    private int maxPreparedStmtCount;
 
-    public ServerPrepareHandler(ServerConnection source) {
+    public ServerPrepareHandler(ServerConnection source,int maxPreparedStmtCount) {
         this.source = source;
         this.pstmtId = 0L;
         this.pstmtForSql = new HashMap<String, PreparedStatement>();
         this.pstmtForId = new HashMap<Long, PreparedStatement>();
+        this.maxPreparedStmtCount = maxPreparedStmtCount;
     }
 
     @Override
@@ -87,6 +89,10 @@ public class ServerPrepareHandler implements FrontendPrepareHandler {
         	// 解析获取字段个数和参数个数
         	int columnCount = getColumnCount(sql);
         	int paramCount = getParamCount(sql);
+        	if(paramCount > maxPreparedStmtCount){
+				source.writeErrMessage(ErrorCode.ER_PS_MANY_PARAM, "Prepared statement contains too many placeholders");
+				return;
+			}
             pstmt = new PreparedStatement(++pstmtId, sql, columnCount, paramCount);
             pstmtForSql.put(pstmt.getStatement(), pstmt);
             pstmtForId.put(pstmt.getId(), pstmt);
@@ -224,22 +230,22 @@ public class ServerPrepareHandler implements FrontendPrepareHandler {
     		// 非空情况, 根据字段类型获取值
     		switch(paramType & 0xff) {
     		case Fields.FIELD_TYPE_TINY:
-    			sb.append(String.valueOf(bindValue.byteBinding));
+    			sb.append(bindValue.byteBinding);
     			break;
     		case Fields.FIELD_TYPE_SHORT:
-    			sb.append(String.valueOf(bindValue.shortBinding));
+    			sb.append(bindValue.shortBinding);
     			break;
     		case Fields.FIELD_TYPE_LONG:
-    			sb.append(String.valueOf(bindValue.intBinding));
+    			sb.append(bindValue.intBinding);
     			break;
     		case Fields.FIELD_TYPE_LONGLONG:
-    			sb.append(String.valueOf(bindValue.longBinding));
+    			sb.append(bindValue.longBinding);
     			break;
     		case Fields.FIELD_TYPE_FLOAT:
-    			sb.append(String.valueOf(bindValue.floatBinding));
+    			sb.append(bindValue.floatBinding);
     			break;
     		case Fields.FIELD_TYPE_DOUBLE:
-    			sb.append(String.valueOf(bindValue.doubleBinding));
+    			sb.append(bindValue.doubleBinding);
     			break;
     		case Fields.FIELD_TYPE_VAR_STRING:
             case Fields.FIELD_TYPE_STRING:
@@ -272,7 +278,6 @@ public class ServerPrepareHandler implements FrontendPrepareHandler {
             	break;
     		}
     	}
-    	
     	return sb.toString();
     }
 

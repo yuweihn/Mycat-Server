@@ -100,21 +100,43 @@ public class ConMap {
         return total;
     }
 
-    public void clearConnections(String reason, PhysicalDatasource dataSource) {
-        for (NIOProcessor processor: MycatServer.getInstance().getProcessors()) {
+    public int getTotalCountForDs(PhysicalDatasource dataSouce) {
+        int total = 0;
+        for (NIOProcessor processor : MycatServer.getInstance().getProcessors()) {
+            for (BackendConnection con : processor.getBackends().values()) {
+                if (con instanceof MySQLConnection) {
+                    MySQLConnection mysqlCon = (MySQLConnection) con;
+                    if (mysqlCon.getPool() == dataSouce && !mysqlCon.isClosed()) {
+                        total++;
+                    }
+
+                } else if (con instanceof JDBCConnection) {
+                    JDBCConnection jdbcCon = (JDBCConnection) con;
+                    if (jdbcCon.getPool() == dataSouce && !jdbcCon.isClosed()) {
+                        total++;
+                    }
+                }
+            }
+        }
+        return total;
+    }
+
+    public void clearConnections(String reason, PhysicalDatasource dataSouce) {
+        for (NIOProcessor processor : MycatServer.getInstance().getProcessors()) {
             ConcurrentMap<Long, BackendConnection> map = processor.getBackends();
-            Iterator<Entry<Long, BackendConnection>> itr = map.entrySet().iterator();
-            while (itr.hasNext()) {
-                Entry<Long, BackendConnection> entry = itr.next();
+            Iterator<Entry<Long, BackendConnection>> itor = map.entrySet().iterator();
+            while (itor.hasNext()) {
+                Entry<Long, BackendConnection> entry = itor.next();
                 BackendConnection con = entry.getValue();
                 if (con instanceof MySQLConnection) {
-                    if (((MySQLConnection) con).getPool() == dataSource) {
+                    if (((MySQLConnection) con).getPool() == dataSouce) {
                         con.close(reason);
-						itr.remove();
+                        itor.remove();
                     }
-                } else if((con instanceof JDBCConnection) && (((JDBCConnection) con).getPool() == dataSource)) {
-					con.close(reason);
-					itr.remove();
+                } else if((con instanceof JDBCConnection)
+						&& (((JDBCConnection) con).getPool() == dataSouce)){
+                        con.close(reason);
+                        itor.remove();
                 }
             }
 		}

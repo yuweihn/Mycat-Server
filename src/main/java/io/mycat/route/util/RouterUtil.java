@@ -6,6 +6,7 @@ import java.sql.SQLSyntaxErrorException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -102,7 +103,7 @@ public class RouterUtil {
 
         StringBuilder sb = new StringBuilder();
         while (indx > 0) {
-            sb.append(stmt.substring(strtPos, indx));
+            sb.append(stmt, strtPos, indx);
 
             if (flag) {
                 strtPos = indx + upSchema2.length();
@@ -110,7 +111,7 @@ public class RouterUtil {
                 strtPos = indx + upSchema.length();
             }
             if (indx > firstE && indx < endE && countChar(stmt, indx) % 2 == 1) {
-                sb.append(stmt.substring(indx, indx + schema.length() + 1));
+                sb.append(stmt, indx, indx + schema.length() + 1);
             }
             indx1 = upStmt.indexOf(upSchema, strtPos);
             indx2 = upStmt.indexOf(upSchema2, strtPos);
@@ -128,11 +129,7 @@ public class RouterUtil {
 			if(sql.charAt(i) == '\'' && !skipChar) {
 				count++;
 				skipChar = false;
-			} else if(sql.charAt(i) == '\\') {
-				skipChar = true;
-			} else {
-				skipChar = false;
-			}
+			} else skipChar = sql.charAt(i) == '\\';
 		}
 		return count;
 	}
@@ -573,15 +570,20 @@ public class RouterUtil {
 		}
 		return processedInsert;
 	}
+	/*
+	 *  找到返回主键的的位置
+	 *  找不到返回 -1
+	 * */
+	private static int isPKInFields(String origSQL,String primaryKey,int firstLeftBracketIndex,int firstRightBracketIndex){
 
-	private static boolean isPKInFields(String origSQL, String primaryKey, int firstLeftBracketIndex, int firstRightBracketIndex) {
 		if (primaryKey == null) {
 			throw new RuntimeException("please make sure the primaryKey's config is not null in schemal.xml");
 		}
 
 		boolean isPrimaryKeyInFields = false;
+		int  pkStart = 0;
 		String upperSQL = origSQL.substring(firstLeftBracketIndex, firstRightBracketIndex + 1).toUpperCase();
-		for (int pkOffset = 0, primaryKeyLength = primaryKey.length(), pkStart = 0;;) {
+		for (int pkOffset = 0, primaryKeyLength = primaryKey.length();;) {
 			pkStart = upperSQL.indexOf(primaryKey, pkOffset);
 			if (pkStart >= 0 && pkStart < firstRightBracketIndex) {
 				char pkSide = upperSQL.charAt(pkStart - 1);
@@ -597,7 +599,12 @@ public class RouterUtil {
 				break;
 			}
 		}
-		return isPrimaryKeyInFields;
+		if (isPrimaryKeyInFields) {
+			return firstLeftBracketIndex + pkStart;
+		} else {
+			return  -1;
+		}
+
 	}
 
 	public static boolean processInsert(ServerConnection sc, SchemaConfig schema, int sqlType, String origSQL, String tableName
@@ -624,11 +631,67 @@ public class RouterUtil {
 		if(valuesIndex + "VALUES".length() <= firstLeftBracketIndex) {
 			throw new SQLSyntaxErrorException("insert must provide ColumnList");
 		}
+		List<List<String>> vauleList = parseSqlValue(origSQL , valuesIndex);
+		//两种情况处理 1 有主键的 id ,但是值为null 进行改下
+		//            2 没有主键的 需要插入 进行改写
+
 		//如果主键不在插入语句的fields中，则需要进一步处理
-		boolean processedInsert = !isPKInFields(origSQL, primaryKey, firstLeftBracketIndex, firstRightBracketIndex);
-		if(processedInsert) {
-			handleBatchInsert(sc, schema, sqlType, origSQL, valuesIndex, tableName, primaryKey);
+		boolean processedInsert= false;
+		int pkStart = isPKInFields(origSQL,primaryKey,firstLeftBracketIndex,firstRightBracketIndex);
+
+
+		if(pkStart == -1){
+			processedInsert = true;
+			handleBatchInsert(sc, schema, sqlType,origSQL, valuesIndex, tableName, primaryKey, vauleList);
+		} else {
+			//判断 主键id的值是否为null
+			if(pkStart != -1) {
+				String subPrefix = origSQL.substring(0, pkStart);
+				char c;
+				int pkIndex = 0;
+				for(int index = 0, len = subPrefix.length(); index < len; index++) {
+					c = subPrefix.charAt(index);
+					if(c == ',') {
+						pkIndex ++;
+					}
+				}
+				processedInsert  = handleBatchInsertWithPK(sc, schema, sqlType,origSQL, valuesIndex, tableName, primaryKey, vauleList , pkIndex);
+			}
 		}
+		return processedInsert;
+	}
+
+	private static boolean handleBatchInsertWithPK(ServerConnection sc, SchemaConfig schema, int sqlType,
+			String origSQL, int valuesIndex, String tableName, String primaryKey, List<List<String>> vauleList,
+			int pkIndex) {
+		boolean processedInsert = false;
+//	  	final String pk = "\\("+primaryKey+",";
+	      final String mycatSeqPrefix = "next value for MYCATSEQ_"+tableName.toUpperCase() ;
+
+	  	/*"VALUES".length() ==6 */
+	      String prefix = origSQL.substring(0, valuesIndex + 6);
+//
+
+	      StringBuilder sb = new StringBuilder();
+	      for(List<String> list : vauleList) {
+	    	  sb.append("(");
+	    	  String pkValue = list.get(pkIndex).trim().toLowerCase();
+	    	  //null值替换为 next value for MYCATSEQ_tableName
+	    	  if("null".equals(pkValue.trim())) {
+	    		  list.set(pkIndex, mycatSeqPrefix);
+	    		  processedInsert = true;
+	    	  }
+	    	  for(String val : list) {
+	    		  sb.append(val).append(",");
+	    	  }
+		      sb.setCharAt(sb.length() - 1, ')');
+	    	  sb.append(",");
+	      }
+	      sb.setCharAt(sb.length() - 1, ' ');
+        if(processedInsert) {
+	 	    processSQL(sc, schema,prefix+sb.toString(), sqlType);
+
+	     }
 		return processedInsert;
 	}
 
@@ -682,29 +745,130 @@ public class RouterUtil {
 		}
 		return handledSQLs;
 	}
-	
+	 /**
+	  * 对于插入的sql : "insert into hotnews(title,name) values('test1',\"name\"),('(test)',\"(test)\"),('\\\"',\"\\'\"),(\")\",\"\\\"\\')\")"：
+	  *  需要返回结果：
+	  *[[ 'test1', "name"],
+	  *	['(test)', "(test)"],
+	  *	['\"', "\'"],
+	  *	[")", "\"\')"],
+	  *	[ 1,  null]
+	  * 值结果的解析
+	  */
+    public  static List<List<String>> parseSqlValue(String origSQL,int valuesIndex ) {
+        List<List<String>> valueArray = new ArrayList<>();
+        String valueStr = origSQL.substring(valuesIndex + 6);// 6 values 长度为6
+        String preStr = origSQL.substring(0, valuesIndex );// 6 values 长度为6
+        int pos = 0 ;
+        int flag  = -1;
+        int len = valueStr.length();
+        StringBuilder currentValue = new StringBuilder();
+//        int colNum = 2; //
+        char c ;
+        List<String> curList = new ArrayList<>();
+        for( ;pos < len; pos ++) {
+            c = valueStr.charAt(pos);
+            if(flag == 1  || flag == 2) {
+                currentValue.append(c);
+                if(c == '\\') {
+                    char nextCode = valueStr.charAt(pos + 1);
+                    if(nextCode == '\'' || nextCode == '\"') {
+                        currentValue.append(nextCode);
+                        pos++;
+                        continue;
+                    }
+                }
+                if(c == '\"' && flag == 1) {
+                    flag = 0;
+                    continue;
+                }
+                if(c == '\'' && flag == 2) {
+                    flag = 0;
+                    continue;
+                }
+            }  else if(c == '\"'){
+                currentValue.append(c);
+                flag = 1;
+            } else if (c == '\'') {
+                currentValue.append(c);
+                flag = 2;
+            } else if (c == '(') {
+                curList = new ArrayList<>();
+                flag = 0;
+            } else if(flag == 4 ) {
+                if(c == ',') {
+                    flag = 0;
+                    continue;
+                }
+            } else if(c == ',') {
+//                System.out.println(currentValue);
+                curList.add(currentValue.toString());
+                currentValue.delete(0, currentValue.length());
+            } else if(c == ')'){
+                flag = 4;
+//                System.out.println(currentValue);
+                curList.add(currentValue.toString());
+                currentValue.delete(0, currentValue.length());
+                valueArray.add(curList);
+            }  else {
+                currentValue.append(c);
+            }
+        }
+        return valueArray;
+    }
+
 	  /**
 	  * 对于主键不在插入语句的fields中的SQL，需要改写。比如hotnews主键为id，插入语句为：
 	  * insert into hotnews(title) values('aaa');
 	  * 需要改写成：
 	  * insert into hotnews(id, title) values(next value for MYCATSEQ_hotnews,'aaa');
 	  */
-    public static void handleBatchInsert(ServerConnection sc, SchemaConfig schema, int sqlType, String origSQL, int valuesIndex
-			, String tableName, String primaryKey) {
-    	final String pk = "\\(" + primaryKey + ",";
-        final String mycatSeqPrefix = "(next value for MYCATSEQ_" + tableName.toUpperCase() + ",";
-    	
-    	/*"VALUES".length() ==6 */
-        String prefix = origSQL.substring(0, valuesIndex + 6);
-        String values = origSQL.substring(valuesIndex + 6);
-        
-        prefix = prefix.replaceFirst("\\(", pk);
-        values = values.replaceFirst("\\(", mycatSeqPrefix);
-        values = Pattern.compile(",\\s*\\(").matcher(values).replaceAll("," + mycatSeqPrefix);
-        processSQL(sc, schema, prefix + values, sqlType);
-    }
+	  public static void handleBatchInsert(ServerConnection sc, SchemaConfig schema,
+	          int sqlType,String origSQL, int valuesIndex,String tableName, String primaryKey , List<List<String>> vauleList) {
 
-	public static RouteResultset routeToMultiNode(boolean cache, RouteResultset rrs, Collection<String> dataNodes, String stmt) {
+	  	final String pk = "\\("+primaryKey+",";
+	      final String mycatSeqPrefix = "(next value for MYCATSEQ_"+tableName.toUpperCase()+"";
+
+	  	/*"VALUES".length() ==6 */
+	      String prefix = origSQL.substring(0, valuesIndex + 6);
+//
+	      prefix = prefix.replaceFirst("\\(", pk);
+
+	      StringBuilder sb = new StringBuilder();
+	      for(List<String> list : vauleList) {
+	    	  sb.append(mycatSeqPrefix);
+	    	  for(String val : list) {
+	    		  sb.append(",").append(val);
+	    	  }
+	    	  sb.append("),");
+	      }
+	      sb.setCharAt(sb.length() - 1, ' ');
+          processSQL(sc, schema,prefix+sb.toString(), sqlType);
+	  }
+//	  /**
+//	  * 对于主键不在插入语句的fields中的SQL，需要改写。比如hotnews主键为id，插入语句为：
+//	  * insert into hotnews(title) values('aaa');
+//	  * 需要改写成：
+//	  * insert into hotnews(id, title) values(next value for MYCATSEQ_hotnews,'aaa');
+//	  */
+//    public static void handleBatchInsert(ServerConnection sc, SchemaConfig schema,
+//            int sqlType,String origSQL, int valuesIndex,String tableName, String primaryKey) {
+//
+//    	final String pk = "\\("+primaryKey+",";
+//        final String mycatSeqPrefix = "(next value for MYCATSEQ_"+tableName.toUpperCase()+",";
+//
+//    	/*"VALUES".length() ==6 */
+//        String prefix = origSQL.substring(0, valuesIndex + 6);
+//        String values = origSQL.substring(valuesIndex + 6);
+//
+//        prefix = prefix.replaceFirst("\\(", pk);
+//        values = values.replaceFirst("\\(", mycatSeqPrefix);
+//        values =Pattern.compile(",\\s*\\(").matcher(values).replaceAll(","+mycatSeqPrefix);
+//        processSQL(sc, schema,prefix+values, sqlType);
+//    }
+
+
+	public static RouteResultset routeToMultiNode(boolean cache,RouteResultset rrs, Collection<String> dataNodes, String stmt) {
 		RouteResultsetNode[] nodes = new RouteResultsetNode[dataNodes.size()];
 		int i = 0;
 		RouteResultsetNode node;
@@ -782,11 +946,12 @@ public class RouterUtil {
 	 * @return
 	 */
 	private static String getAliveRandomDataNode(TableConfig tc) {
-		List<String> randomDns = tc.getDataNodes();
+		List<String> randomDns = (List<String>)tc.getDataNodes().clone();
 
 		MycatConfig mycatConfig = MycatServer.getInstance().getConfig();
 		if (mycatConfig != null) {
-			for (String randomDn: randomDns) {
+			Collections.shuffle(randomDns);
+			for (String randomDn : randomDns) {
 				PhysicalDBNode physicalDBNode = mycatConfig.getDataNodes().get(randomDn);
 				if (physicalDBNode != null) {
 					if (physicalDBNode.getDbPool().getSource().isAlive()) {
@@ -1054,8 +1219,11 @@ public class RouterUtil {
 				// mulit routes ,not cache route result
 				if (isSelect) {
 					rrs.setCacheAble(false);
-					routeToSingleNode(rrs, retNodesSet.iterator().next(), ctx.getSql());
-				} else {//delete 删除全局表的记录
+					ArrayList<String> retNodeList = new ArrayList<String>(retNodesSet);
+					Collections.shuffle(retNodeList);//by kaiz : add shuffle
+					routeToSingleNode(rrs, retNodeList.get(0), ctx.getSql());
+				}
+				else {//delete 删除全局表的记录
 					routeToMultiNode(isSelect, rrs, retNodesSet, ctx.getSql(),true);
 				}
 
@@ -1447,12 +1615,9 @@ public class RouterUtil {
 			return true;
 		}
 
-		if (schemaConfig.getDataNode() != null && !schemaConfig.getTables().containsKey(tableName)) {
-			return true;
-		}
+        return schemaConfig.getDataNode() != null && !schemaConfig.getTables().containsKey(tableName);
 
-		return false;
-	}
+    }
 
 	/**
 	 * 系统表判断,某些sql语句会查询系统表或者跟系统表关联
@@ -1473,11 +1638,8 @@ public class RouterUtil {
 	 */
 	public static boolean isConditionAlwaysTrue(SQLExpr expr) {
 		Object o = WallVisitorUtils.getValue(expr);
-		if(Boolean.TRUE.equals(o)) {
-			return true;
-		}
-		return false;
-	}
+        return Boolean.TRUE.equals(o);
+    }
 
 	/**
 	 * 判断条件是否永假的
@@ -1486,11 +1648,8 @@ public class RouterUtil {
 	 */
 	public static boolean isConditionAlwaysFalse(SQLExpr expr) {
 		Object o = WallVisitorUtils.getValue(expr);
-		if(Boolean.FALSE.equals(o)) {
-			return true;
-		}
-		return false;
-	}
+        return Boolean.FALSE.equals(o);
+    }
 
 
 	/**

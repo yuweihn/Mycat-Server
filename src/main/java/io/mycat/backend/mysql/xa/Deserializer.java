@@ -55,7 +55,9 @@ public class Deserializer {
                 participantLogEntries[i]=recreateParticipantLogEntry(coordinatorId, elements.get(i));
             }
 
-            CoordinatorLogEntry actual = new CoordinatorLogEntry(header.get("id"), Boolean.valueOf(header.get("wasCommitted")), participantLogEntries, header.get("superiorCoordinatorId"));
+
+            CoordinatorLogEntry actual = new CoordinatorLogEntry(header.get("id"),Boolean.valueOf(header.get("wasCommitted")),
+                    participantLogEntries,header.get("superiorCoordinatorId"), Long.valueOf(header.get("createTime")));
             return actual;
         } catch (Exception unexpectedEOF) {
             throw new DeserialisationException(coordinatorLogEntryStr);

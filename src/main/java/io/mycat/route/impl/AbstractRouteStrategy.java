@@ -1,6 +1,13 @@
 package io.mycat.route.impl;
 
 
+import java.sql.SQLNonTransientException;
+import java.sql.SQLSyntaxErrorException;
+import java.util.List;
+
+import io.mycat.config.model.TableConfig;
+import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+
 import io.mycat.MycatServer;
 import io.mycat.cache.LayerCachePool;
 import io.mycat.config.model.SchemaConfig;
@@ -11,11 +18,6 @@ import io.mycat.route.util.RouterUtil;
 import io.mycat.server.ServerConnection;
 import io.mycat.server.parser.ServerParse;
 import io.mycat.sqlengine.mpp.LoadData;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.sql.SQLNonTransientException;
-import java.sql.SQLSyntaxErrorException;
 
 
 public abstract class AbstractRouteStrategy implements RouteStrategy {
@@ -80,6 +82,20 @@ public abstract class AbstractRouteStrategy implements RouteStrategy {
 			if (returnedSet == null) {
 				rrs = routeNormalSqlWithAST(schema, stmt, rrs, charset, cachePool, sqlType, sc);
 			}
+		}
+
+		if (rrs.getSqlType()==ServerParse.INSERT && rrs.getTables()!=null && rrs.getTables().size()!=0) {
+			List<String> tables = rrs.getTables();
+			boolean isAutoIncrement = false;
+			for (String tableName: tables) {
+				if (schema.getTables()!=null && schema.getTables().get(tableName)!=null) {
+					TableConfig tableConfig = schema.getTables().get(tableName);
+					if (tableConfig.isAutoIncrement()) {
+						isAutoIncrement = true;
+					}
+				}
+			}
+			rrs.setAutoIncrement(isAutoIncrement);
 		}
 
 		return rrs;

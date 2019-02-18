@@ -414,8 +414,9 @@ public class MySQLConnection extends BackendAIOConnection {
 		}
 		int txIsoLationSyn = (txIsolation == clientTxIsoLation) ? 0 : 1;
 		int autoCommitSyn = (conAutoComit == expectAutocommit) ? 0 : 1;
-		int synCount = schemaSyn + charsetSyn + txIsoLationSyn + autoCommitSyn + (xaCmd != null ? 1 : 0);
-		if (synCount == 0 && this.xaStatus != TxState.TX_STARTED_STATE) {
+		int synCount = schemaSyn + charsetSyn + txIsoLationSyn + autoCommitSyn + (xaCmd!=null?1:0);
+//		if (synCount == 0 && this.xaStatus != TxState.TX_STARTED_STATE) {
+		if (synCount == 0 ) {
 			// not need syn connection
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("not need syn connection :\n" + this+"\n to send query cmd:\n"+rrn.getStatement()
@@ -575,6 +576,7 @@ public class MySQLConnection extends BackendAIOConnection {
 		attachment = null;
 		statusSync = null;
 		modifiedSQLExecuted = false;
+		xaStatus = TxState.TX_INITIALIZE_STATE;
 		setResponseHandler(null);
 		pool.releaseChannel(this);
 	}

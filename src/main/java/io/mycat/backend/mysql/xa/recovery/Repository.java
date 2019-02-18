@@ -12,8 +12,12 @@ public interface Repository {
     void init();
     void put(String id, CoordinatorLogEntry coordinatorLogEntry);
     CoordinatorLogEntry get(String coordinatorId);
-    Collection<CoordinatorLogEntry> findAllCommittingCoordinatorLogEntries();
-    Collection<CoordinatorLogEntry>  getAllCoordinatorLogEntries();
-    void writeCheckpoint(Collection<CoordinatorLogEntry> checkpointContent);
+
+    Collection<CoordinatorLogEntry> findAllCommittingCoordinatorLogEntries() ;
+
+    Collection<CoordinatorLogEntry>  getAllCoordinatorLogEntries() ;
+
+    void writeCheckpoint(String id, Collection<CoordinatorLogEntry> checkpointContent) ;
+
     void close();
 }
