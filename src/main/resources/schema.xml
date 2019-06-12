@@ -7,9 +7,9 @@
 		<table name="user_test" dataNode="dn1,dn2" rule="sharding-by-murmur"/>
 		<table name="sequence" dataNode="dn1,dn2" rule="sharding-by-segmentMod2"/>
 	</schema>
-    <schema name="mycat_gateway_dev" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn3">
+    <schema name="gateway_dev" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn3">
     </schema>
-    <schema name="mycat_shici_dev" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn4">
+    <schema name="shici_dev" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn4">
     </schema>
 
     <!-- <dataNode name="dn1$0-743" dataHost="localhost1" database="db$0-743" /> -->
