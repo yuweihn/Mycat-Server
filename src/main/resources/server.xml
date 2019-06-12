@@ -108,7 +108,7 @@
 
 	<user name="yuwei">
 		<property name="password">dev</property>
-		<property name="schemas">dev_mycat,mycat_gateway_dev</property>
+		<property name="schemas">dev_mycat,mycat_gateway_dev,mycat_shici_dev</property>
 		<property name="readOnly">false</property>
 	</user>
 

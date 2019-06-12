@@ -9,11 +9,14 @@
 	</schema>
     <schema name="mycat_gateway_dev" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn3">
     </schema>
+    <schema name="mycat_shici_dev" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn4">
+    </schema>
 
     <!-- <dataNode name="dn1$0-743" dataHost="localhost1" database="db$0-743" /> -->
     <dataNode name="dn1" dataHost="localhost1" database="dev_01" />
     <dataNode name="dn2" dataHost="localhost1" database="dev_02" />
     <dataNode name="dn3" dataHost="localhost1" database="gateway_dev" />
+    <dataNode name="dn4" dataHost="localhost2" database="shici_test" />
 
     <dataHost name="localhost1" maxCon="200" minCon="10" balance="0"
               writeType="0" dbType="mysql" dbDriver="native" switchType="1" slaveThreshold="100" maxRetryCount="4">
@@ -21,5 +24,10 @@
         <!-- can have multi write hosts -->
         <writeHost host="hostM1" url="db-mysql.yuweix.com:3307" user="yuwei" password="dev"></writeHost>
         <!-- <writeHost host="hostM2" url="localhost:3316" user="root" password="123456"/> -->
+    </dataHost>
+    <dataHost name="localhost2" maxCon="200" minCon="10" balance="0"
+              writeType="0" dbType="mysql" dbDriver="native" switchType="1" slaveThreshold="100" maxRetryCount="4">
+        <heartbeat>select user()</heartbeat>
+        <writeHost host="hostM1" url="db-mysql.sz-wenjian.com:3307" user="shici_test" password="test"></writeHost>
     </dataHost>
 </mycat:schema>
