@@ -1,6 +1,5 @@
 package io.mycat.route;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,18 +7,18 @@ import io.mycat.MycatServer;
 import io.mycat.config.ErrorCode;
 import io.mycat.route.parser.druid.DruidSequenceHandler;
 
-
 public class MyCATSequnceProcessor {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MyCATSequnceProcessor.class);
 	
 	//使用Druid解析器实现sequence处理  @兵临城下
-	private static final DruidSequenceHandler sequenceHandler = new DruidSequenceHandler(MycatServer.getInstance().getConfig().getSystem().getSequnceHandlerType());
+	private static final DruidSequenceHandler sequenceHandler = new DruidSequenceHandler(MycatServer
+			.getInstance().getConfig().getSystem().getSequnceHandlerType(),MycatServer.getInstance().getConfig().getSystem().getSequnceHandlerPattern());
 	
-	private static class InnerMyCATSequnceProcessor {
+	private static class InnerMyCATSequnceProcessor{
 		private static MyCATSequnceProcessor INSTANCE = new MyCATSequnceProcessor();
 	}
 	
-	public static MyCATSequnceProcessor getInstance() {
+	public static MyCATSequnceProcessor getInstance(){
 		return InnerMyCATSequnceProcessor.INSTANCE;
 	}
 	
@@ -49,12 +48,12 @@ public class MyCATSequnceProcessor {
 			}*/
 			
 			String charset = pair.session.getSource().getCharset();
-			String executeSql = sequenceHandler.getExecuteSql(pair, charset == null ? "utf-8" : charset);
+			String executeSql = sequenceHandler.getExecuteSql(pair,charset == null ? "utf-8":charset);
 			
-			pair.session.getSource().routeEndExecuteSQL(executeSql, pair.type, pair.schema);
+			pair.session.getSource().routeEndExecuteSQL(executeSql, pair.type,pair.schema);
 		} catch (Exception e) {
-			LOGGER.error("MyCATSequenceProcessor.executeSeq(SessionSQLPair)", e);
-			pair.session.getSource().writeErrMessage(ErrorCode.ER_YES, "mycat sequnce err." + e);
+			LOGGER.error("MyCATSequenceProcessor.executeSeq(SesionSQLPair)",e);
+			pair.session.getSource().writeErrMessage(ErrorCode.ER_YES,"mycat sequnce err." + e);
 			return;
 		}
 	}
