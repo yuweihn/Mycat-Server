@@ -97,11 +97,11 @@ public class PhysicalDBNode {
 			if(rrs.getRunOnSlave() != null){		// 带有 /*db_type=master/slave*/ 注解
 				// 强制走 slave
 				if(rrs.getRunOnSlave()){			
-					LOGGER.debug("rrs.isHasBlanceFlag() " + rrs.isHasBalanceFlag());
-					if (rrs.isHasBalanceFlag()) {		// 带有 /*balance*/ 注解(目前好像只支持一个注解...)
+					LOGGER.debug("rrs.isHasBlanceFlag() " + rrs.isHasBlanceFlag());
+					if (rrs.isHasBlanceFlag()) {		// 带有 /*balance*/ 注解(目前好像只支持一个注解...)
 						dbPool.getReadBanlanceCon(schema,autoCommit,handler, attachment, this.database);
 					}else{	// 没有 /*balance*/ 注解
-						LOGGER.debug("rrs.isHasBlanceFlag()" + rrs.isHasBalanceFlag());
+						LOGGER.debug("rrs.isHasBlanceFlag()" + rrs.isHasBlanceFlag());
 						if(!dbPool.getReadCon(schema, autoCommit, handler, attachment, this.database)){
 							LOGGER.warn("Do not have slave connection to use, use master connection instead.");
 							PhysicalDatasource writeSource=dbPool.getSource();
@@ -110,7 +110,7 @@ public class PhysicalDBNode {
 							writeSource.getConnection(schema,
 									autoCommit, handler, attachment);
 							rrs.setRunOnSlave(false);
-							rrs.setCanRunnINReadDB(false);
+							rrs.setCanRunInReadDB(false);
 						}
 					}
 				}else{	// 强制走 master
@@ -121,7 +121,7 @@ public class PhysicalDBNode {
 					writeSource.setWriteCount();
 					writeSource.getConnection(schema, autoCommit,
 							handler, attachment);
-					rrs.setCanRunnINReadDB(false);
+					rrs.setCanRunInReadDB(false);
 				}
 			}else{	// 没有  /*db_type=master/slave*/ 注解，按照原来的处理方式
 				LOGGER.debug("rrs.getRunOnSlave() " + rrs.getRunOnSlaveDebugInfo());	// null
