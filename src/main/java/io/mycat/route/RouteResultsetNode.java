@@ -23,18 +23,17 @@
  */
 package io.mycat.route;
 
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Set;
 
 import io.mycat.server.parser.ServerParse;
 import io.mycat.sqlengine.mpp.LoadData;
 
-import java.io.Serializable;
-import java.util.Map;
-
-
 /**
  * @author mycat
  */
-public final class RouteResultsetNode implements Serializable, Comparable<RouteResultsetNode> {
+public final class RouteResultsetNode implements Serializable , Comparable<RouteResultsetNode> {
 	/**
 	 *
 	 */
@@ -43,41 +42,35 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 	private String statement; // 执行的语句
 	private final String srcStatement;
 	private final int sqlType;
-	private volatile boolean canRunnINReadDB;
-	private final boolean hasBalanceFlag;
+	private volatile boolean canRunInReadDB;
+	private final boolean hasBlanceFlag;
     private boolean callStatement = false; // 处理call关键字
 	private int limitStart;
 	private int limitSize;
-	private int totalNodeSize = 0; //方便后续jdbc批量获取扩展
-	private Procedure procedure;
+	private int totalNodeSize =0; //方便后续jdbc批量获取扩展
+   private Procedure procedure;
 	private LoadData loadData;
 	private RouteResultset source;
 	
-	// 强制走 master，可以通过 RouteResultset的属性canRunnINReadDB(false)
+	// 强制走 master，可以通过 RouteResultset的属性canRunInReadDB(false)
 	// 传给 RouteResultsetNode 来实现，但是 强制走 slave需要增加一个属性来实现:
 	private Boolean runOnSlave = null;	// 默认null表示不施加影响, true走slave,false走master
 	
 	private String subTableName; // 分表的表名
 
 	//迁移算法用     -2代表不是slot分片  ，-1代表扫描所有分片
-	private int slot = -2;
-	private Map hintMap;
-
-
-	/**
-	 * @param name------------------data node
-	 * @param sqlType---------------sql type, {@link ServerParse}
-	 * @param srcStatement----------sql
-	 */
+	private int slot=-2;
+	
 	public RouteResultsetNode(String name, int sqlType, String srcStatement) {
 		this.name = name;
-		this.limitStart = 0;
+		limitStart=0;
 		this.limitSize = -1;
 		this.sqlType = sqlType;
 		this.srcStatement = srcStatement;
 		this.statement = srcStatement;
-		this.canRunnINReadDB = sqlType == ServerParse.SELECT || sqlType == ServerParse.SHOW;
-		this.hasBalanceFlag = statement != null && statement.startsWith("/*balance*/");
+		canRunInReadDB = (sqlType == ServerParse.SELECT || sqlType == ServerParse.SHOW);
+		hasBlanceFlag = (statement != null)
+				&& statement.startsWith("/*balance*/");
 	}
 
 	public Boolean getRunOnSlave() {
@@ -87,18 +80,21 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 		return runOnSlave == null?" default ":Boolean.toString(runOnSlave);
 	}
 	public boolean isUpdateSql() {
-		int type = sqlType;
-		return ServerParse.INSERT == type || ServerParse.UPDATE == type || ServerParse.DELETE == type || ServerParse.DDL == type;
+		int type=sqlType;
+		return ServerParse.INSERT==type||ServerParse.UPDATE==type||ServerParse.DELETE==type||ServerParse.DDL==type;
 	}
 	public void setRunOnSlave(Boolean runOnSlave) {
 		this.runOnSlave = runOnSlave;
 	}
+	  private Map hintMap;
 
-    public Map getHintMap() {
+    public Map getHintMap()
+    {
         return hintMap;
     }
 
-    public void setHintMap(Map hintMap) {
+    public void setHintMap(Map hintMap)
+    {
         this.hintMap = hintMap;
     }
 
@@ -106,12 +102,12 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 		this.statement = statement;
 	}
 
-	public void setCanRunnINReadDB(boolean canRunnINReadDB) {
-		this.canRunnINReadDB = canRunnINReadDB;
+	public void setCanRunInReadDB(boolean canRunInReadDB) {
+		this.canRunInReadDB = canRunInReadDB;
 	}
 
-	public boolean getCanRunnINReadDB() {
-		return this.canRunnINReadDB;
+	public boolean getCanRunInReadDB() {
+		return this.canRunInReadDB;
 	}
 
 	public void resetStatement() {
@@ -125,20 +121,20 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 	 * 
 	 * 在非自动提交的情况下(有事物)，除非使用了  balance 注解的情况下，才可以走slave.
 	 * 
-	 * 当然还有一个大前提，必须是 select 或者 show 语句(canRunnINReadDB=true)
+	 * 当然还有一个大前提，必须是 select 或者 show 语句(canRunInReadDB=true)
 	 * @param autocommit
 	 * @return
 	 */
 	public boolean canRunnINReadDB(boolean autocommit) {
-//		return canRunnINReadDB && (autocommit || (!autocommit && hasBalanceFlag));
-		return canRunnINReadDB && (autocommit || hasBalanceFlag);
+		return canRunInReadDB && ( autocommit || (!autocommit && hasBlanceFlag) );
 	}
 	
 //	public boolean canRunnINReadDB(boolean autocommit) {
-//		return canRunnINReadDB && autocommit && !hasBalanceFlag || canRunnINReadDB && !autocommit && hasBalanceFlag;
+//		return canRunInReadDB && autocommit && !hasBlanceFlag
+//			|| canRunInReadDB && !autocommit && hasBlanceFlag;
 //	}
-
-	public Procedure getProcedure() {
+  public Procedure getProcedure()
+    {
         return procedure;
     }
 
@@ -150,15 +146,18 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 		this.slot = slot;
 	}
 
-	public void setProcedure(Procedure procedure) {
+	public void setProcedure(Procedure procedure)
+    {
         this.procedure = procedure;
     }
 
-    public boolean isCallStatement() {
+    public boolean isCallStatement()
+    {
         return callStatement;
     }
 
-    public void setCallStatement(boolean callStatement) {
+    public void setCallStatement(boolean callStatement)
+    {
         this.callStatement = callStatement;
     }
 	public String getName() {
@@ -173,35 +172,43 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 		return statement;
 	}
 
-	public int getLimitStart() {
+	public int getLimitStart()
+	{
 		return limitStart;
 	}
 
-	public void setLimitStart(int limitStart) {
+	public void setLimitStart(int limitStart)
+	{
 		this.limitStart = limitStart;
 	}
 
-	public int getLimitSize() {
+	public int getLimitSize()
+	{
 		return limitSize;
 	}
 
-	public void setLimitSize(int limitSize) {
+	public void setLimitSize(int limitSize)
+	{
 		this.limitSize = limitSize;
 	}
 
-	public int getTotalNodeSize() {
+	public int getTotalNodeSize()
+	{
 		return totalNodeSize;
 	}
 
-	public void setTotalNodeSize(int totalNodeSize) {
+	public void setTotalNodeSize(int totalNodeSize)
+	{
 		this.totalNodeSize = totalNodeSize;
 	}
 
-	public LoadData getLoadData() {
+	public LoadData getLoadData()
+	{
 		return loadData;
 	}
 
-	public void setLoadData(LoadData loadData) {
+	public void setLoadData(LoadData loadData)
+	{
 		this.loadData = loadData;
 	}
 
@@ -217,10 +224,14 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 		}
 		if (obj instanceof RouteResultsetNode) {
 			RouteResultsetNode rrn = (RouteResultsetNode) obj;
-			if (subTableName != null) {
-				return equals(name, rrn.getName()) && equals(subTableName, rrn.getSubTableName());
-			} else {
-				return equals(name, rrn.getName());
+			if(subTableName!=null){
+				if (equals(name, rrn.getName()) && equals(subTableName, rrn.getSubTableName())) {
+					return true;
+				}
+			}else{
+				if (equals(name, rrn.getName())) {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -250,36 +261,40 @@ public final class RouteResultsetNode implements Serializable, Comparable<RouteR
 	}
 
 	public boolean isModifySQL() {
-		return !canRunnINReadDB;
+		return !canRunInReadDB;
 	}
 	public boolean isDisctTable() {
-		return subTableName != null && !subTableName.equals("");
+		if(subTableName!=null && !subTableName.equals("")){
+			return true;
+		};
+		return false;
 	}
 	
 
 	@Override
 	public int compareTo(RouteResultsetNode obj) {
-		if (obj == null) {
+		if(obj == null) {
 			return 1;
 		}
-		if (this.name == null) {
+		if(this.name == null) {
 			return -1;
 		}
-		if (obj.name == null) {
+		if(obj.name == null) {
 			return 1;
 		}
 		int c = this.name.compareTo(obj.name);
-		if (!this.isDisctTable()) {
+		if(!this.isDisctTable()||obj.subTableName == null){
 			return c;
-		} else if (c == 0) {
-			return this.subTableName.compareTo(obj.subTableName);
-		} else {
+		}else{
+			if(c==0){
+				return this.subTableName.compareTo(obj.subTableName);
+			}
 			return c;
 		}
 	}
 	
-	public boolean isHasBalanceFlag() {
-		return hasBalanceFlag;
+	public boolean isHasBlanceFlag() {
+		return hasBlanceFlag;
 	}
 
 	public RouteResultset getSource() {
