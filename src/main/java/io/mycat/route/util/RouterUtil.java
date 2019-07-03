@@ -157,7 +157,7 @@ public class RouterUtil {
 			nodes[0].setSlot(rrs.getDataNodeSlotMap().get(dataNode));
 		}
 		if (rrs.getCanRunInReadDB() != null) {
-			nodes[0].setCanRunnINReadDB(rrs.getCanRunInReadDB());
+			nodes[0].setCanRunInReadDB(rrs.getCanRunInReadDB());
 		}
 		if(rrs.getRunOnSlave() != null) {
 			nodes[0].setRunOnSlave(rrs.getRunOnSlave());
@@ -905,7 +905,7 @@ public class RouterUtil {
 				node.setSlot(rrs.getDataNodeSlotMap().get(dataNode));
 			}
 			if (rrs.getCanRunInReadDB() != null) {
-				node.setCanRunnINReadDB(rrs.getCanRunInReadDB());
+				node.setCanRunInReadDB(rrs.getCanRunInReadDB());
 			}
 			if(rrs.getRunOnSlave() != null) {
 				nodes[0].setRunOnSlave(rrs.getRunOnSlave());
@@ -938,7 +938,7 @@ public class RouterUtil {
 			nodes[0].setSlot(rrs.getDataNodeSlotMap().get(dataNode));
 		}
 		if (rrs.getCanRunInReadDB() != null) {
-			nodes[0].setCanRunnINReadDB(rrs.getCanRunInReadDB());
+			nodes[0].setCanRunInReadDB(rrs.getCanRunInReadDB());
 		}
 		if(rrs.getRunOnSlave() != null) {
 			nodes[0].setRunOnSlave(rrs.getRunOnSlave());
@@ -1405,7 +1405,7 @@ public class RouterUtil {
 				nodes[i].setSlot(rrs.getDataNodeSlotMap().get(dataNode));
 			}
 			if (rrs.getCanRunInReadDB() != null) {
-				nodes[i].setCanRunnINReadDB(rrs.getCanRunInReadDB());
+				nodes[i].setCanRunInReadDB(rrs.getCanRunInReadDB());
 			}
 			if(dataNodeSlotMap.containsKey(table)) {
 				nodes[i].setSlot(dataNodeSlotMap.get(table));
