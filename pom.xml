@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.mycat</groupId>
 	<artifactId>Mycat-server</artifactId>
-	<version>1.6.7.1-release</version>
+	<version>1.6.7.2-release</version>
 	<packaging>jar</packaging>
 	<name>Mycat-server</name>
 	<description>The project of Mycat-server</description>
@@ -433,7 +433,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>appassembler-maven-plugin</artifactId>
-				<version>1.7</version>
+				<version>1.8</version>
 				<configuration>
 					<configurationDirectory>conf</configurationDirectory>
 					<includeConfigurationDirectoryInClasspath>true</includeConfigurationDirectoryInClasspath>
