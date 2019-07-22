@@ -1,7 +1,8 @@
 package io.mycat.net;
 
-
 import io.mycat.util.TimeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -10,7 +11,6 @@ import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-
 public class NIOSocketWR extends SocketWR {
 	private SelectionKey processKey;
 	private static final int OP_NOT_READ = ~SelectionKey.OP_READ;
@@ -18,7 +18,8 @@ public class NIOSocketWR extends SocketWR {
 	private final AbstractConnection con;
 	private final SocketChannel channel;
 	private final AtomicBoolean writing = new AtomicBoolean(false);
-
+	protected static final Logger LOGGER = LoggerFactory.getLogger(NIOSocketWR.class);
+	public static final ByteBuffer EMPTY_BYTEBUFFER  = ByteBuffer.allocate(0);
 	public NIOSocketWR(AbstractConnection con) {
 		this.con = con;
 		this.channel = (SocketChannel) con.channel;
@@ -35,6 +36,7 @@ public class NIOSocketWR extends SocketWR {
 	}
 
 	public void doNextWriteCheck() {
+
 		if (!writing.compareAndSet(false, true)) {
 			return;
 		}
@@ -46,14 +48,17 @@ public class NIOSocketWR extends SocketWR {
 			boolean noMoreData = write0();
 			writing.set(false);
 			if (noMoreData && con.writeQueue.isEmpty()) {
-				if (processKey.isValid() && (processKey.interestOps() & SelectionKey.OP_WRITE) != 0) {
+				if ((processKey.isValid() && (processKey.interestOps() & SelectionKey.OP_WRITE) != 0)) {
 					disableWrite();
 				}
+
 			} else {
+
 				if ((processKey.isValid() && (processKey.interestOps() & SelectionKey.OP_WRITE) == 0)) {
 					enableWrite(false);
 				}
 			}
+
 		} catch (IOException e) {
 			if (AbstractConnection.LOGGER.isDebugEnabled()) {
 				AbstractConnection.LOGGER.debug("caught err:", e);
@@ -62,9 +67,21 @@ public class NIOSocketWR extends SocketWR {
 		} finally {
 			writing.set(false);
 		}
+
+	}
+
+	@Override
+	public boolean checkAlive() {
+		try {
+			return 	channel.read(EMPTY_BYTEBUFFER) == 0;
+		} catch (IOException e) {
+			LOGGER.error("",e);
+			return false;
+		}
 	}
 
 	private boolean write0() throws IOException {
+
 		int written = 0;
 		ByteBuffer buffer = con.writeBuffer;
 		if (buffer != null) {
@@ -97,7 +114,8 @@ public class NIOSocketWR extends SocketWR {
 			buffer.flip();
 			try {
 				while (buffer.hasRemaining()) {
-					written = channel.write(buffer);// java.io.IOException: Connection reset by peer
+					written = channel.write(buffer);// java.io.IOException:
+									// Connection reset by peer
 					if (written > 0) {
 						con.lastWriteTime = TimeUtil.currentTimeMillis();
 						con.netOutBytes += written;
@@ -127,8 +145,10 @@ public class NIOSocketWR extends SocketWR {
 			SelectionKey key = this.processKey;
 			key.interestOps(key.interestOps() & OP_NOT_WRITE);
 		} catch (Exception e) {
-			AbstractConnection.LOGGER.warn("can't disable write " + e + " con " + con);
+			AbstractConnection.LOGGER.warn("can't disable write " + e + " con "
+					+ con);
 		}
+
 	}
 
 	private void enableWrite(boolean wakeup) {
@@ -139,6 +159,7 @@ public class NIOSocketWR extends SocketWR {
 			needWakeup = true;
 		} catch (Exception e) {
 			AbstractConnection.LOGGER.warn("can't enable write " + e);
+
 		}
 		if (needWakeup && wakeup) {
 			processKey.selector().wakeup();
@@ -146,11 +167,13 @@ public class NIOSocketWR extends SocketWR {
 	}
 
 	public void disableRead() {
+
 		SelectionKey key = this.processKey;
 		key.interestOps(key.interestOps() & OP_NOT_READ);
 	}
 
 	public void enableRead() {
+
 		boolean needWakeup = false;
 		try {
 			SelectionKey key = this.processKey;
@@ -180,11 +203,15 @@ public class NIOSocketWR extends SocketWR {
 	public void asynRead() throws IOException {
 		ByteBuffer theBuffer = con.readBuffer;
 		if (theBuffer == null) {
+
 			theBuffer = con.processor.getBufferPool().allocate(con.processor.getBufferPool().getChunkSize());
+
 			con.readBuffer = theBuffer;
 		}
 
 		int got = channel.read(theBuffer);
+
 		con.onReadData(got);
 	}
+
 }
