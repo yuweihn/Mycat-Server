@@ -23,6 +23,13 @@
  */
 package io.mycat.server;
 
+import java.io.IOException;
+import java.nio.channels.NetworkChannel;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.mycat.MycatServer;
 import io.mycat.config.ErrorCode;
@@ -38,20 +45,13 @@ import io.mycat.server.response.Ping;
 import io.mycat.server.util.SchemaUtil;
 import io.mycat.util.SplitUtil;
 import io.mycat.util.TimeUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.nio.channels.NetworkChannel;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 
 /**
  * @author mycat
  */
 public class ServerConnection extends FrontendConnection {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ServerConnection.class);
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(ServerConnection.class);
 	private static final long AUTH_TIMEOUT = 15 * 1000L;
 
 	private volatile int txIsolation;
@@ -66,7 +66,8 @@ public class ServerConnection extends FrontendConnection {
 	 */
 	private volatile boolean isLocked = false;
 	
-	public ServerConnection(NetworkChannel channel) throws IOException {
+	public ServerConnection(NetworkChannel channel)
+			throws IOException {
 		super(channel);
 		this.txInterrupted = false;
 		this.autocommit = true;
@@ -78,7 +79,8 @@ public class ServerConnection extends FrontendConnection {
 		if (isAuthenticated) {
 			return super.isIdleTimeout();
 		} else {
-			return TimeUtil.currentTimeMillis() > Math.max(lastWriteTime, lastReadTime) + AUTH_TIMEOUT;
+			return TimeUtil.currentTimeMillis() > Math.max(lastWriteTime,
+					lastReadTime) + AUTH_TIMEOUT;
 		}
 	}
 
@@ -115,9 +117,9 @@ public class ServerConnection extends FrontendConnection {
 			this.txInterrputMsg = txInterrputMsg;
 		}
 	}
-
+	
 	/**
-	 *
+	 * 
 	 * 清空食事务中断
 	 * */
 	public void clearTxInterrupt() {
@@ -126,7 +128,7 @@ public class ServerConnection extends FrontendConnection {
 			this.txInterrputMsg = "";
 		}
 	}
-
+	
 	public boolean isTxInterrupted()
 	{
 		return txInterrupted;
@@ -165,7 +167,8 @@ public class ServerConnection extends FrontendConnection {
 		}
 		// 事务状态检查
 		if (txInterrupted) {
-			writeErrMessage(ErrorCode.ER_YES, "Transaction error, need to rollback." + txInterrputMsg);
+			writeErrMessage(ErrorCode.ER_YES,
+					"Transaction error, need to rollback." + txInterrputMsg);
 			return;
 		}
 
@@ -183,14 +186,21 @@ public class ServerConnection extends FrontendConnection {
 		
 		// 兼容PhpAdmin's, 支持对MySQL元数据的模拟返回
 		//// TODO: 2016/5/20 支持更多information_schema特性
-		if (ServerParse.SELECT == type && db.equalsIgnoreCase("information_schema")) {
-			MysqlInformationSchemaHandler.handle(sql, this);
-			return;
-		}
+//		if (ServerParse.SELECT == type
+//				&& db.equalsIgnoreCase("information_schema") ) {
+//			MysqlInformationSchemaHandler.handle(sql, this);
+//			return;
+//		}
 
-		if (ServerParse.SELECT == type && sql.contains("mysql") && sql.contains("proc")) {
+		if (ServerParse.SELECT == type 
+				&& sql.contains("mysql") 
+				&& sql.contains("proc")) {
+			
 			SchemaUtil.SchemaInfo schemaInfo = SchemaUtil.parseSchema(sql);
-			if (schemaInfo != null && "mysql".equalsIgnoreCase(schemaInfo.schema) && "proc".equalsIgnoreCase(schemaInfo.table)) {
+			if (schemaInfo != null 
+					&& "mysql".equalsIgnoreCase(schemaInfo.schema)
+					&& "proc".equalsIgnoreCase(schemaInfo.table)) {
+				
 				// 兼容MySQLWorkbench
 				MysqlProcHandler.handle(sql, this);
 				return;
@@ -199,12 +209,14 @@ public class ServerConnection extends FrontendConnection {
 		
 		SchemaConfig schema = MycatServer.getInstance().getConfig().getSchemas().get(db);
 		if (schema == null) {
-			writeErrMessage(ErrorCode.ERR_BAD_LOGICDB, "Unknown MyCAT Database '" + db + "'");
+			writeErrMessage(ErrorCode.ERR_BAD_LOGICDB,
+					"Unknown MyCAT Database '" + db + "'");
 			return;
 		}
 
 		//fix navicat   SELECT STATE AS `State`, ROUND(SUM(DURATION),7) AS `Duration`, CONCAT(ROUND(SUM(DURATION)/*100,3), '%') AS `Percentage` FROM INFORMATION_SCHEMA.PROFILING WHERE QUERY_ID= GROUP BY STATE ORDER BY SEQ
-		if(ServerParse.SELECT == type && sql.contains(" INFORMATION_SCHEMA.PROFILING ") && sql.contains("CONCAT(ROUND(SUM(DURATION)/")) {
+		if(ServerParse.SELECT == type &&sql.contains(" INFORMATION_SCHEMA.PROFILING ")&&sql.contains("CONCAT(ROUND(SUM(DURATION)/"))
+		{
 			InformationSchemaProfiling.response(this);
 			return;
 		}
@@ -217,41 +229,48 @@ public class ServerConnection extends FrontendConnection {
 			SchemaUtil.SchemaInfo schemaInfo = SchemaUtil.parseSchema(sql);
 			if (schemaInfo != null && schemaInfo.schema != null && !schemaInfo.schema.equals(db)) {
 				SchemaConfig schemaConfig = MycatServer.getInstance().getConfig().getSchemas().get(schemaInfo.schema);
-				if (schemaConfig != null) {
+				if (schemaConfig != null)
 					schema = schemaConfig;
-				}
 			}
 		}
 
 		routeEndExecuteSQL(sql, type, schema);
+
 	}
 	
 	private boolean isNormalSql(int type) {
-		return ServerParse.SELECT == type || ServerParse.INSERT == type || ServerParse.UPDATE == type
-				|| ServerParse.DELETE == type || ServerParse.DDL == type;
+		return ServerParse.SELECT==type||ServerParse.INSERT==type||ServerParse.UPDATE==type||ServerParse.DELETE==type||ServerParse.DDL==type;
 	}
 
     public RouteResultset routeSQL(String sql, int type) {
+
 		// 检查当前使用的DB
 		String db = this.schema;
 		if (db == null) {
-			writeErrMessage(ErrorCode.ERR_BAD_LOGICDB, "No MyCAT Database selected");
+			writeErrMessage(ErrorCode.ERR_BAD_LOGICDB,
+					"No MyCAT Database selected");
 			return null;
 		}
-		SchemaConfig schema = MycatServer.getInstance().getConfig().getSchemas().get(db);
+		SchemaConfig schema = MycatServer.getInstance().getConfig()
+				.getSchemas().get(db);
 		if (schema == null) {
-			writeErrMessage(ErrorCode.ERR_BAD_LOGICDB, "Unknown MyCAT Database '" + db + "'");
+			writeErrMessage(ErrorCode.ERR_BAD_LOGICDB,
+					"Unknown MyCAT Database '" + db + "'");
 			return null;
 		}
 
 		// 路由计算
 		RouteResultset rrs = null;
 		try {
-			rrs = MycatServer.getInstance().getRouterservice()
-					.route(MycatServer.getInstance().getConfig().getSystem(), schema, type, sql, this.charset, this);
+			rrs = MycatServer
+					.getInstance()
+					.getRouterservice()
+					.route(MycatServer.getInstance().getConfig().getSystem(),
+							schema, type, sql, this.charset, this);
+
 		} catch (Exception e) {
 			StringBuilder s = new StringBuilder();
-			LOGGER.warn(s.append(this).append(sql).toString() + " err:" + e.toString(), e);
+			LOGGER.warn(s.append(this).append(sql).toString() + " err:" + e.toString(),e);
 			String msg = e.getMessage();
 			writeErrMessage(ErrorCode.ER_PARSE_ERROR, msg == null ? e.getClass().getSimpleName() : msg);
 			return null;
@@ -259,23 +278,31 @@ public class ServerConnection extends FrontendConnection {
 		return rrs;
 	}
 
+
+
+
 	public void routeEndExecuteSQL(String sql, final int type, final SchemaConfig schema) {
 		// 路由计算
 		RouteResultset rrs = null;
 		try {
-			rrs = MycatServer.getInstance().getRouterservice()
-					.route(MycatServer.getInstance().getConfig().getSystem(), schema, type, sql, this.charset, this);
+			rrs = MycatServer
+					.getInstance()
+					.getRouterservice()
+					.route(MycatServer.getInstance().getConfig().getSystem(),
+							schema, type, sql, this.charset, this);
+
 		} catch (Exception e) {
 			StringBuilder s = new StringBuilder();
-			LOGGER.warn(s.append(this).append(sql).toString() + " err:" + e.toString(), e);
+			LOGGER.warn(s.append(this).append(sql).toString() + " err:" + e.toString(),e);
 			String msg = e.getMessage();
 			writeErrMessage(ErrorCode.ER_PARSE_ERROR, msg == null ? e.getClass().getSimpleName() : msg);
 			return;
 		}
 		if (rrs != null) {
 			// session执行
-			session.execute(rrs, rrs.isSelectForUpdate() ? ServerParse.UPDATE : type);
+			session.execute(rrs, rrs.isSelectForUpdate()?ServerParse.UPDATE:type);
 		}
+		
  	}
 
 	/**
@@ -332,12 +359,13 @@ public class ServerConnection extends FrontendConnection {
 	public void unLockTable(String sql) {
 		sql = sql.replaceAll("\n", " ").replaceAll("\t", " ");
 		String[] words = SplitUtil.split(sql, ' ', true);
-		if (words.length == 2 && ("table".equalsIgnoreCase(words[1]) || "tables".equalsIgnoreCase(words[1]))) {
+		if (words.length==2 && ("table".equalsIgnoreCase(words[1]) || "tables".equalsIgnoreCase(words[1]))) {
 			isLocked = false;
 			session.unLockTable(sql);
 		} else {
 			writeErrMessage(ErrorCode.ER_UNKNOWN_COM_ERROR, "Unknown command");
 		}
+		
 	}
 
 	/**
@@ -359,7 +387,8 @@ public class ServerConnection extends FrontendConnection {
 	public void close(String reason) {
 		super.close(reason);
 		session.terminate();
-		if(getLoadDataInfileHandler() != null) {
+		if(getLoadDataInfileHandler()!=null)
+		{
 			getLoadDataInfileHandler().clear();
 		}
 	}
@@ -379,15 +408,14 @@ public class ServerConnection extends FrontendConnection {
 	    }
 	    return count;
 	}
-
 	@Override
 	public String toString() {
-
+		
 		return "ServerConnection [id=" + id + ", schema=" + schema + ", host="
 				+ host + ", user=" + user + ",txIsolation=" + txIsolation
 				+ ", autocommit=" + autocommit + ", schema=" + schema+ ", executeSql=" + executeSql + "]" +
 				this.getSession2();
-
+		
 	}
 
 	public boolean isPreAcStates() {
@@ -397,4 +425,5 @@ public class ServerConnection extends FrontendConnection {
 	public void setPreAcStates(boolean preAcStates) {
 		this.preAcStates = preAcStates;
 	}
+
 }

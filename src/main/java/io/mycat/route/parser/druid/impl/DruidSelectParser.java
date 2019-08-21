@@ -317,7 +317,9 @@ public class DruidSelectParser extends DefaultDruidParser {
 				|| (item.getExpr() instanceof SQLIdentifierExpr) || item.getExpr() instanceof SQLBinaryOpExpr) {
 			return item.getExpr().toString();//字段别名
 		}
-		else {
+		else if (!StringUtil.isEmpty(item.getAlias())) { // add by hehuang 20181205 如果SelectItem存在别名，则认为表达式为字段名，sql语法支持常量作为字段
+			return item.getExpr().toString();
+		} else {
 			return item.toString();
 		}
 	}
@@ -433,15 +435,15 @@ public class DruidSelectParser extends DefaultDruidParser {
 				SQLExpr where = mysqlSelectQuery.getWhere();
 				List<SQLIdentifierExpr> exprs = new ArrayList<>(3);
 				if (where != null){
-						where.accept(new MySqlASTVisitorAdapter() {
-							@Override
-							public void endVisit(SQLIdentifierExpr x) {
-								if (orgTable.equalsIgnoreCase(x.getName())) {
-									exprs.add(x);
-								}
-								super.endVisit(x);
+					where.accept(new MySqlASTVisitorAdapter() {
+						@Override
+						public void endVisit(SQLIdentifierExpr x) {
+							if (orgTable.equalsIgnoreCase(x.getName())) {
+								exprs.add(x);
 							}
-						});
+							super.endVisit(x);
+						}
+					});
 				}
 				for (RouteResultsetNode node : rrs.getNodes()) {
 					SQLIdentifierExpr sqlIdentifierExpr = new SQLIdentifierExpr();
@@ -582,13 +584,13 @@ public class DruidSelectParser extends DefaultDruidParser {
 	}
 
 	private boolean isNeedCache(SchemaConfig schema, RouteResultset rrs,
-			MySqlSelectQueryBlock mysqlSelectQuery, Map<String, Map<String, Set<ColumnRoutePair>>> allConditions) {
+								MySqlSelectQueryBlock mysqlSelectQuery, Map<String, Map<String, Set<ColumnRoutePair>>> allConditions) {
 		if(ctx.getTables() == null || ctx.getTables().size() == 0 ) {
 			return false;
 		}
 		TableConfig tc = schema.getTables().get(ctx.getTables().get(0));
 		if(tc==null ||(ctx.getTables().size() == 1 && tc.isGlobalTable())
-		) {//|| (ctx.getTables().size() == 1) && tc.getRule() == null && tc.getDataNodes().size() == 1
+				) {//|| (ctx.getTables().size() == 1) && tc.getRule() == null && tc.getDataNodes().size() == 1
 			return false;
 		} else {
 			//单表主键查询
@@ -618,7 +620,7 @@ public class DruidSelectParser extends DefaultDruidParser {
 	 * @return
 	 */
 	private boolean isNeedAddLimit(SchemaConfig schema, RouteResultset rrs,
-			MySqlSelectQueryBlock mysqlSelectQuery, Map<String, Map<String, Set<ColumnRoutePair>>> allConditions) {
+								   MySqlSelectQueryBlock mysqlSelectQuery, Map<String, Map<String, Set<ColumnRoutePair>>> allConditions) {
 //		ctx.getTablesAndConditions().get(key))
 		if(rrs.getLimitSize()>-1)
 		{
