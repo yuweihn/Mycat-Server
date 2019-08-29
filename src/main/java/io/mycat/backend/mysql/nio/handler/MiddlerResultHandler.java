@@ -15,5 +15,5 @@ public interface MiddlerResultHandler<T> {
 	List<SQLCharExpr> getResult();
 	void add(T t);
 	String getDataType();
-	void secondExecute();
+	void secondEexcute();
 }
