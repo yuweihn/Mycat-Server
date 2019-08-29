@@ -23,15 +23,6 @@
  */
 package io.mycat.backend.mysql.nio.handler;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Strings;
 import io.mycat.MycatServer;
 import io.mycat.backend.BackendConnection;
@@ -53,6 +44,14 @@ import io.mycat.statistic.stat.QueryResult;
 import io.mycat.statistic.stat.QueryResultDispatcher;
 import io.mycat.util.ResultSetUtil;
 import io.mycat.util.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * @author mycat
  */
@@ -360,7 +359,7 @@ public class SingleNodeHandler implements ResponseHandler, Terminatable, LoadDat
 		MiddlerResultHandler middlerResultHandler = session.getMiddlerResultHandler();
 
 		if(middlerResultHandler !=null ){
-			middlerResultHandler.secondExecute();
+			middlerResultHandler.secondEexcute();
 		} else{
 			//modify by zwy 2018.07
 			if(!errorRepsponsed.get()&& !session.closed()&& source.canResponse()) {
