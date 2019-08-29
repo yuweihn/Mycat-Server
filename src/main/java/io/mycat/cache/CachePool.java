@@ -23,7 +23,6 @@
  */
 package io.mycat.cache;
 
-
 /**
  * simple cache pool for implement
  * 
@@ -31,9 +30,15 @@ package io.mycat.cache;
  * 
  */
 public interface CachePool {
-	void putIfAbsent(Object key, Object value);
-	Object get(Object key);
-	void clearCache();
-	CacheStatic getCacheStatic();
-	long getMaxSize();
+
+	public void putIfAbsent(Object key, Object value);
+
+	public Object get(Object key);
+
+	public void clearCache();
+
+	public CacheStatic getCacheStatic();
+
+	public long getMaxSize();
+	public void clearCache(String cacheName);
 }

@@ -23,9 +23,7 @@
  */
 package io.mycat.cache;
 
-
 import java.util.Map;
-
 
 /**
  * Layered cache pool
@@ -34,12 +32,16 @@ import java.util.Map;
  * 
  */
 public interface LayerCachePool extends CachePool {
-	void putIfAbsent(String primaryKey, Object secondKey, Object value);
-	Object get(String primaryKey, Object secondKey);
+
+	public void putIfAbsent(String primaryKey, Object secondKey, Object value);
+
+	public Object get(String primaryKey, Object secondKey);
 
 	/**
 	 * get all cache static, name is cache name
 	 * @return map of CacheStatic
 	 */
-	Map<String, CacheStatic> getAllCacheStatic();
+	public Map<String, CacheStatic> getAllCacheStatic();
+
+	public void clearCache(String cacheName);
 }

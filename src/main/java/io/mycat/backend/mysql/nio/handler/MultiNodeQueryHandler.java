@@ -291,8 +291,8 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 			OkPacket ok = new OkPacket();
 			ok.read(data);
             //存储过程
-            boolean isCanClose2Client =(!rrs.isCallStatement()) ||(rrs.isCallStatement() &&!rrs.getProcedure().isResultSimpleValue());
-            if(!isCallProcedure)
+            boolean isCanClose2Client =(!rrs.isCallStatement()) ||(rrs.isCallStatement() &&!rrs.getProcedure().isResultSimpleValue());;
+             if(!isCallProcedure)
              {
                  if (clearIfSessionClosed(session))
                  {
@@ -432,7 +432,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
             	}
 
 				try {
-					dataMergeSvr.outputMergeResult();
+					dataMergeSvr.outputMergeResult(session, eof);
 				} catch (Exception e) {
 					handleDataProcessException(e);
 				}
@@ -481,7 +481,7 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
  				while (!this.isMiddleResultDone.compareAndSet(false, true)) {
  	                Thread.yield();
  	             }
- 				middlerResultHandler.secondExecute();
+ 				middlerResultHandler.secondEexcute();
 				isMiddleResultDone.set(false);
 			}
 		}
@@ -886,7 +886,9 @@ public class MultiNodeQueryHandler extends MultiNodeHandler implements LoadDataR
 					rowDataPkg.read(row);
 					String primaryKey = new String(rowDataPkg.fieldValues.get(primaryKeyIndex));
 					LayerCachePool pool = MycatServer.getInstance().getRouterservice().getTableId2DataNodeCache();
-					pool.putIfAbsent(priamaryKeyTable, primaryKey, dataNode);
+					if (priamaryKeyTable != null){
+						pool.putIfAbsent(priamaryKeyTable.toUpperCase(), primaryKey, dataNode);
+					}
 				}
 				if( prepared ) {
 					if(rowDataPkg==null) {
