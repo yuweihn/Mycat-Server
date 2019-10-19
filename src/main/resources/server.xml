@@ -118,8 +118,8 @@
 		<property name="schemas">dev_mycat,gateway_dev,shici_dev</property>
 		<property name="readOnly">false</property>
 	</user>
-	<user name="shici">
-		<property name="password">readonly</property>
+	<user name="shici_reader">
+		<property name="password">shicitest</property>
 		<property name="schemas">shici_prd</property>
 		<property name="readOnly">true</property>
 	</user>
