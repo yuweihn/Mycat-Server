@@ -36,6 +36,6 @@
     <dataHost name="localhost3" maxCon="200" minCon="10" balance="0"
               writeType="0" dbType="mysql" dbDriver="native" switchType="1" slaveThreshold="100" maxRetryCount="4">
         <heartbeat>select user()</heartbeat>
-        <writeHost host="hostM1" url="db-mysql.sz-wenjian.com:3307" user="shici_reader" password="shicitest"></writeHost>
+        <writeHost host="hostM1" url="db-mysql.sz-wenjian.com:3307" user="shici_prd_reader" password="shicitest"></writeHost>
     </dataHost>
 </mycat:schema>
