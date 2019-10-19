@@ -11,12 +11,15 @@
     </schema>
     <schema name="shici_dev" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn4">
     </schema>
+    <schema name="shici_prd" checkSQLschema="true" sqlMaxLimit="100" dataNode="dn5">
+    </schema>
 
     <!-- <dataNode name="dn1$0-743" dataHost="localhost1" database="db$0-743" /> -->
     <dataNode name="dn1" dataHost="localhost1" database="dev_01" />
     <dataNode name="dn2" dataHost="localhost1" database="dev_02" />
     <dataNode name="dn3" dataHost="localhost1" database="gateway_dev" />
     <dataNode name="dn4" dataHost="localhost2" database="shici_test" />
+    <dataNode name="dn5" dataHost="localhost3" database="shici_prd" />
 
     <dataHost name="localhost1" maxCon="200" minCon="10" balance="0"
               writeType="0" dbType="mysql" dbDriver="native" switchType="1" slaveThreshold="100" maxRetryCount="4">
@@ -29,5 +32,10 @@
               writeType="0" dbType="mysql" dbDriver="native" switchType="1" slaveThreshold="100" maxRetryCount="4">
         <heartbeat>select user()</heartbeat>
         <writeHost host="hostM1" url="db-mysql.sz-wenjian.com:3307" user="shici_test" password="test"></writeHost>
+    </dataHost>
+    <dataHost name="localhost3" maxCon="200" minCon="10" balance="0"
+              writeType="0" dbType="mysql" dbDriver="native" switchType="1" slaveThreshold="100" maxRetryCount="4">
+        <heartbeat>select user()</heartbeat>
+        <writeHost host="hostM1" url="db-mysql.sz-wenjian.com:3307" user="shici_reader" password="shicitest"></writeHost>
     </dataHost>
 </mycat:schema>
