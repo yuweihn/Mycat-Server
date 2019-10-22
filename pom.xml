@@ -1,5 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>io.mycat</groupId>
 	<artifactId>Mycat-server</artifactId>
@@ -10,8 +11,9 @@
 	<url>http://io.mycat</url>
 
 	<properties>
-		<app.encoding>utf-8</app.encoding>
-		<!--<buildNumber>${maven.build.timestamp}</buildNumber>-->
+		<app.encoding>UTF-8</app.encoding>
+		<!-- maven.build.timestamp.format>yyyyMMdd</maven.build.timestamp.format> 
+			<buildNumber>${maven.build.timestamp}</buildNumber      -->
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
 		<version.template.file>version.txt.template</version.template.file>
 		<version.file>version.txt</version.file>
@@ -41,11 +43,8 @@
 		</snapshotRepository>
 	</distributionManagement -->
 	<dependencies>
-		<!--<dependency>-->
-			<!--<groupId>com.google.guava</groupId>-->
-			<!--<artifactId>guava-parent</artifactId>-->
-			<!--<version>18.0</version>-->
-		<!--</dependency>-->
+		<!-- <dependency> <groupId>com.google.guava</groupId> <artifactId>guava-parent</artifactId> 
+			<version>18.0</version> </dependency> -->
 		<dependency>
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
@@ -232,12 +231,13 @@
 			<artifactId>netty-buffer</artifactId>
 			<version>4.1.9.Final</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp -->
 		<dependency>
-			<groupId>com.trilead</groupId>
-			<artifactId>trilead-ssh2</artifactId>
-			<version>1.0.0-build221</version>
-			<scope>test</scope>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>4.2.2</version>
 		</dependency>
+
 	</dependencies>
 
 

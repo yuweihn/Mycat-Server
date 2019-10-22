@@ -55,6 +55,7 @@ public class JDBCConnection implements BackendConnection {
 	private boolean isSpark = false;
 
 	private NIOProcessor processor;
+	private boolean setSchemaFail = false;
 	
 	
 	
@@ -82,6 +83,14 @@ public class JDBCConnection implements BackendConnection {
 	@Override
 	public void close(String reason) {
 		try {
+			try {
+				if (!isAutocommit()) {
+					rollback();
+					con.setAutoCommit(true);
+				}
+			}catch (Exception e){
+				LOGGER.error("close jdbc connection, found it is in transcation so try to rollback");
+			}
 			con.close();
 			if(processor!=null){
 			    processor.removeConnection(this);
@@ -295,6 +304,14 @@ public class JDBCConnection implements BackendConnection {
             syncIsolation(sc.getTxIsolation()) ;
 			if (!this.schema.equals(this.oldSchema)) {
 				con.setCatalog(schema);
+				if (!setSchemaFail) {
+                    try {
+                        con.setSchema(schema); //add@byron to test
+                    } catch (Throwable e) {
+                        LOGGER.error("JDBC setSchema Exception for " + schema, e);
+                        setSchemaFail = true;
+                    }
+                }
 				this.oldSchema = schema;
 			}
 			if (!this.isSpark) {
@@ -424,7 +441,7 @@ public class JDBCConnection implements BackendConnection {
             boolean hadResults= stmt.execute();
 
             ByteBuffer byteBuf = sc.allocate();
-            if(procedure.getSelectColumns().size()>0)
+            if(procedure.getSelectColumns().size()>0&&!procedure.isResultList())
             {
                 List<FieldPacket> fieldPks = new LinkedList<FieldPacket>();
                 for (ProcedureParameter paramter : paramters)
@@ -474,8 +491,13 @@ public class JDBCConnection implements BackendConnection {
                 for (String name : procedure.getSelectColumns())
                 {
                     ProcedureParameter procedureParameter=   procedure.getParamterMap().get(name);
-                    curRow.add(StringUtil.encode(String.valueOf(stmt.getObject(procedureParameter.getIndex())),
-                            sc.getCharset()));
+					Object object = stmt.getObject(procedureParameter.getIndex());
+					if (object != null){
+						curRow.add(StringUtil.encode(String.valueOf(object),
+								sc.getCharset()));
+					}else {
+						curRow.add(null);
+					}
                 }
 
                 curRow.packetId = ++packetId;
@@ -559,8 +581,13 @@ public class JDBCConnection implements BackendConnection {
                             RowDataPacket curRow = new RowDataPacket(colunmCount);
                             for (int i = 0; i < colunmCount; i++) {
                                 int j = i + 1;
-                                curRow.add(StringUtil.encode(rs.getString(j),
-                                        sc.getCharset()));
+								Object object1 = rs.getObject(j);
+								if (object1 == null){
+									curRow.add(null);
+								}else {
+									curRow.add(StringUtil.encode(Objects.toString(object1),
+											sc.getCharset()));
+								}
                             }
                             curRow.packetId = ++packetId;
                             byteBuf = curRow.write(byteBuf, sc, false);

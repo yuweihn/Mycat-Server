@@ -185,9 +185,19 @@ public class RouterUtil {
 		//去除sql前面的注册,如/* ApplicationName=DBeaver 6.0.1 - Main */，这个注册会导致create table出错
 		stmt = stmt.replaceFirst("\\/\\*.*\\*\\/\\s*", "");
 		final String upStmt = stmt.toUpperCase();
+		String rrsStmt = new String(upStmt);
 		if(upStmt.startsWith("CREATE")){
 			if (upStmt.contains("CREATE INDEX ") || upStmt.contains("CREATE UNIQUE INDEX ")){
 				tablename = RouterUtil.getTableName(stmt, RouterUtil.getCreateIndexPos(upStmt, 0));
+				/**
+				 * Date：2017年11月2日
+				 * @author SvenAugustus
+				修复oracle 语法不支持 drop index i_t_f on t_test，只有drop index i_t_f;
+				 */
+				if(!"oracle".equalsIgnoreCase(schema.getDefaultDataNodeDbType())){
+					int onInd = upStmt.indexOf("ON", 0);
+					rrsStmt= upStmt.substring(0, onInd);
+				}
 			}else {
 				tablename = RouterUtil.getTableName(stmt, RouterUtil.getCreateTablePos(upStmt, 0));
 			}
@@ -228,9 +238,11 @@ public class RouterUtil {
 					}  else if(isSlotFunction){
 						nodes[i].setSlot(-1);
 					}
+					nodes[i].setStatement(rrsStmt);
 				}
 				rrs.setNodes(nodes);
 			}
+			rrs.setStatement(rrsStmt);
 			return rrs;
 		}else if(schema.getDataNode()!=null){		//默认节点ddl
 			RouteResultsetNode[] nodes = new RouteResultsetNode[1];
@@ -324,8 +336,9 @@ public class RouterUtil {
 	 * @return 表名
 	 * @author AStoneGod
 	 */
-	public static String getShowTableName(String stmt, int[] repPos) {
+	public static String getShowTableName(SchemaConfig schema, String stmt, int[] repPos) {
 		int startPos = repPos[0];
+        startPos = getStartPos(stmt, startPos);
 		int secInd = stmt.indexOf(' ', startPos + 1);
 		if (secInd < 0) {
 			secInd = stmt.length();
@@ -333,8 +346,11 @@ public class RouterUtil {
 
 		repPos[1] = secInd;
 		String tableName = stmt.substring(startPos, secInd).trim();
+        if (!schema.isCheckSQLSchema()) {
+            return tableName;
+        }
 
-		int ind2 = tableName.indexOf('.');
+        int ind2 = tableName.indexOf('.');
 		if (ind2 > 0) {
 			tableName = tableName.substring(ind2 + 1);
 		}
@@ -2022,5 +2038,20 @@ public class RouterUtil {
 		return (insertStmt.getValuesList() != null && insertStmt.getValuesList().size() > 1)
 				|| insertStmt.getQuery() != null;
 	}
-
+    /**
+     * escape white spaces and get the real start position.
+     * @author kevin
+     * @param stmt  The sql statement.
+     * @param startPos  The initial start position.
+     * @return  int  The real start position.
+     */
+    private static int getStartPos(String stmt, int startPos) {
+        while (startPos < stmt.length()) {
+            if (!Character.isWhitespace(stmt.charAt(startPos))) {
+                break;
+            }
+            ++startPos;
+        }
+        return startPos;
+    }
 }
