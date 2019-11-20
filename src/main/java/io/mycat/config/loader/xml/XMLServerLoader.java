@@ -205,6 +205,7 @@ public class XMLServerLoader {
                 String passwordDecrypt = DecryptUtil.mycatDecrypt(usingDecrypt, name, password);
                 user.setName(name);
                 user.setDefaultAccount(Boolean.parseBoolean(defaultAccount));
+                user.setDefaultSchema((String)props.get("defaultSchema"));
                 user.setPassword(passwordDecrypt);
                 user.setEncryptPassword(password);
 

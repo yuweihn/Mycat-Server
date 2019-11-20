@@ -23,60 +23,81 @@
  */
 package io.mycat.backend.mysql.nio.handler;
 
+import java.util.List;
 
-import io.mycat.backend.BackendConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import io.mycat.backend.BackendConnection;
 
-
-public class SimpleLogHandler implements ResponseHandler {
-	private static final Logger LOGGER = LoggerFactory.getLogger(SimpleLogHandler.class);
-
-
+public class SimpleLogHandler implements ResponseHandler{
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(SimpleLogHandler.class);
 	@Override
 	public void connectionError(Throwable e, BackendConnection conn) {
 		LOGGER.warn(conn+" connectionError "+e);
+		
 	}
 
 	@Override
 	public void connectionAcquired(BackendConnection conn) {
-		LOGGER.info("connectionAcquired " + conn);
+		LOGGER.info("connectionAcquired "+conn);
+		
 	}
 
 	@Override
 	public void errorResponse(byte[] err, BackendConnection conn) {
-		LOGGER.warn("caught error resp: " + conn + " " + new String(err));
+		LOGGER.warn("caught error resp: " + conn + " " + bytesToHex(err));
 	}
 
 	@Override
 	public void okResponse(byte[] ok, BackendConnection conn) {
-		LOGGER.info("okResponse: " + conn );
+		LOGGER.info("okResponse: " + conn + "," + bytesToHex(ok) );
+		
 	}
 
 	@Override
-	public void fieldEofResponse(byte[] header, List<byte[]> fields, byte[] eof, BackendConnection conn) {
-		LOGGER.info("fieldEofResponse: " + conn );
+	public void fieldEofResponse(byte[] header, List<byte[]> fields,
+			byte[] eof, BackendConnection conn) {
+		LOGGER.info("fieldEofResponse : " + conn );
+		LOGGER.info("SimpleLogHandler.fieldEofResponse header: " + bytesToHex(header) );
+		for(byte[] field : fields) {
+			LOGGER.info("SimpleLogHandler.fieldEofResponse fields: " + bytesToHex(field) );
+		}
+		LOGGER.info("SimpleLogHandler.fieldEofResponse eof: " + bytesToHex(eof) );
+		
 	}
 
 	@Override
 	public void rowResponse(byte[] row, BackendConnection conn) {
 		LOGGER.info("rowResponse: " + conn );
+		System.out.println("SimpleLogHandler.rowResponse: " + bytesToHex(row) );
 	}
 
 	@Override
 	public void rowEofResponse(byte[] eof, BackendConnection conn) {
 		LOGGER.info("rowEofResponse: " + conn );
+		LOGGER.info("SimpleLogHandler.rowEofResponse: " + bytesToHex(eof) );
+
 	}
 
 	@Override
 	public void writeQueueAvailable() {
 		
+		
 	}
 
 	@Override
 	public void connectionClose(BackendConnection conn, String reason) {
+		
+		
+	}
 
+	public static String bytesToHex(byte[] bytes) {
+		StringBuilder sb = new StringBuilder();
+		for (byte b : bytes) {
+			sb.append(String.format("%02x ", b));
+		}
+		return sb.toString();
 	}
 }

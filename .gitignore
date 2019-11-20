@@ -107,9 +107,11 @@ hs_err_pid*
 /project/project/
 /project/target/
 /project/activator-*
+/logs/
 /RUNNING_PID
 .DS_Store
 /target/
+/conf/
 /datanode/datenode-af4c7d19-a629-4035-91f7-6df68607420f/57/mycat1
 /conf/ruledata/crc32slot_AUTOSLOT.properties
 /conf/ruledata/test.properties

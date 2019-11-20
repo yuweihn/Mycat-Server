@@ -23,8 +23,9 @@
  */
 package io.mycat.util;
 
-
 import io.mycat.config.util.ConfigException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.Cipher;
 import java.security.*;
@@ -34,16 +35,17 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.RSAPrivateKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-
+import java.util.Arrays;
 
 /**
  * @author songwie
  *
  */
 public class DecryptUtil {
+
 	private static final String DEFAULT_PRIVATE_KEY_STRING = "MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAocbCrurZGbC5GArEHKlAfDSZi7gFBnd4yxOt0rwTqKBFzGyhtQLu5PRKjEiOXVa95aeIIBJ6OhC2f8FjqFUpawIDAQABAkAPejKaBYHrwUqUEEOe8lpnB6lBAsQIUFnQI/vXU4MV+MhIzW0BLVZCiarIQqUXeOhThVWXKFt8GxCykrrUsQ6BAiEA4vMVxEHBovz1di3aozzFvSMdsjTcYRRo82hS5Ru2/OECIQC2fAPoXixVTVY7bNMeuxCP4954ZkXp7fEPDINCjcQDywIgcc8XLkkPcs3Jxk7uYofaXaPbg39wuJpEmzPIxi3k0OECIGubmdpOnin3HuCP/bbjbJLNNoUdGiEmFL5hDI4UdwAdAiEAtcAwbm08bKN7pwwvyqaCBC//VnEWaq39DCzxr+Z2EIk=";
 	public static final String DEFAULT_PUBLIC_KEY_STRING = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAKHGwq7q2RmwuRgKxBypQHw0mYu4BQZ3eMsTrdK8E6igRcxsobUC7uT0SoxIjl1WveWniCASejoQtn/BY6hVKWsCAwEAAQ==";
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(DecryptUtil.class);
 	public static void main(String[] args) throws Exception {
 	  System.out.println("其中 0:user:password是加密字符串,有两种格式\n"
         + "\n"
@@ -71,44 +73,45 @@ public class DecryptUtil {
 		System.out.println(encrypt(password));
 	}
 	
-	public static String mycatDecrypt(String usingDecrypt, String user, String password) {
-		if("1".equals(usingDecrypt)) {
+	public static String mycatDecrypt(String usingDecrypt,String user ,String passwrod){
+		if("1".equals(usingDecrypt)||"true".equalsIgnoreCase(usingDecrypt)){
         	//type:user:password
         	//0:test:test
         	boolean flag = false;
         	try {
-        		String passwords[] = DecryptUtil.decrypt(password).split(":");
-            	if("0".equals(passwords[0]) && user.equals(passwords[1])) {
-					flag = true;
-					return passwords[2];
+        		String passwrods[] = DecryptUtil.decrypt(passwrod).split(":");
+            	if("0".equals(passwrods[0])
+						&& user.equals(passwrods[1])){
+                        flag = true;
+            			return passwrods[2];
             	}
-            	if(flag == false) {
-            		 throw new ConfigException("user " + user + " password need to decrypt, but decrypt password is wrong!");
+            	if(flag==false){
+            		 throw new ConfigException("user " + user + " passwrod need to decrype ,but decrype password is wrong !");
             	}
         	} catch (Exception e2) {
-       		    throw new ConfigException("user " + user + " password need to decrypt, but decrypt password is wrong!", e2);
+       		    throw new ConfigException("user " + user + " passwrod need to decrype ,but decrype password is wrong !",e2);
 			}
 		}
-		return password;
+		return passwrod;
 	}
-	public static String DBHostDecrypt(String usingDecrypt, String host, String user, String password) {
-		if("1".equals(usingDecrypt)) {
+	public static String DBHostDecrypt(String usingDecrypt,String host,String user ,String passwrod){
+		if("1".equals(usingDecrypt)||"true".equalsIgnoreCase(usingDecrypt)){
 			//type:host:user:password
         	//1:myhost1:test:test
         	boolean flag = false;
         	try {
-        		String passwords[] = DecryptUtil.decrypt(password).split(":");
-            	if("1".equals(passwords[0]) && host.equals(passwords[1]) && user.equals(passwords[2])) {
-            		return passwords[3];
+        		String passwrods[] = DecryptUtil.decrypt(passwrod).split(":");
+            	if("1".equals(passwrods[0]) && host.equals(passwrods[1]) && user.equals(passwrods[2])){
+            		return passwrods[3];
             	}
-            	if(flag == false) {
-            		 throw new ConfigException("user " + user + " password need to decrypt ,but decrypt password is wrong!");
+            	if(flag==false){
+            		 throw new ConfigException("user " + user + " passwrod need to decrype ,but decrype password is wrong !");
             	}
         	} catch (Exception e2) {
-       		    throw new ConfigException("host " + host + ", user " + user + " password need to decrypt ,but decrypt password is wrong!", e2);
+       		    throw new ConfigException("host " + host + ",user " + user + " passwrod need to decrype ,but decrype password is wrong !",e2);
 			}
 		}
-		return password;
+		return passwrod;
 	}
 	
 
@@ -116,8 +119,10 @@ public class DecryptUtil {
 		return decrypt((String) null, cipherText);
 	}
 
-	public static String decrypt(String publicKeyText, String cipherText) throws Exception {
+	public static String decrypt(String publicKeyText, String cipherText)
+			throws Exception {
 		PublicKey publicKey = getPublicKey(publicKeyText);
+
 		return decrypt(publicKey, cipherText);
 	}
 
@@ -128,7 +133,8 @@ public class DecryptUtil {
 
 		try {
 			byte[] publicKeyBytes = Base64.base64ToByteArray(publicKeyText);
-			X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(publicKeyBytes);
+			X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(
+					publicKeyBytes);
 
 			KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 			return keyFactory.generatePublic(x509KeySpec);
@@ -138,7 +144,8 @@ public class DecryptUtil {
 	}
 
 
-	public static String decrypt(PublicKey publicKey, String cipherText) throws Exception {
+	public static String decrypt(PublicKey publicKey, String cipherText)
+			throws Exception {
 		Cipher cipher = Cipher.getInstance("RSA");
 		try {
 			cipher.init(Cipher.DECRYPT_MODE, publicKey);
@@ -175,7 +182,8 @@ public class DecryptUtil {
 		return encrypt(keyBytes, plainText);
 	}
 
-	public static String encrypt(byte[] keyBytes, String plainText) throws Exception {
+	public static String encrypt(byte[] keyBytes, String plainText)
+			throws Exception {
 		PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
 		KeyFactory factory = KeyFactory.getInstance("RSA");
 		PrivateKey privateKey = factory.generatePrivate(spec);
@@ -197,7 +205,8 @@ public class DecryptUtil {
 		return encryptedString;
 	}
 
-	public static byte[][] genKeyPairBytes(int keySize) throws NoSuchAlgorithmException {
+	public static byte[][] genKeyPairBytes(int keySize)
+			throws NoSuchAlgorithmException {
 		byte[][] keyPairBytes = new byte[2][];
 
 		KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
@@ -210,7 +219,8 @@ public class DecryptUtil {
 		return keyPairBytes;
 	}
 
-	public static String[] genKeyPair(int keySize) throws NoSuchAlgorithmException {
+	public static String[] genKeyPair(int keySize)
+			throws NoSuchAlgorithmException {
 		byte[][] keyPairBytes = genKeyPairBytes(keySize);
 		String[] keyPairs = new String[2];
 
@@ -221,6 +231,7 @@ public class DecryptUtil {
 	}
 	
 	static class Base64 {
+
 	    /**
 	     * Translates the specified byte array into a Base64 string as per Preferences.put(byte[]).
 	     */
@@ -281,10 +292,10 @@ public class DecryptUtil {
 	     * This array is a lookup table that translates 6-bit positive integer index values into their "Base64 Alphabet"
 	     * equivalents as specified in Table 1 of RFC 2045.
 	     */
-	    private static final char intToBase64[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+	    private static final char intToBase64[]    = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
 	            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
 	            'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2',
-	            '3', '4', '5', '6', '7', '8', '9', '+', '/'};
+	            '3', '4', '5', '6', '7', '8', '9', '+', '/' };
 
 	    /**
 	     * This array is a lookup table that translates 6-bit positive integer index values into their
@@ -292,10 +303,10 @@ public class DecryptUtil {
 	     * alternate alphabet does not use the capital letters. It is designed for use in environments where "case folding"
 	     * occurs.
 	     */
-	    private static final char intToAltBase64[] = {'!', '"', '#', '$', '%', '&', '\'', '(', ')', ',', '-', '.', ':',
+	    private static final char intToAltBase64[] = { '!', '"', '#', '$', '%', '&', '\'', '(', ')', ',', '-', '.', ':',
 	            ';', '<', '>', '@', '[', ']', '^', '`', '_', '{', '|', '}', '~', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
 	            'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2',
-	            '3', '4', '5', '6', '7', '8', '9', '+', '?'};
+	            '3', '4', '5', '6', '7', '8', '9', '+', '?' };
 
 	    /**
 	     * Translates the specified Base64 string (as per Preferences.get(byte[])) into a byte array.
@@ -383,21 +394,22 @@ public class DecryptUtil {
 	     * Table 1 of RFC 2045) into their 6-bit positive integer equivalents. Characters that are not in the Base64
 	     * alphabet but fall within the bounds of the array are translated to -1.
 	     */
-	    private static final byte base64ToInt[] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	    private static final byte base64ToInt[]    = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 	            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62,
 	            -1, -1, -1, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7,
 	            8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, -1, 26, 27, 28,
-	            29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51};
+	            29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 };
 
 	    /**
 	     * This array is the analogue of base64ToInt, but for the nonstandard variant that avoids the use of uppercase
 	     * alphabetic characters.
 	     */
-	    private static final byte altBase64ToInt[] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	    private static final byte altBase64ToInt[] = { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 	            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, -1, 62, 9, 10,
 	            11, -1, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 12, 13, 14, -1, 15, 63, 16, -1, -1, -1, -1, -1, -1, -1, -1,
 	            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 17, -1, 18, 19, 21, 20, 26, 27, 28,
-	            29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 22, 23, 24, 25};
+	            29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 22, 23, 24, 25 };
 
 	}
+
 }
