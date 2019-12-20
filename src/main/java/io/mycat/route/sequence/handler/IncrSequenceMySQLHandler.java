@@ -22,33 +22,18 @@ import io.mycat.net.mysql.RowDataPacket;
 import io.mycat.route.RouteResultsetNode;
 import io.mycat.route.util.PropertiesUtil;
 import io.mycat.server.parser.ServerParse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
-
 
 public class IncrSequenceMySQLHandler implements SequenceHandler {
-	protected static final Logger LOGGER = LoggerFactory.getLogger(IncrSequenceMySQLHandler.class);
+
+	protected static final Logger LOGGER = LoggerFactory
+			.getLogger(IncrSequenceMySQLHandler.class);
 
 	private static final String SEQUENCE_DB_PROPS = "sequence_db_conf.properties";
 	protected static final String errSeqResult = "-999999,null";
 	protected static final String errlockSeqResult = "0,0"; //数据库lock失败 返回0, 0
 
 	protected static Map<String, String> latestErrors = new ConcurrentHashMap<String, String>();
-	private final FetchMySQLSequenceHandler mysqlSeqFetcher = new FetchMySQLSequenceHandler();
-
-	/**
-	 * save sequence -> curVal
-	 */
-	private ConcurrentHashMap<String, SequenceVal> seqValueMap = new ConcurrentHashMap<String, SequenceVal>();
-
+	private final FetchMySQLSequnceHandler mysqlSeqFetcher = new FetchMySQLSequnceHandler();
 
 	private static class IncrSequenceMySQLHandlerHolder {
 		private static final IncrSequenceMySQLHandler instance = new IncrSequenceMySQLHandler();
@@ -59,11 +44,12 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 	}
 
 	public IncrSequenceMySQLHandler() {
+
 		load();
 	}
 	//加载配置文件
 	public void load() {
-		// load sequence properties
+		// load sequnce properties
 		Properties props = PropertiesUtil.loadProps(SEQUENCE_DB_PROPS);
 		removeDesertedSequenceVals(props);
 		putNewSequenceVals(props);
@@ -71,7 +57,8 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 
 	//移除旧的配置
 	private void removeDesertedSequenceVals(Properties props) {
-		Iterator<Map.Entry<String, SequenceVal>> i = seqValueMap.entrySet().iterator();
+		Iterator<Map.Entry<String, SequenceVal>> i = seqValueMap.entrySet()
+				.iterator();
 		while (i.hasNext()) {
 			Map.Entry<String, SequenceVal> entry = i.next();
 			if (!props.containsKey(entry.getKey())) {
@@ -81,7 +68,7 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 	}
 
 	private void putNewSequenceVals(Properties props) {
-		for (Map.Entry<Object, Object> entry: props.entrySet()) {
+		for (Map.Entry<Object, Object> entry : props.entrySet()) {
 			String seqName = (String) entry.getKey();
 			String dataNode = (String) entry.getValue();
 			if (!seqValueMap.containsKey(seqName)) {
@@ -92,11 +79,17 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 		}
 	}
 
+	/**
+	 * save sequnce -> curval
+	 */
+	private ConcurrentHashMap<String, SequenceVal> seqValueMap = new ConcurrentHashMap<String, SequenceVal>();
+
 	@Override
 	public long nextId(String seqName) {
 		SequenceVal seqVal = seqValueMap.get(seqName);
 		if (seqVal == null) {
-			throw new ConfigException("can't find definition for sequence: " + seqName);
+			throw new ConfigException("can't find definition for sequence :"
+					+ seqName);
 		}
 		if (!seqVal.isSuccessFetched()) {
 			//从数据库获取
@@ -105,6 +98,7 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 			//已经设置 获取下一个有效id
 			return getNextValidSeqVal(seqVal);
 		}
+
 	}
 	//获取有效的sequence
 	private Long getNextValidSeqVal(SequenceVal seqVal) {
@@ -120,19 +114,20 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 
 	//在这边用锁。
 	/*
-	 * 1.尝试获取fetching锁，
-	 *    成功：
+	 * 1.尝试获取fetching锁， 
+	 *    成功： 
 	 *       再次判断下一个值是否有效，有效直接返回
 	 *       否则 调用waitFinish请求后端的请求
 	 *     失败：
 	 *        进行等待，等待一定次数 尝试从数据库获取
 	 *             别的后端请求已经成功获取，调用getNextValidSeqVal获取下一个可用值
-	 *
-	 *
+	 *  
+	 * 
 	 * */
 	private long getSeqValueFromDB(SequenceVal seqVal) {
 		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("get next segment of sequence from db for sequence: " + seqVal.seqName + " curVal " + seqVal.curVal);
+			LOGGER.debug("get next segement of sequence from db for sequnce:"
+					+ seqVal.seqName + " curVal " + seqVal.curVal);
 		}
 		//设置正在获取
 		boolean isLock = seqVal.fetching.compareAndSet(false, true);
@@ -143,8 +138,8 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 //			seqVal.newValueSetted.set(false);
 //			seqVal.successFetched = false; //添加代码
 //			mysqlSeqFetcher.execute(seqVal);
-//			isLock = true;
-//		}
+//			isLock = true;			
+//		}		
 		if(isLock) {
 			//判断当前的是否有效。
 			if(seqVal.successFetched == true) {
@@ -154,26 +149,26 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 					return nexVal;
 				}
 			}
-
+						
 			//发起请求sql 等待到返回  或者进行
 			Long[] values = seqVal.waitFinish( mysqlSeqFetcher, 1, true); //只有一个线程可以进 并且有重试机制。
 			if (values == null) {
-
+				
 				throw new RuntimeException("can't fetch sequnce in db,sequnce :"
 						+ seqVal.seqName + " detail:"
 						+ mysqlSeqFetcher.getLastestError(seqVal.seqName));
 			} else {
-					seqVal.setCurValue(values[0]);
+					seqVal.setCurValue(values[0]); 
 					seqVal.maxSegValue = values[1];
 					seqVal.successFetched = true; //设置successFetched
 					return values[0];
-
+			
 			}
 		} else {
 			long count = 0 ;
 			//正在获取 ，或者还未返回
 			while(seqVal.fetching.get() || seqVal.successFetched == false){
-				try {
+				try {										
 					Thread.sleep(10);
 					if(++count > 10000L) {
 						return this.getSeqValueFromDB(seqVal);
@@ -184,30 +179,33 @@ public class IncrSequenceMySQLHandler implements SequenceHandler {
 				}
 			}
 			return this.getNextValidSeqVal(seqVal);
-		}
+		}	
 
 	}
 }
 
-class FetchMySQLSequenceHandler implements ResponseHandler {
-	private static final Logger LOGGER = LoggerFactory.getLogger(FetchMySQLSequenceHandler.class);
+class FetchMySQLSequnceHandler implements ResponseHandler {
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(FetchMySQLSequnceHandler.class);
 
 	public void execute(SequenceVal seqVal) {
 		MycatConfig conf = MycatServer.getInstance().getConfig();
 		PhysicalDBNode mysqlDN = conf.getDataNodes().get(seqVal.dataNode);
 		try {
 			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("execute in datanode " + seqVal.dataNode + " for fetch sequence sql " + seqVal.sql);
+				LOGGER.debug("execute in datanode " + seqVal.dataNode
+						+ " for fetch sequnce sql " + seqVal.sql);
 			}
 			// 修正获取seq的逻辑，在读写分离的情况下只能走写节点。修改Select模式为Update模式。
-			mysqlDN.getConnection(mysqlDN.getDatabase(), true
-					, new RouteResultsetNode(seqVal.dataNode, ServerParse.UPDATE, seqVal.sql)
-					, this, seqVal);
+			mysqlDN.getConnection(mysqlDN.getDatabase(), true,
+					new RouteResultsetNode(seqVal.dataNode, ServerParse.UPDATE,
+							seqVal.sql), this, seqVal);
 		} catch (Exception e) {
 			seqVal.dbfinished = true;
 
 			LOGGER.warn("get connection err " + e);
 		}
+
 	}
 
 	public String getLastestError(String seqName) {
@@ -216,6 +214,7 @@ class FetchMySQLSequenceHandler implements ResponseHandler {
 
 	@Override
 	public void connectionAcquired(BackendConnection conn) {
+
 		conn.setResponseHandler(this);
 		try {
 			//发起sql请求
@@ -230,6 +229,7 @@ class FetchMySQLSequenceHandler implements ResponseHandler {
 	public void connectionError(Throwable e, BackendConnection conn) {
 		((SequenceVal) conn.getAttachment()).dbfinished = true;
 		LOGGER.warn("connectionError " + e);
+
 	}
 	//返回错误结果处理
 	@Override
@@ -243,6 +243,7 @@ class FetchMySQLSequenceHandler implements ResponseHandler {
 		LOGGER.warn("errorResponse " + err.errno + " " + errMsg);
 		IncrSequenceMySQLHandler.latestErrors.put(seqVal.seqName, errMsg);
 		conn.release();
+
 	}
 
 	@Override
@@ -253,8 +254,9 @@ class FetchMySQLSequenceHandler implements ResponseHandler {
 //			((SequenceVal) conn.getAttachment()).dbfinished = true;
 			conn.release();
 		}
+
 	}
-	//获取一行的数据
+	//获取一行的数据 
 	@Override
 	public void rowResponse(byte[] row, BackendConnection conn) {
 		RowDataPacket rowDataPkg = new RowDataPacket(1);
@@ -273,7 +275,7 @@ class FetchMySQLSequenceHandler implements ResponseHandler {
 	//结果集合接受完毕
 	@Override
 	public void rowEofResponse(byte[] eof, BackendConnection conn) {
-		SequenceVal sequenceVal = (SequenceVal) conn.getAttachment();
+		SequenceVal sequenceVal = ((SequenceVal) conn.getAttachment());
 		conn.release();
 //		sequenceVal.dbfinished = true;
 		sequenceVal.setDbfinished();
@@ -286,8 +288,8 @@ class FetchMySQLSequenceHandler implements ResponseHandler {
 		String errMgs=e.toString();
 		LOGGER.error("{}",e);
 		IncrSequenceMySQLHandler.latestErrors.put(seqVal.seqName, errMgs);
-		LOGGER.warn("executeException: " + errMgs);
-		c.close("exception: " + errMgs);
+		c.close("exception:" +errMgs);
+
 	}
 
 	@Override
@@ -303,13 +305,16 @@ class FetchMySQLSequenceHandler implements ResponseHandler {
 	}
 
 	@Override
-	public void fieldEofResponse(byte[] header, List<byte[]> fields, byte[] eof, BackendConnection conn) {
+	public void fieldEofResponse(byte[] header, List<byte[]> fields,
+			byte[] eof, BackendConnection conn) {
+
 	}
+
 }
 
 class SequenceVal {
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(FetchMySQLSequenceHandler.class);
+			.getLogger(FetchMySQLSequnceHandler.class);
 //	public AtomicBoolean newValueSetted = new AtomicBoolean(false);
 	public AtomicLong curVal = new AtomicLong(0); //当前可用的id
 	public volatile long maxSegValue; //最大的可用id
@@ -323,7 +328,7 @@ class SequenceVal {
 	public final String sql;//请求分片的sql SELECT mycat_seq_nextval('tableName');
 	//初始化
 	public void reset(){
-
+		
 		dbretVal = null;
 		dbfinished = false;
 //		newValueSetted.set(false);
@@ -331,7 +336,7 @@ class SequenceVal {
 
 	}
 	//设置成功返回
-	public void setDbfinished() {
+	public void setDbfinished() {	
 		dbfinished = true;
 	}
 	//
@@ -342,7 +347,11 @@ class SequenceVal {
 	}
 	//nexVal是否可以用的判断
 	public boolean isNexValValid(Long nexVal) {
-        return nexVal < this.maxSegValue;
+		if (nexVal < this.maxSegValue) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	//设置当前的可用值。
@@ -351,21 +360,21 @@ class SequenceVal {
 	}
 	// 重试次数 保证最大可能性的获取到。
 	/*
-	 *1.后端获取序列
+	 *1.后端获取序列 
 	 *  如果返回的结果为超时，异常，尝试数据库重试获取
 	 *     返回的为0，0   尝试数据库重试获取
 	 *     结果还未返回，调用函数继续等待
 	 *  成功返回则正常返回
 	 * */
-	public Long[] waitFinish(FetchMySQLSequenceHandler mysqlSeqFetcher, int retryCount, boolean canSendFetch) {
+	public Long[] waitFinish(FetchMySQLSequnceHandler mysqlSeqFetcher, int retryCount, boolean canSendFetch) {
 		final int systemRetryCount = MycatServer.getInstance().getConfig().getSystem().getSequnceMySqlRetryCount();
 		//进入waitFinish小于4次，或者可以后端获取数据
 		if(retryCount <= systemRetryCount && canSendFetch) {
-
+			
 			this.reset();
 			mysqlSeqFetcher.execute(this);
 		} else if(retryCount > systemRetryCount){
-			fetching.compareAndSet(true, false); //
+			fetching.compareAndSet(true, false); //	
 			return null;
 		}
 		long start = System.currentTimeMillis();
@@ -373,10 +382,10 @@ class SequenceVal {
 		long mysqlWaitTime = MycatServer.getInstance().getConfig().getSystem().getSequnceMySqlWaitTime();
 
 		long end = start + mysqlWaitTime;
-		while (System.currentTimeMillis() < end) {
+		while (System.currentTimeMillis() < end) {			
 			if(dbfinished){
 				if (dbretVal == IncrSequenceMySQLHandler.errSeqResult) {
-					fetching.compareAndSet(true, false); //修改
+					fetching.compareAndSet(true, false); //修改					
 					throw new java.lang.RuntimeException(
 							"sequnce not found in db table ");
 				}
@@ -391,7 +400,7 @@ class SequenceVal {
 					return waitFinish(mysqlSeqFetcher, ++retryCount , true);
 				}
 				String[] items = dbretVal.split(",");
-
+				
 				Long curVal = Long.parseLong(items[0]);
 				int span = Integer.parseInt(items[1]);
 				//处理返回0，0
@@ -402,7 +411,7 @@ class SequenceVal {
 					//数据库之类的连接错误，休息一下在重试。
 					sleep(100);
 					return waitFinish(mysqlSeqFetcher, ++retryCount, true);
-				}
+				}			
 				fetching.compareAndSet(true, false); //修改s
 				return new Long[] { curVal, curVal + span };
 			} else{
@@ -430,7 +439,8 @@ class SequenceVal {
 	//下一个可用的id
 	public long nextValue() {
 		if (successFetched == false) {
-			throw new java.lang.RuntimeException("sequence fetched failed  from db ");
+			throw new java.lang.RuntimeException(
+					"sequnce fetched failed  from db ");
 		}
 		return curVal.incrementAndGet();
 	}

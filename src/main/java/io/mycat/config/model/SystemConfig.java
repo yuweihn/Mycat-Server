@@ -44,6 +44,10 @@ public final class SystemConfig {
 	private static final short DEFAULT_BUFFER_CHUNK_SIZE = 4096;
 	private static final int DEFAULT_BUFFER_POOL_PAGE_SIZE = 512 * 1024 * 4;
 	private static final short DEFAULT_BUFFER_POOL_PAGE_NUMBER = 64;
+
+
+
+	private int removeGraveAccent;
 	private int processorBufferLocalPercent;
 	private static final int DEFAULT_PROCESSORS = Runtime.getRuntime().availableProcessors();
 	private int frontSocketSoRcvbuf = 1024 * 1024;
@@ -309,6 +313,7 @@ public final class SystemConfig {
 		this.maxPreparedStmtCount = DEFAULT_MAX_PREPAREDSTMT_COUNT;
 		this.ignoreUnknownCommand = 0;
 		this.parallExecute = 0;
+		this.removeGraveAccent = 1;
 	}
 
 	public void setMaxPreparedStmtCount(int maxPreparedStmtCount){
@@ -929,6 +934,7 @@ public final class SystemConfig {
 				+ ", mycatNodeId=" + mycatNodeId
 				+ ",ignoreUnknownCommand="+ignoreUnknownCommand
 				+ ",parallExecute="+parallExecute
+				+ ",removeGraveAccent="+ removeGraveAccent
 				+ "]";
 	}
 
@@ -1041,5 +1047,12 @@ public final class SystemConfig {
 
 	public void setParallExecute(int parallExecute) {
 		this.parallExecute = parallExecute;
+	}
+
+	public int getRemoveGraveAccent() {
+		return removeGraveAccent;
+	}
+	public void setRemoveGraveAccent(int removeGraveAccent) {
+		this.removeGraveAccent = removeGraveAccent;
 	}
 }
